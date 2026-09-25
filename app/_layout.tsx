@@ -20,9 +20,15 @@ import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-import { startSessionListener, useSessionStore } from '@/features/auth';
+import { QueryClientProvider } from '@tanstack/react-query';
+
+import { Button, ErrorState } from '@/components';
+import { useAppRoute } from '@/features/account';
+import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
+import { t } from '@/i18n';
+import { queryClient } from '@/lib/query/queryClient';
 import { palette, useApplyThemePreference, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -60,7 +66,7 @@ export default function RootLayout() {
   }, [colors.background]);
 
   useEffect(() => startSessionListener(), []);
-  const { session, initialized, recovering } = useSessionStore();
+  const { session, initialized } = useSessionStore();
   const ready = (fontsLoaded || Boolean(fontError)) && initialized;
 
   useEffect(() => {
@@ -68,32 +74,65 @@ export default function RootLayout() {
   }, [ready]);
 
   if (!ready) return null;
-  const signedIn = session !== null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <ThemeProvider value={navigationTheme(scheme)}>
-          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-          {/* Guards decide what is reachable; when one flips (sign in, sign out, reset code
-              accepted) Expo Router redirects to the first allowed route, which index.tsx resolves. */}
-          <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
-            <Stack.Screen name="index" />
-            <Stack.Protected guard={!signedIn}>
-              <Stack.Screen name="(auth)" />
-            </Stack.Protected>
-            <Stack.Protected guard={signedIn && recovering}>
-              <Stack.Screen name="new-password" />
-            </Stack.Protected>
-            <Stack.Protected guard={signedIn && !recovering}>
-              <Stack.Screen name="(app)" />
-            </Stack.Protected>
-            <Stack.Protected guard={__DEV__}>
-              <Stack.Screen name="design-system" />
-            </Stack.Protected>
-          </Stack>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider value={navigationTheme(scheme)}>
+            <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+            <RootNavigator signedIn={session !== null} />
+          </ThemeProvider>
+        </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
+  );
+}
+
+/**
+ * Guards decide what is reachable. When one flips (sign in, sign out, reset code accepted,
+ * onboarding finished) Expo Router redirects to the first allowed route, which index.tsx resolves.
+ */
+function RootNavigator({ signedIn }: { signedIn: boolean }) {
+  const { route, retry } = useAppRoute();
+
+  // Never show one user's cached data to the next.
+  useEffect(() => {
+    if (!signedIn) queryClient.clear();
+  }, [signedIn]);
+
+  if (route === 'loading') return null;
+  if (route === 'error') {
+    return (
+      <SafeAreaView className="flex-1 justify-center gap-2 bg-background px-5">
+        <ErrorState onRetry={retry} />
+        <Button
+          variant="ghost"
+          label={t('auth.signOut')}
+          onPress={() => signOut().catch(() => undefined)}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+      <Stack.Screen name="index" />
+      <Stack.Protected guard={route === 'welcome'}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+      <Stack.Protected guard={route === 'new-password'}>
+        <Stack.Screen name="new-password" />
+      </Stack.Protected>
+      <Stack.Protected guard={route === 'onboarding'}>
+        <Stack.Screen name="(onboarding)" />
+      </Stack.Protected>
+      <Stack.Protected guard={route === 'home'}>
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+      <Stack.Protected guard={__DEV__}>
+        <Stack.Screen name="design-system" />
+      </Stack.Protected>
+    </Stack>
   );
 }
