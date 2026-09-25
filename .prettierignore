@@ -1,0 +1,7 @@
+prototype/
+node_modules/
+.expo/
+dist/
+coverage/
+package-lock.json
+CLAUDE.md

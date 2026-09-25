@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Keep in sync with src/theme/tokens.ts (enforced by tokens.test.ts). Values are RGB channels. */
+:root {
+  --background: 249 247 244;
+  --foreground: 31 41 55;
+  --card: 255 255 255;
+  --primary: 245 158 11;
+  --primary-foreground: 255 255 255;
+  --muted: 243 244 246;
+  --muted-foreground: 107 114 128;
+  --accent: 254 243 199;
+  --accent-foreground: 146 64 14;
+  --destructive: 239 68 68;
+  --border: 0 0 0;
+  --border-alpha: 0.08;
+}
+
+.dark:root {
+  --background: 15 23 42;
+  --foreground: 249 250 251;
+  --card: 30 41 59;
+  --primary: 245 158 11;
+  --primary-foreground: 255 255 255;
+  --muted: 30 41 59;
+  --muted-foreground: 148 163 184;
+  --accent: 45 26 0;
+  --accent-foreground: 253 230 138;
+  --destructive: 239 68 68;
+  --border: 255 255 255;
+  --border-alpha: 0.08;
+}
