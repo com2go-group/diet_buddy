@@ -83,9 +83,15 @@ npm run lint              # eslint + prettier check
 npm run format            # prettier --write
 npm run typecheck         # tsc --noEmit
 npx expo export --platform ios --platform android   # bundle check without a device
-npx supabase start        # local backend (from Phase 1 item 4)
+npm run db:start          # local Supabase stack (needs Docker Desktop)
+npm run db:reset          # re-apply migrations + seed.sql
+npm run db:test           # pgTAP tests in supabase/tests (local stack)
+npm run db:test:plain     # same tests on plain Postgres + pgTAP, no Docker (DATABASE_URL)
+npm run db:types          # regenerate src/lib/supabase/database.types.ts after a migration
 npx supabase functions serve
 ```
+
+Backend setup, the access model and the no-Docker test path are in `docs/backend.md`. Every migration that changes personal data must update `docs/data-inventory.md` and add pgTAP tests.
 
 Expo SDK 57 (React Native 0.86, React 19.2, TypeScript 6). Install native packages with `npx expo install <pkg>` so versions match the SDK; if Expo's API is unreachable, pin the version listed in `node_modules/expo/bundledNativeModules.json`.
 
@@ -381,3 +387,7 @@ Ask the owner before making these choices; record answers in the decision log.
 | 2026-09-25 | Free-tier coach limit: 5 messages/day, stored in server config (not hardcoded in the app) | Easy to tune without an app release |
 | 2026-09-25 | LLM: Claude via Supabase Edge Functions, behind a provider adapter so it can be swapped | Owner approved; keeps provider choice reversible |
 | 2026-09-25 | Nutrition interpretation choices (fast pace scaling, recomposition rule, protein reference weight, water, fiber, body-fat formula) | Listed in `docs/nutrition-model.md` for owner review |
+| 2026-09-25 | Server-owned data is read-only to the app via column/table privileges: `is_premium`, `xp`, `streak_days`, meal plans, coach messages, achievements unlocked, ad unlocks. XP/streak/weight-trend/consent-audit logic runs in database triggers | Anti-tamper (§7.15) and one place for the rules; see `docs/backend.md` |
+| 2026-09-25 | Schema additions beyond §10: `profiles.onboarding_step` (resume), `goals.motivation_other`, `consent_events` (GDPR audit trail), `app_config` (tunable limits), `ai_usage` (token logging, §11), `body_metrics.checkin_id` (check-in weight → trend) | Needed by §7.2, §7.9, §11, §13 |
+| 2026-09-25 | "Clean Eater" copy is "5 days within your calorie target" (prototype said "under") | Don't reward undereating (§9) |
+| 2026-09-25 | Owner has no Supabase project yet; schema is built and tested locally, hosted project to be created before auth goes live (steps in `docs/backend.md`) | Unblocks Phase 1 without an account |
