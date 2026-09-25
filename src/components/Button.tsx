@@ -63,9 +63,10 @@ export function Button({
         if (hapticOnPress) haptics.success();
         onPress?.(e);
       }}
-      style={({ pressed }) => ({
+      // A plain object, not a style function: NativeWind drops style functions on components that
+      // also take className. Press feedback comes from the active: class instead.
+      style={{
         minHeight: MIN_TOUCH_TARGET,
-        transform: [{ scale: pressed ? 0.98 : 1 }],
         opacity: isDisabled ? 0.5 : 1,
         ...(variant === 'primary' && !isDisabled
           ? {
@@ -76,9 +77,9 @@ export function Button({
               elevation: 6,
             }
           : null),
-      })}
+      }}
       className={cn(
-        'flex-row items-center justify-center gap-2 overflow-hidden rounded-lg px-5',
+        'flex-row items-center justify-center gap-2 overflow-hidden rounded-lg px-5 active:opacity-80',
         size === 'lg' ? 'py-4' : 'py-3',
         fullWidth && 'w-full',
         containers[variant],
