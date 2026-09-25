@@ -2,15 +2,25 @@
 -- Security-definer functions pin search_path and are not executable by app roles.
 
 -- ─── New auth user → profile ────────────────────────────────────────────────
+-- Copies name and birth date from sign-up metadata. The birth date passes through the age gate
+-- below, so an under-18 sign-up fails as a whole and no account is created (CLAUDE.md §9).
+-- Apple/Google sign-ups carry no birth date; onboarding collects it.
 create function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  meta jsonb := coalesce(new.raw_user_meta_data, '{}');
+  raw_birth_date text := meta ->> 'birth_date';
 begin
-  insert into public.profiles (user_id, name)
-  values (new.id, nullif(left(trim(new.raw_user_meta_data ->> 'name'), 80), ''));
+  insert into public.profiles (user_id, name, birth_date)
+  values (
+    new.id,
+    nullif(left(trim(coalesce(meta ->> 'name', meta ->> 'full_name')), 80), ''),
+    case when raw_birth_date ~ '^\d{4}-\d{2}-\d{2}$' then raw_birth_date::date end
+  );
   return new;
 end;
 $$;

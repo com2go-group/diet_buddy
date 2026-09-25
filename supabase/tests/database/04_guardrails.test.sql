@@ -11,6 +11,20 @@ select is((select name from public.profiles where user_id = '11111111-1111-1111-
 select is((select name from public.profiles where user_id = '22222222-2222-2222-2222-222222222222'),
   null, 'sign-up without a name leaves it empty');
 
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('33333333-3333-3333-3333-333333333333', 'c@example.com', '{"full_name":"Casey G","birth_date":"1990-05-17"}');
+select is((select birth_date from public.profiles where user_id = '33333333-3333-3333-3333-333333333333'),
+  date '1990-05-17', 'sign-up copies the birth date from metadata');
+select is((select name from public.profiles where user_id = '33333333-3333-3333-3333-333333333333'),
+  'Casey G', 'Google-style full_name metadata is used when name is absent');
+select throws_ok(
+  format($$ insert into auth.users (id, email, raw_user_meta_data)
+            values ('44444444-4444-4444-4444-444444444444', 'd@example.com', '{"birth_date":"%s"}') $$,
+         (current_date - interval '17 years')::date),
+  '23514', null, 'an under-18 sign-up is rejected and no account is created');
+select is_empty($$ select 1 from auth.users where id = '44444444-4444-4444-4444-444444444444' $$,
+  'the rejected under-18 user does not exist');
+
 set local role authenticated;
 set local request.jwt.claims to '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
 
