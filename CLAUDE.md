@@ -91,7 +91,7 @@ npm run db:types          # regenerate src/lib/supabase/database.types.ts after 
 npx supabase functions serve
 ```
 
-Backend setup, the access model and the no-Docker test path are in `docs/backend.md`. Every migration that changes personal data must update `docs/data-inventory.md` and add pgTAP tests.
+Backend setup, the access model and the no-Docker test path are in `docs/backend.md`; auth providers and their setup in `docs/auth.md`. Every migration that changes personal data must update `docs/data-inventory.md` and add pgTAP tests.
 
 Expo SDK 57 (React Native 0.86, React 19.2, TypeScript 6). Install native packages with `npx expo install <pkg>` so versions match the SDK; if Expo's API is unreachable, pin the version listed in `node_modules/expo/bundledNativeModules.json`.
 
@@ -375,6 +375,8 @@ Ask the owner before making these choices; record answers in the decision log.
 6. ~~Gender options beyond male/female and how BMR handles them.~~ Decided 2026-09-25.
 7. Human coaching: in scope or not.
 8. Whether the Lifetime plan stays (it creates long-term AI cost with no recurring revenue).
+9. SMS provider for phone verification (Twilio, MessageBird, Vonage…) and its budget.
+10. Transactional email provider for verification codes (Resend, Postmark, SES…), ideally EU.
 
 ## 18. Decision log
 
@@ -391,3 +393,9 @@ Ask the owner before making these choices; record answers in the decision log.
 | 2026-09-25 | Schema additions beyond §10: `profiles.onboarding_step` (resume), `goals.motivation_other`, `consent_events` (GDPR audit trail), `app_config` (tunable limits), `ai_usage` (token logging, §11), `body_metrics.checkin_id` (check-in weight → trend) | Needed by §7.2, §7.9, §11, §13 |
 | 2026-09-25 | "Clean Eater" copy is "5 days within your calorie target" (prototype said "under") | Don't reward undereating (§9) |
 | 2026-09-25 | Owner has no Supabase project yet; schema is built and tested locally, hosted project to be created before auth goes live (steps in `docs/backend.md`) | Unblocks Phase 1 without an account |
+| 2026-09-25 | App identifier `com.com2go.dietbuddy` (iOS bundle ID and Android package); project name stays `diet-buddy` | Owner chose "diet-buddy"; store IDs must be reverse-DNS and Android disallows hyphens |
+| 2026-09-25 | Sign-up verification: user picks Email or Phone; 6-digit code by email or SMS typed into the app; email confirmation required. Apple/Google skip it (provider-verified) | Owner decision; codes avoid deep-link problems on mobile |
+| 2026-09-25 | Date of birth collected at sign-up and enforced by the database when the account is created; Apple/Google users give it in onboarding | 18+ age gate "at signup" (§9) that can't be bypassed via the API |
+| 2026-09-25 | Sign in with Apple on iOS only; Google via `@react-native-google-signin/google-signin`; both through `signInWithIdToken`. Buttons appear only when configured | Native flows; Apple requires its button on iOS alongside Google |
+| 2026-09-25 | Sign-up subtitle "Free to start. No credit card required." replaces the prototype's "Start your 7-day free trial today" | The trial belongs to Premium; promising it at sign-up would mislead (store rules, §12) |
+| 2026-09-25 | Added dependencies for auth: `@supabase/supabase-js`, `react-hook-form`, `zod`, `@hookform/resolvers`, `expo-apple-authentication`, `expo-crypto`, `@react-native-google-signin/google-signin` | Implement the §3 stack's auth and forms choices |
