@@ -36,7 +36,7 @@ export function SegmentedControl<T extends string>({
             key={option.value}
             accessibilityRole="tab"
             accessibilityLabel={option.label}
-            accessibilityState={{ selected }}
+            aria-selected={selected}
             onPress={() => {
               if (selected) return;
               haptics.selection();

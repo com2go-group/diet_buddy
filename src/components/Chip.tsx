@@ -29,7 +29,7 @@ export function Chip({
     <Pressable
       accessibilityRole={selectionRole}
       accessibilityLabel={label}
-      accessibilityState={selectionRole === 'radio' ? { selected } : { checked: selected }}
+      aria-checked={selected}
       onPress={(e) => {
         haptics.selection();
         onPress?.(e);

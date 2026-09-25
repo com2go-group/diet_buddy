@@ -57,7 +57,8 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      aria-disabled={isDisabled}
+      aria-busy={loading}
       disabled={isDisabled}
       onPress={(e) => {
         if (hapticOnPress) haptics.success();

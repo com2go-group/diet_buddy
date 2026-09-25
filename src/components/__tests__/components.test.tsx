@@ -26,9 +26,9 @@ describe('Chip', () => {
     expect(screen.getByRole('checkbox', { name: 'Vegan' })).toBeChecked();
   });
 
-  it('exposes selected state for single-select', async () => {
+  it('exposes checked state for single-select', async () => {
     await render(<Chip label="Balanced" selectionRole="radio" selected={false} />);
-    expect(screen.getByRole('radio', { name: 'Balanced' })).not.toBeSelected();
+    expect(screen.getByRole('radio', { name: 'Balanced' })).not.toBeChecked();
   });
 });
 

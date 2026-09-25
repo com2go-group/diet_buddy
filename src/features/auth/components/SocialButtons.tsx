@@ -23,7 +23,7 @@ export function SocialButtons({ apple, google, busy, onApple, onGoogle }: Social
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('auth.appleA11y')}
-          accessibilityState={{ disabled: busy }}
+          aria-disabled={busy}
           disabled={busy}
           onPress={onApple}
           style={{ minHeight: MIN_TOUCH_TARGET + 6 }}
@@ -39,7 +39,7 @@ export function SocialButtons({ apple, google, busy, onApple, onGoogle }: Social
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('auth.googleA11y')}
-          accessibilityState={{ disabled: busy }}
+          aria-disabled={busy}
           disabled={busy}
           onPress={onGoogle}
           style={{ minHeight: MIN_TOUCH_TARGET + 6 }}
