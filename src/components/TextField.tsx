@@ -17,12 +17,14 @@ export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
   password?: boolean;
   /** Optional link or action shown to the right of the label, e.g. "Forgot password?". */
   labelAction?: React.ReactNode;
+  /** Content inside the field after the text, e.g. a unit label. */
+  trailing?: React.ReactNode;
   className?: string;
 }
 
 /** Labelled text input with hint and error, themed for light and dark. */
 export const TextField = forwardRef<TextInput, TextFieldProps>(function TextField(
-  { label, error, hint, password = false, labelAction, className, style, ...props },
+  { label, error, hint, password = false, labelAction, trailing, className, style, ...props },
   ref,
 ) {
   const { colors } = useTheme();
@@ -53,6 +55,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
           className="flex-1 px-4 py-3.5 font-sans text-base"
           {...props}
         />
+        {trailing}
         {password ? (
           <Pressable
             onPress={() => setHidden((h) => !h)}
