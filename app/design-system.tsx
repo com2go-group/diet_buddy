@@ -1,6 +1,6 @@
 /**
- * TEMPORARY: design-system preview used while Phase 1 is scaffolded.
- * Replaced by the auth/onboarding redirect in the Auth task (Phase 1, item 5).
+ * Design-system preview (development builds only; see the guard in app/_layout.tsx).
+ * Open /design-system in the dev client or browser.
  */
 import { useState } from 'react';
 import { View } from 'react-native';

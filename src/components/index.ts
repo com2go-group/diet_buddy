@@ -8,6 +8,8 @@ export { GradientFill } from './GradientFill';
 export { KpiTile, type KpiTileProps } from './KpiTile';
 export { Ring, type RingProps } from './Ring';
 export { Screen, type ScreenProps } from './Screen';
+export { SegmentedControl, type SegmentedControlProps } from './SegmentedControl';
 export { Sheet, type SheetProps } from './Sheet';
 export { Skeleton, SkeletonCard, type SkeletonProps } from './Skeleton';
 export { Text, type TextProps, type TextTone, type TextVariant } from './Text';
+export { TextField, type TextFieldProps } from './TextField';

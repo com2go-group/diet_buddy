@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { startSessionListener, useSessionStore } from '@/features/auth';
 import { palette, useApplyThemePreference, useTheme } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -58,18 +59,39 @@ export default function RootLayout() {
     SystemUI.setBackgroundColorAsync(colors.background).catch(() => undefined);
   }, [colors.background]);
 
-  useEffect(() => {
-    if (fontsLoaded || fontError) SplashScreen.hideAsync().catch(() => undefined);
-  }, [fontsLoaded, fontError]);
+  useEffect(() => startSessionListener(), []);
+  const { session, initialized, recovering } = useSessionStore();
+  const ready = (fontsLoaded || Boolean(fontError)) && initialized;
 
-  if (!fontsLoaded && !fontError) return null;
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => undefined);
+  }, [ready]);
+
+  if (!ready) return null;
+  const signedIn = session !== null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider value={navigationTheme(scheme)}>
           <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-          <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }} />
+          {/* Guards decide what is reachable; when one flips (sign in, sign out, reset code
+              accepted) Expo Router redirects to the first allowed route, which index.tsx resolves. */}
+          <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+            <Stack.Screen name="index" />
+            <Stack.Protected guard={!signedIn}>
+              <Stack.Screen name="(auth)" />
+            </Stack.Protected>
+            <Stack.Protected guard={signedIn && recovering}>
+              <Stack.Screen name="new-password" />
+            </Stack.Protected>
+            <Stack.Protected guard={signedIn && !recovering}>
+              <Stack.Screen name="(app)" />
+            </Stack.Protected>
+            <Stack.Protected guard={__DEV__}>
+              <Stack.Screen name="design-system" />
+            </Stack.Protected>
+          </Stack>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
