@@ -73,18 +73,21 @@ Do not add major dependencies outside this list without asking first.
 
 ## 4. Commands
 
-(Update once the project is scaffolded.)
-
 ```bash
-npx expo start            # dev server
-npx expo run:ios          # native dev build (needed for ads, health, purchases)
-npx expo run:android
-npm test                  # unit tests
+npm start                 # Expo dev server (Expo Go / dev client / web)
+npm run web               # dev server in the browser
+npm run ios               # native dev build (needed for ads, health, purchases)
+npm run android
+npm test                  # Jest (unit + component tests)
 npm run lint              # eslint + prettier check
+npm run format            # prettier --write
 npm run typecheck         # tsc --noEmit
-npx supabase start        # local backend
+npx expo export --platform ios --platform android   # bundle check without a device
+npx supabase start        # local backend (from Phase 1 item 4)
 npx supabase functions serve
 ```
+
+Expo SDK 57 (React Native 0.86, React 19.2, TypeScript 6). Install native packages with `npx expo install <pkg>` so versions match the SDK; if Expo's API is unreachable, pin the version listed in `node_modules/expo/bundledNativeModules.json`.
 
 Development happens on **Windows**. iOS builds must go through EAS Build (cloud), not a local Mac. Prefer cross-platform scripts; avoid bash-only tooling in package.json scripts.
 
@@ -331,6 +334,10 @@ Prices (configure in App Store Connect / Play Console and RevenueCat, never hard
 - Commits: conventional commits (`feat:`, `fix:`, `chore:`). Small, focused PRs.
 - Secrets in `.env` (never committed); provide `.env.example`.
 - Before finishing any task: run typecheck, lint and tests, and report results.
+- Strings live in `src/i18n/en.ts`; read them with `t('section.key', params)`.
+- Styling: NativeWind classes on plain RN components. Reanimated's `Animated.View` does not take `className`; put classes on an inner `View`. Use `src/theme/tokens.ts` only where a raw value is needed (SVG, charts, native APIs); `tokens.test.ts` keeps it in sync with `global.css`.
+- Inter needs one font family per weight on native: use the `font-sans|medium|semibold|bold|extrabold` classes, not `fontWeight`.
+- Tests: Testing Library 14 is async (`await render(...)`, `await fireEvent.press(...)`). Real Reanimated runs in Jest via the worklets resolver; AsyncStorage and haptics are mocked in `jest.setup.ts`.
 
 ## 16. Build phases
 
@@ -355,11 +362,11 @@ AI camera body scan, Digital AI Twin, Weekly Progress Story, admin dashboard (we
 Ask the owner before making these choices; record answers in the decision log.
 
 1. AI camera body scan: licensed SDK vs in-house estimate vs defer to Phase 4 (current default: defer, ship manual only).
-2. Free-tier coach message limit per day.
+2. ~~Free-tier coach message limit per day.~~ Decided 2026-09-25.
 3. Whether meal-plan ad unlock is per meal or per day.
-4. LLM provider/model and monthly AI budget.
+4. ~~LLM provider/model~~ (decided 2026-09-25); monthly AI budget still open.
 5. Nutrition API beyond USDA (needed for barcode scanning and branded foods).
-6. Gender options beyond male/female and how BMR handles them.
+6. ~~Gender options beyond male/female and how BMR handles them.~~ Decided 2026-09-25.
 7. Human coaching: in scope or not.
 8. Whether the Lifetime plan stays (it creates long-term AI cost with no recurring revenue).
 
@@ -370,3 +377,7 @@ Ask the owner before making these choices; record answers in the decision log.
 | 2026-09-25 | React Native (Expo) rebuild instead of wrapping the web prototype | Native modules needed for ads, health, camera, purchases |
 | 2026-09-25 | Wearables and scales via HealthKit / Health Connect only | One integration per platform instead of one per device |
 | 2026-09-25 | Google Fit excluded | Being retired in favor of Health Connect |
+| 2026-09-25 | Gender options: Male, Female, Other / prefer not to say. BMR for the third uses the average of the male and female Mifflin-St Jeor equations (constant −78); body-fat estimate and calorie floor (1,350) use the midpoint too | Neutral, documented default; see `docs/nutrition-model.md` |
+| 2026-09-25 | Free-tier coach limit: 5 messages/day, stored in server config (not hardcoded in the app) | Easy to tune without an app release |
+| 2026-09-25 | LLM: Claude via Supabase Edge Functions, behind a provider adapter so it can be swapped | Owner approved; keeps provider choice reversible |
+| 2026-09-25 | Nutrition interpretation choices (fast pace scaling, recomposition rule, protein reference weight, water, fiber, body-fat formula) | Listed in `docs/nutrition-model.md` for owner review |
