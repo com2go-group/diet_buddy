@@ -342,6 +342,8 @@ Prices (configure in App Store Connect / Play Console and RevenueCat, never hard
 - Before finishing any task: run typecheck, lint and tests, and report results.
 - Strings live in `src/i18n/en.ts`; read them with `t('section.key', params)`.
 - Styling: NativeWind classes on plain RN components. Reanimated's `Animated.View` does not take `className`; put classes on an inner `View`. Use `src/theme/tokens.ts` only where a raw value is needed (SVG, charts, native APIs); `tokens.test.ts` keeps it in sync with `global.css`.
+- Accessibility state uses `aria-*` props (`aria-checked`, `aria-selected`, `aria-disabled`, `aria-busy`, `aria-expanded`), not `accessibilityState`: React Native Web ignores `accessibilityState`, so states would be lost on web. Radios use `aria-checked`.
+- Don't pass a style function to a `Pressable` that also has `className` (NativeWind drops it); use a style object and `active:` classes.
 - Inter needs one font family per weight on native: use the `font-sans|medium|semibold|bold|extrabold` classes, not `fontWeight`.
 - Tests: Testing Library 14 is async (`await render(...)`, `await fireEvent.press(...)`). Real Reanimated runs in Jest via the worklets resolver; AsyncStorage and haptics are mocked in `jest.setup.ts`.
 
@@ -399,3 +401,10 @@ Ask the owner before making these choices; record answers in the decision log.
 | 2026-09-25 | Sign in with Apple on iOS only; Google via `@react-native-google-signin/google-signin`; both through `signInWithIdToken`. Buttons appear only when configured | Native flows; Apple requires its button on iOS alongside Google |
 | 2026-09-25 | Sign-up subtitle "Free to start. No credit card required." replaces the prototype's "Start your 7-day free trial today" | The trial belongs to Premium; promising it at sign-up would mislead (store rules, §12) |
 | 2026-09-25 | Added dependencies for auth: `@supabase/supabase-js`, `react-hook-form`, `zod`, `@hookform/resolvers`, `expo-apple-authentication`, `expo-crypto`, `@react-native-google-signin/google-signin` | Implement the §3 stack's auth and forms choices |
+| 2026-09-25 | Onboarding adds a **health-data consent** step right after "personal" (before any body data), and asks **date of birth** instead of age (prefilled from sign-up). Declining blocks onboarding; sign-out is offered | §13 explicit, separate consent before collecting special-category data; §9 age gate |
+| 2026-09-25 | Health-app and device steps say plainly that syncing arrives with HealthKit / Health Connect (Phase 2) and list devices as supported through them; no simulated "Connected"/"Paired" states. Google Fit removed | §7.12; don't show fake connections |
+| 2026-09-25 | Onboarding saves each step to its table (profile, consent, goal, preferences) plus `profiles.onboarding_step`; finishing writes the first `body_metrics` row and `plans` v1, then sets `onboarding_completed_at` (last). Routing sends signed-in users to onboarding until that is set | §7.2 resume; a failure part-way leaves the user in onboarding to retry |
+| 2026-09-25 | Pace and goal-date previews assume Lightly Active until the activity step is answered (as the prototype did); the final plan uses the real answer | Activity is asked after pace in the prototype's order |
+| 2026-09-25 | Imperial units offered in onboarding (lb, ft/in); values are stored metric with `profiles.units` | §1 |
+| 2026-09-25 | Consent is recorded with the `set_consent()` RPC, not an upsert | An upsert would need update rights on `user_id`/`consent_type`, which users deliberately don't have |
+| 2026-09-25 | Added `@tanstack/react-query` (in the §3 stack) for server state | Profile and onboarding data |
