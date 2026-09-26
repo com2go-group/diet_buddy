@@ -1,9 +1,6 @@
 import { Stack } from 'expo-router';
 
-import { usePurchasesSetup } from '@/features/subscriptions';
-
 export default function AppLayout() {
-  usePurchasesSetup();
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />

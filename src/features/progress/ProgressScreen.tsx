@@ -3,6 +3,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, SegmentedControl, SkeletonCard, Text } from '@/components';
+import { AppBanner } from '@/features/ads';
 import { t } from '@/i18n';
 import { useTheme } from '@/theme';
 
@@ -89,6 +90,7 @@ export function ProgressScreen() {
           ]}
         />
         {body()}
+        <AppBanner />
       </ScrollView>
     </SafeAreaView>
   );

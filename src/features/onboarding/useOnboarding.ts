@@ -2,10 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
+import { showInterstitial } from '@/lib/ads';
 import { formatWeight } from '@/lib/format';
 import { haptics } from '@/lib/haptics';
 
 import { profileQueryKey } from '../account/useProfile';
+import { useShowAds } from '../ads/useAds';
 import { useSessionStore } from '../auth/sessionStore';
 import { loadOnboarding, saveStep, type OnboardingState } from './api';
 import { validateStep, type OnboardingDraft, type StepErrors } from './draft';
@@ -38,6 +40,7 @@ export function useSavedOnboarding() {
 export function useOnboarding(initial: OnboardingState) {
   const userId = useSessionStore((s) => s.session?.user.id)!;
   const queryClient = useQueryClient();
+  const ads = useShowAds();
   const [draft, setDraft] = useState<OnboardingDraft>(initial.draft);
   const [step, setStep] = useState<StepId>(initial.step);
   const [goalId, setGoalId] = useState<string | null>(initial.goalId);
@@ -75,6 +78,8 @@ export function useOnboarding(initial: OnboardingState) {
       // The cached answers are from when this screen loaded; the body scan must read the saved ones.
       queryClient.removeQueries({ queryKey: onboardingQueryKey(userId) });
       await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+      // Free users see one skippable interstitial between the questions and the body scan (§6).
+      if (ads.enabled) await showInterstitial(ads.personalised);
       router.replace('/body-scan');
     },
   });

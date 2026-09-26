@@ -428,3 +428,7 @@ enabled = true
 # RevenueCat calls this without a Supabase JWT; it checks its own Authorization secret instead.
 [functions.revenuecat-webhook]
 verify_jwt = false
+
+# Google's AdMob servers call this (signed query string, no Supabase JWT).
+[functions.admob-ssv]
+verify_jwt = false

@@ -12,6 +12,7 @@ import Animated, { FadeIn, SlideInLeft, SlideInRight } from 'react-native-reanim
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, ErrorState, ProgressBar, SkeletonCard, Text } from '@/components';
+import { AppBanner } from '@/features/ads';
 import { t } from '@/i18n';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
@@ -152,6 +153,7 @@ function OnboardingFlow({ initial }: { initial: OnboardingState }) {
               onPress={() => c.next({ skip: true })}
             />
           ) : null}
+          <AppBanner />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -21,6 +21,7 @@ import { ProfileHeader } from './components/ProfileHeader';
 import { ProfileInfoSheet, type ProfileInfo } from './components/ProfileInfoSheet';
 import { SettingsRow, SettingsSection } from './components/Settings';
 import { minCalories } from './goals';
+import { useAdPrivacyOptions } from '../ads';
 import { usePaywall } from '../subscriptions/usePaywall';
 import { usePremium } from '../subscriptions/usePremium';
 import { useProfileOverview } from './useProfile';
@@ -32,6 +33,7 @@ export function ProfileScreen() {
   const { preference, setPreference } = useThemeStore();
   const { query, units, plan } = useProfileOverview();
   const { premium } = usePremium();
+  const adPrivacy = useAdPrivacyOptions();
   const { available: purchasesOn, restore } = usePaywall();
   const [sheet, setSheet] = useState<'theme' | 'units' | null>(null);
   const [edit, setEdit] = useState<GoalEdit | null>(null);

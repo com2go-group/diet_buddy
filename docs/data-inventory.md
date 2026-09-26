@@ -32,4 +32,6 @@ AI coach: each message goes to Anthropic (Claude) with a context built by `coach
 
 Food search: the search text (e.g. "chicken breast") goes to USDA FoodData Central through the `food-search` Edge Function. No user ID, name or other personal data is sent, and results are not stored except for the foods the user logs.
 
-Not collected in Phase 1: precise location, contacts, advertising ID (arrives with AdMob in Phase 2, behind UMP consent), analytics and crash data (PostHog/Sentry, later).
+Ads (free tier): the Google Mobile Ads SDK collects the device's advertising ID and ad interaction data after the UMP consent flow; non-personalised ads are requested unless the user allows personalisation. No health data, keywords or content URLs are sent with ad requests. Rewarded-ad callbacks from Google contain only our user ID and `{type, target}`.
+
+Not collected: precise location, contacts, analytics and crash data (PostHog/Sentry, later).

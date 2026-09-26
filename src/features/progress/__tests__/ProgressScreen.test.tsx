@@ -6,6 +6,7 @@ import { loadProgress, type ProgressData } from '../api';
 import { ProgressScreen } from '../ProgressScreen';
 
 jest.mock('../api', () => ({ loadProgress: jest.fn() }));
+jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 jest.mock('../../notifications/api', () => ({
   loadNotifications: jest.fn().mockResolvedValue([]),
   markAllRead: jest.fn(),

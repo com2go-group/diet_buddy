@@ -29,3 +29,23 @@ jest.mock('react-native-purchases', () => ({
   },
   LOG_LEVEL: { WARN: 'WARN' },
 }));
+
+// AdMob: native only. Feature tests mock '@/lib/ads' when they need ad behaviour.
+jest.mock('react-native-google-mobile-ads', () => ({
+  __esModule: true,
+  default: () => ({ initialize: jest.fn(() => Promise.resolve([])) }),
+  AdsConsent: {
+    gatherConsent: jest.fn(() => Promise.resolve({ canRequestAds: false })),
+    getConsentInfo: jest.fn(() =>
+      Promise.resolve({ canRequestAds: false, privacyOptionsRequirementStatus: 'NOT_REQUIRED' }),
+    ),
+    getUserChoices: jest.fn(() => Promise.resolve({ selectPersonalisedAds: false })),
+    showPrivacyOptionsForm: jest.fn(() => Promise.resolve({})),
+  },
+  InterstitialAd: { createForAdRequest: jest.fn() },
+  RewardedAd: { createForAdRequest: jest.fn() },
+  AdEventType: { LOADED: 'loaded', CLOSED: 'closed', ERROR: 'error' },
+  RewardedAdEventType: { LOADED: 'rewarded_loaded', EARNED_REWARD: 'rewarded_earned_reward' },
+  BannerAd: () => null,
+  BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
+}));

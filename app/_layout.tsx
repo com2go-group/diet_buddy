@@ -26,6 +26,8 @@ import { QueryClientProvider } from '@tanstack/react-query';
 
 import { Button, ErrorState } from '@/components';
 import { ONBOARDING_ROUTES, useAppRoute } from '@/features/account';
+import { useAdsSetup } from '@/features/ads';
+import { usePurchasesSetup } from '@/features/subscriptions';
 import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
 import { t } from '@/i18n';
 import { queryClient } from '@/lib/query/queryClient';
@@ -116,23 +118,33 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
-      <Stack.Screen name="index" />
-      <Stack.Protected guard={route === 'welcome'}>
-        <Stack.Screen name="(auth)" />
-      </Stack.Protected>
-      <Stack.Protected guard={route === 'new-password'}>
-        <Stack.Screen name="new-password" />
-      </Stack.Protected>
-      <Stack.Protected guard={ONBOARDING_ROUTES.includes(route)}>
-        <Stack.Screen name="(onboarding)" />
-      </Stack.Protected>
-      <Stack.Protected guard={route === 'home'}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-      <Stack.Protected guard={__DEV__}>
-        <Stack.Screen name="design-system" />
-      </Stack.Protected>
-    </Stack>
+    <>
+      {signedIn ? <SignedInServices /> : null}
+      <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+        <Stack.Screen name="index" />
+        <Stack.Protected guard={route === 'welcome'}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+        <Stack.Protected guard={route === 'new-password'}>
+          <Stack.Screen name="new-password" />
+        </Stack.Protected>
+        <Stack.Protected guard={ONBOARDING_ROUTES.includes(route)}>
+          <Stack.Screen name="(onboarding)" />
+        </Stack.Protected>
+        <Stack.Protected guard={route === 'home'}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+        <Stack.Protected guard={__DEV__}>
+          <Stack.Screen name="design-system" />
+        </Stack.Protected>
+      </Stack>
+    </>
   );
+}
+
+/** Store purchases and ad consent, for the signed-in user (onboarding and the main app). */
+function SignedInServices() {
+  usePurchasesSetup();
+  useAdsSetup();
+  return null;
 }

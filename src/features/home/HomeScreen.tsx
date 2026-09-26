@@ -4,6 +4,7 @@ import { RefreshControl, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, SkeletonCard } from '@/components';
+import { AppBanner } from '@/features/ads';
 import { t } from '@/i18n';
 import { useTheme } from '@/theme';
 
@@ -122,6 +123,7 @@ export function HomeScreen() {
           onAction={() => router.navigate('/progress')}
         />
         <WeeklyAdherence week={week} />
+        <AppBanner />
       </>
     );
   };

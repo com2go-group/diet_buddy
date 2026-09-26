@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +11,7 @@ import { formatWeight } from '@/lib/format';
 import { haptics } from '@/lib/haptics';
 
 import { profileQueryKey } from '../account/useProfile';
+import { RewardGate, useShowAds } from '../ads';
 import { FormMessage } from '../auth/components/FormMessage';
 import { useSessionStore } from '../auth/sessionStore';
 import { PlanWarnings } from '../onboarding/steps/PlanWarnings';
@@ -28,6 +30,9 @@ export function InitialPlanScreen() {
     queryFn: () => loadInitialPlan(userId!),
     gcTime: 0,
   });
+  // Free users get an optional rewarded video before the plan (§6); skipping still shows it.
+  const ads = useShowAds();
+  const [revealed, setRevealed] = useState(false);
   if (data.isPending) {
     return (
       <SafeAreaView className="flex-1 gap-4 bg-background px-5 pt-16">
@@ -42,6 +47,18 @@ export function InitialPlanScreen() {
       <SafeAreaView className="flex-1 justify-center bg-background px-5">
         <ErrorState message={t('initialPlan.loadFailed')} onRetry={() => data.refetch()} />
       </SafeAreaView>
+    );
+  }
+  if (ads.enabled && !revealed) {
+    return (
+      <RewardGate
+        title={t('ads.planTitle')}
+        description={t('ads.planDesc')}
+        xp={100}
+        type="ai_plan"
+        target="initial"
+        onDone={() => setRevealed(true)}
+      />
     );
   }
   return <PlanView userId={userId!} data={data.data} />;
