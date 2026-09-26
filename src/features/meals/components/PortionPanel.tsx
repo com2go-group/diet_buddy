@@ -118,6 +118,11 @@ export function PortionPanel({
           {t('logFood.source')}
         </Text>
       ) : null}
+      {food.kind === 'per100g' && food.ref?.startsWith('off:') ? (
+        <Text variant="caption" tone="muted">
+          {t('logFood.sourceOff')}
+        </Text>
+      ) : null}
       <FormMessage message={failed ? t('logFood.saveFailed') : undefined} />
       <Button
         label={t('logFood.add', { slot: slotLabel })}

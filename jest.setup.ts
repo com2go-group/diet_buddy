@@ -68,3 +68,18 @@ jest.mock('react-native-health-connect', () => ({
   insertRecords: jest.fn(() => Promise.resolve([])),
   openHealthConnectSettings: jest.fn(),
 }));
+
+// expo-camera: a stand-in CameraView that tests can drive through `globalThis.__scanBarcode`.
+jest.mock('expo-camera', () => {
+  const { View } = jest.requireActual('react-native');
+  const React = jest.requireActual('react');
+  const CameraView = (props: { onBarcodeScanned?: (r: { data: string }) => void }) => {
+    (globalThis as { __scanBarcode?: (data: string) => void }).__scanBarcode = (data) =>
+      props.onBarcodeScanned?.({ data });
+    return React.createElement(View, { testID: 'camera' });
+  };
+  return {
+    CameraView,
+    useCameraPermissions: jest.fn(() => [{ granted: true }, jest.fn()]),
+  };
+});

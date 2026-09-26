@@ -2,13 +2,14 @@ import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { EmptyState, ErrorState, SkeletonCard, Text, TextField } from '@/components';
+import { Button, EmptyState, ErrorState, SkeletonCard, Text, TextField } from '@/components';
 import { t } from '@/i18n';
 import { useTheme } from '@/theme';
 
 import { FoodSearchError } from '../api';
 import type { FoodResult, PortionFood } from '../types';
 import { useFoodSearch, useRecentFoods } from '../useMeals';
+import { BarcodeScanner } from './BarcodeScanner';
 import { FoodList } from './FoodList';
 
 const toPortionFood = (f: FoodResult): PortionFood => ({
@@ -25,10 +26,11 @@ const toPortionFood = (f: FoodResult): PortionFood => ({
   servings: f.servings,
 });
 
-/** USDA search, or recent foods while the box is empty. */
+/** USDA search (or a barcode from Open Food Facts), or recent foods while the box is empty. */
 export function SearchPanel({ onPick }: { onPick: (food: PortionFood) => void }) {
   const { colors } = useTheme();
   const [text, setText] = useState('');
+  const [scanning, setScanning] = useState(false);
   const search = useFoodSearch(text);
   const recent = useRecentFoods();
 
@@ -98,6 +100,19 @@ export function SearchPanel({ onPick }: { onPick: (food: PortionFood) => void })
           />
         }
       />
+      <Button
+        label={`▦ ${t('logFood.scanBarcode')}`}
+        variant="outline"
+        size="md"
+        onPress={() => setScanning(true)}
+      />
+      {scanning ? (
+        <BarcodeScanner
+          visible
+          onClose={() => setScanning(false)}
+          onFound={(food) => onPick(toPortionFood(food))}
+        />
+      ) : null}
       {search.enabled ? (
         results()
       ) : (

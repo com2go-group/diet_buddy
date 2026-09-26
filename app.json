@@ -71,8 +71,16 @@
         "expo-image-picker",
         {
           "photosPermission": "DietBuddy uses the photos you choose to recognise the food on your plate. Photos are not stored.",
-          "cameraPermission": "DietBuddy uses the camera to photograph your meal and recognise the food on it. Photos are not stored.",
+          "cameraPermission": "DietBuddy uses the camera to scan barcodes and photograph your meals and progress. Meal and menu photos are not stored; progress photos are kept privately until you delete them.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "DietBuddy uses the camera to scan barcodes and photograph your meals and progress. Meal and menu photos are not stored; progress photos are kept privately until you delete them.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ],
       [

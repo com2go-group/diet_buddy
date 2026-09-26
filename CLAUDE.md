@@ -60,7 +60,7 @@ Key prototype files:
 | Backend | **Supabase**: Postgres, Auth, Storage, Edge Functions, Row Level Security |
 | Auth providers | Email/password, Sign in with Apple, Google |
 | AI | LLM API called **only from Supabase Edge Functions**, never from the app |
-| Nutrition data | USDA FoodData Central (primary); a paid API (Edamam/Nutritionix) may be added for branded foods and barcodes |
+| Nutrition data | USDA FoodData Central (primary); Open Food Facts for barcodes and packaged foods |
 | Ads | Google AdMob via `react-native-google-mobile-ads`, with Google UMP consent |
 | Subscriptions | RevenueCat (`react-native-purchases`) over App Store / Play Billing |
 | Health data | Apple HealthKit (iOS) and Health Connect (Android) |
@@ -374,7 +374,7 @@ Ask the owner before making these choices; record answers in the decision log.
 2. ~~Free-tier coach message limit per day.~~ Decided 2026-09-25.
 3. ~~Meal-plan ad unlock per meal or per day.~~ Decided 2026-09-28: per meal.
 4. ~~LLM provider/model~~ (decided 2026-09-25); ~~monthly AI budget~~ decided 2026-09-28: no cap, editable in the admin dashboard.
-5. Nutrition API beyond USDA: include European options (research in progress, 2026-09-28).
+5. ~~Nutrition API beyond USDA.~~ Decided 2026-09-28: Open Food Facts for barcodes; FatSecret or national tables (CIQUAL, NEVO, CoFID) later if coverage needs it.
 6. ~~Gender options beyond male/female and how BMR handles them.~~ Decided 2026-09-25.
 7. ~~Human coaching.~~ Decided 2026-09-28: not in scope.
 8. ~~Lifetime plan.~~ Decided 2026-09-28: removed.
@@ -456,4 +456,4 @@ Ask the owner before making these choices; record answers in the decision log.
 | 2026-09-28 | Phase 4 direction: AI Twin = cartoon avatar in three variants (male, female, other); Weekly Progress Story = a shareable image; Wellness Insights hub = insights drawn from AI coach chats; admin dashboard = admins only, covering price packages, users, pay codes, limits, analytics, content and support | Owner answers; details to confirm before building |
 | 2026-09-28 | Clarifications: no pay codes and no price editing in the admin dashboard (store offer codes and store consoles are used instead); coach-chat analysis for wellness insights needs its own optional GDPR consent, asked in the onboarding consent step as a separate checkbox (consent can't be bundled into the T&C) and described in the Privacy Policy; per-meal ad unlock = +15 XP | Owner answers; GDPR Art. 9 explicit consent |
 | 2026-09-28 | Lifetime plan removed from app, tests and setup guide; per-meal unlocks (`ad_unlocks.target_id` = `YYYY-MM-DD:slot`, checked by the database and `admob-ssv`); Brevo via Supabase SMTP; sms.to via a `send-sms` Send SMS hook with provider and sender in `app_config` | P4.1 |
-
+| 2026-09-28 | Barcodes: Open Food Facts (free, EU-strong, ODbL: attribution shown with the numbers) via a `food-barcode` Edge Function; scanning with `expo-camera` (Expo SDK module, added) in Log Food → Search → Scan barcode, with a typed fallback (web: typed only). Logged as source `search`, `food_ref = off:<barcode>` | §17.5, §9 numbers from a database |
