@@ -10,16 +10,20 @@ import { parseDayKey } from '@/lib/dates';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { ManualForm } from './components/ManualForm';
+import { PhotoPanel } from './components/PhotoPanel';
 import { PortionPanel } from './components/PortionPanel';
 import { SearchPanel } from './components/SearchPanel';
 import { SlotTabs } from './components/SlotTabs';
 import { gramsFor, logTimeFor, MEAL_SLOTS, portionQuantity } from './portion';
 import type { MealSlot, NewFoodLog, PortionFood } from './types';
-import { useLogFood } from './useMeals';
+import { useLogFood, useLogFoods } from './useMeals';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/meals'));
 
-/** Log Food sheet: search USDA (or pick a recent food), choose a portion, or enter it manually. */
+/**
+ * Log Food sheet: search USDA (or pick a recent food) and choose a portion, scan a photo of the
+ * plate, or enter it manually.
+ */
 export function LogFoodScreen() {
   const { colors } = useTheme();
   const params = useLocalSearchParams<{ slot?: string; date?: string }>();
@@ -27,9 +31,10 @@ export function LogFoodScreen() {
     MEAL_SLOTS.includes(params.slot as MealSlot) ? (params.slot as MealSlot) : 'breakfast',
   );
   const [day] = useState(() => parseDayKey(params.date) ?? new Date());
-  const [mode, setMode] = useState<'search' | 'manual'>('search');
+  const [mode, setMode] = useState<'search' | 'photo' | 'manual'>('search');
   const [picked, setPicked] = useState<PortionFood | null>(null);
   const save = useLogFood();
+  const saveMany = useLogFoods();
   const slotLabel = t(`homeScreen.${slot}`);
 
   const submit = (entry: Omit<NewFoodLog, 'slot' | 'loggedAt'>) =>
@@ -86,6 +91,7 @@ export function LogFoodScreen() {
                 accessibilityLabel={t('logFood.title')}
                 options={[
                   { value: 'search', label: t('logFood.search') },
+                  { value: 'photo', label: t('logFood.photo') },
                   { value: 'manual', label: t('logFood.manual') },
                 ]}
                 value={mode}
@@ -93,6 +99,28 @@ export function LogFoodScreen() {
               />
               {mode === 'search' ? (
                 <SearchPanel onPick={setPicked} />
+              ) : mode === 'photo' ? (
+                <PhotoPanel
+                  slotLabel={slotLabel}
+                  saving={saveMany.isPending}
+                  failed={saveMany.isError}
+                  onLog={(entries) => {
+                    const loggedAt = logTimeFor(day, slot, new Date());
+                    saveMany.mutate(
+                      entries.map((e) => ({
+                        slot,
+                        loggedAt,
+                        name: e.item.name,
+                        foodRef: e.item.food?.ref ?? null,
+                        quantity: e.grams,
+                        unit: 'g',
+                        macros: e.macros,
+                        source: 'photo' as const,
+                      })),
+                      { onSuccess: close },
+                    );
+                  }}
+                />
               ) : (
                 <ManualForm
                   slotLabel={slotLabel}
@@ -115,9 +143,6 @@ export function LogFoodScreen() {
                   }
                 />
               )}
-              <Text variant="caption" tone="muted" className="text-center">
-                📷 {t('logFood.photoSoon')}
-              </Text>
             </View>
           )}
         </ScrollView>

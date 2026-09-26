@@ -19,5 +19,6 @@ on conflict (code) do update
       emoji = excluded.emoji, xp_reward = excluded.xp_reward;
 
 insert into public.app_config (key, value, description) values
-  ('coach_daily_message_limit_free', '5', 'Coach messages per day on the free tier (decision log 2026-09-25)')
+  ('coach_daily_message_limit_free', '5', 'Coach messages per day on the free tier (decision log 2026-09-25)'),
+  ('food_photo_daily_limit_free', '3', 'Food photo scans per day on the free tier')
 on conflict (key) do nothing;

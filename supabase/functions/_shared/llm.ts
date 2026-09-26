@@ -3,9 +3,25 @@
  * swapped). Functions depend on LlmProvider only.
  */
 
+/** A content block of a multimodal message (vision functions). */
+export type LlmContentBlock =
+  { type: 'text'; text: string } | { type: 'image'; mediaType: ImageMediaType; base64: string };
+
+export type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/webp';
+
 export interface LlmMessage {
   role: 'user' | 'assistant';
-  content: string;
+  content: string | LlmContentBlock[];
+}
+
+/** Anthropic's wire format for a message's content. */
+function toAnthropicContent(content: LlmMessage['content']) {
+  if (typeof content === 'string') return content;
+  return content.map((b) =>
+    b.type === 'text'
+      ? b
+      : { type: 'image', source: { type: 'base64', media_type: b.mediaType, data: b.base64 } },
+  );
 }
 
 export interface LlmRequest {
@@ -48,7 +64,12 @@ export function anthropicProvider(
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
         },
-        body: JSON.stringify({ model, system, messages, max_tokens: maxTokens }),
+        body: JSON.stringify({
+          model,
+          system,
+          messages: messages.map((m) => ({ role: m.role, content: toAnthropicContent(m.content) })),
+          max_tokens: maxTokens,
+        }),
       }).catch((e: unknown) => {
         throw new LlmError(`network: ${String(e)}`);
       });

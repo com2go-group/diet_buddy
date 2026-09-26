@@ -78,3 +78,18 @@ export interface NewFoodLog {
   macros: Macros;
   source: Enums<'food_source'>;
 }
+
+export const photoItemSchema = z.object({
+  name: z.string().min(1),
+  grams: z.number().positive(),
+  confidence: z.enum(['high', 'medium', 'low']),
+  food: foodResultSchema.nullable(),
+  warnings: z.array(z.string()),
+});
+export const foodPhotoResponseSchema = z.object({
+  items: z.array(photoItemSchema),
+  plateWarnings: z.array(z.string()),
+  remaining: z.number().int().min(0).nullable(),
+});
+export type PhotoItem = z.infer<typeof photoItemSchema>;
+export type FoodPhotoResult = z.infer<typeof foodPhotoResponseSchema>;

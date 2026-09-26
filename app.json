@@ -68,6 +68,14 @@
       ],
       "react-native-health-connect",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "DietBuddy uses the photos you choose to recognise the food on your plate. Photos are not stored.",
+          "cameraPermission": "DietBuddy uses the camera to photograph your meal and recognise the food on it. Photos are not stored.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {

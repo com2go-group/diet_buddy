@@ -6,6 +6,7 @@ import { haptics } from '@/lib/haptics';
 
 import { useSessionStore } from '../auth/sessionStore';
 import {
+  analyzeFoodPhoto,
   deleteFoodLog,
   loadMealsDay,
   loadRecentLogs,
@@ -67,6 +68,23 @@ export function useLogFood() {
     onSuccess: () => haptics.success(),
     onSettled: () => invalidateFood(queryClient),
   });
+}
+
+/** Logs several foods at once (photo scan); stops at the first failure. */
+export function useLogFoods() {
+  const userId = useSessionStore((s) => s.session?.user.id);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (entries: NewFoodLog[]) => {
+      for (const entry of entries) await logFood(userId!, entry);
+    },
+    onSuccess: () => haptics.success(),
+    onSettled: () => invalidateFood(queryClient),
+  });
+}
+
+export function usePhotoScan() {
+  return useMutation({ mutationFn: (image: string) => analyzeFoodPhoto(image) });
 }
 
 export function useRecentFoods() {

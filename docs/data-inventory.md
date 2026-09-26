@@ -33,6 +33,8 @@ AI coach: each message goes to Anthropic (Claude) with a context built by `coach
 
 AI meal plans: `generate-meal-plan` sends Anthropic the day's calorie and protein targets, per-meal calorie guidance, diet styles, restrictions, allergies (including free text) and avoided foods. No name, age, weight or other identifiers. Food names from the plan are searched in USDA.
 
+Food photo scan: `analyze-food-photo` sends the meal photo the user takes or picks to Anthropic (Claude vision) to name the foods and estimate portions, plus nothing else about the user (their allergies, restrictions and avoided foods are checked in our code, not sent). The photo is not stored by DietBuddy: it is held in memory for the request only. JPEG metadata (EXIF including GPS location, XMP, comments) is removed on the server before the photo is sent. The app asks users to keep people out of the shot and the prompt tells the model to ignore people. Recognised food names are searched in USDA. Logged items are ordinary `food_logs` rows with source `photo`.
+
 Food search: the search text (e.g. "chicken breast") goes to USDA FoodData Central through the `food-search` Edge Function. No user ID, name or other personal data is sent, and results are not stored except for the foods the user logs.
 
 Ads (free tier): the Google Mobile Ads SDK collects the device's advertising ID and ad interaction data after the UMP consent flow; non-personalised ads are requested unless the user allows personalisation. No health data, keywords or content URLs are sent with ad requests. Rewarded-ad callbacks from Google contain only our user ID and `{type, target}`.
