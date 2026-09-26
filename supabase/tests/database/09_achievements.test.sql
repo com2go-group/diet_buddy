@@ -22,27 +22,32 @@ select is(
   (select current from public.achievement_progress('11111111-1111-1111-1111-111111111111') where code = 'clean_eater'),
   4::numeric, 'four days within the calorie target so far; the undereating day does not count');
 select is(
-  (select count(*)::integer from public.user_achievements), 0, 'nothing unlocked yet');
+  (select count(*)::integer from public.user_achievements u join public.achievements a on a.id = u.achievement_id
+    where a.code <> 'first_log'), 0, 'nothing unlocked yet apart from First Bite');
 
+create temp table xp_before as
+  select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111';
 insert into public.food_logs (user_id, logged_at, meal_slot, name, calories, protein_g, source)
   values ('11111111-1111-1111-1111-111111111111', now() - interval '5 days', 'lunch', 'Meal', 2100, 160, 'manual');
 
+select ok(
+  exists (select 1 from public.user_achievements u join public.achievements a on a.id = u.achievement_id
+    where u.user_id = '11111111-1111-1111-1111-111111111111' and a.code = 'clean_eater'),
+  'the fifth day on target unlocks Clean Eater');
 select is(
-  (select a.code from public.user_achievements u join public.achievements a on a.id = u.achievement_id
-    where u.user_id = '11111111-1111-1111-1111-111111111111'),
-  'clean_eater', 'the fifth day on target unlocks Clean Eater');
-select is(
-  (select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  80, 'Clean Eater awards its 80 XP');
-select is(
-  (select title from public.notifications where user_id = '11111111-1111-1111-1111-111111111111'),
-  '🥗 Achievement unlocked: Clean Eater', 'a notification announces the unlock');
+  (select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111') - (select xp from xp_before),
+  85, 'Clean Eater awards its 80 XP (plus 5 XP for logging that meal)');
+select ok(
+  exists (select 1 from public.notifications where user_id = '11111111-1111-1111-1111-111111111111'
+    and title = '🥗 Achievement unlocked: Clean Eater'),
+  'a notification announces the unlock');
 
+update xp_before set xp = (select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111');
 insert into public.food_logs (user_id, logged_at, meal_slot, name, calories, protein_g, source)
   values ('11111111-1111-1111-1111-111111111111', now() - interval '8 days', 'lunch', 'Meal', 2000, 160, 'manual');
 select is(
-  (select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  80, 'an achievement is awarded only once');
+  (select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111') - (select xp from xp_before),
+  5, 'an achievement is awarded only once (only the meal XP is added)');
 
 select is(
   (select current from public.achievement_progress('11111111-1111-1111-1111-111111111111') where code = 'protein_pro'),

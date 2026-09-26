@@ -2,17 +2,20 @@ import { View } from 'react-native';
 
 import { GradientFill, Text } from '@/components';
 import { t } from '@/i18n';
+import { levelFor } from '@/lib/gamification/levels';
 import { formatNumber } from '@/lib/format';
 
 export function ProfileHeader({
   name,
   contact,
   premium,
+  xp,
   stats,
 }: {
   name: string;
   contact: string;
   premium: boolean;
+  xp: number;
   stats: { loggedDays: number; mealsLogged: number; goalProgress: number | null };
 }) {
   const items = [
@@ -42,6 +45,10 @@ export function ProfileHeader({
           </Text>
           <Text variant="caption" style={{ color: '#94A3B8' }} numberOfLines={1}>
             {contact}
+          </Text>
+          <Text variant="caption" className="font-bold" style={{ color: '#10B981' }}>
+            ⚡ {t('homeScreen.level', { level: levelFor(xp).level })} ·{' '}
+            {t('homeScreen.xp', { count: xp })}
           </Text>
         </View>
         <View

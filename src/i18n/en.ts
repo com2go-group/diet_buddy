@@ -1066,6 +1066,8 @@ export const en = {
     scoreHigh: 'Great work — you’re on track today!',
     streak: '{{count}} Day Streak',
     xp: '{{count}} XP',
+    level: 'Level {{level}}',
+    toNextLevel: '{{count}} XP to level {{next}}',
     nutrition: 'Today’s Nutrition',
     details: 'Details',
     ofTarget: 'of {{target}}{{unit}}',

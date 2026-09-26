@@ -22,6 +22,7 @@ export const EXPORT_TABLES = [
   'device_connections',
   'push_tokens',
   'notification_preferences',
+  'xp_events',
   'ai_usage',
 ] as const;
 

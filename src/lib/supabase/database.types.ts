@@ -861,6 +861,36 @@ export type Database = {
         }
         Relationships: []
       }
+      xp_events: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          reason: string
+          ref: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          reason: string
+          ref: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          reason?: string
+          ref?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -889,6 +919,10 @@ export type Database = {
       evaluate_achievements: {
         Args: { target_user: string }
         Returns: undefined
+      }
+      grant_xp_once: {
+        Args: { target_user: string; p_reason: string; p_ref: string; p_amount: number }
+        Returns: boolean
       }
       has_activity_on: {
         Args: { target_user: string; day: string }

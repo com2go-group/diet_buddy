@@ -29,7 +29,7 @@ insert into public.food_logs (logged_at, meal_slot, name, calories, source)
 
 reset role;
 select is((select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  20, 'the rejected second check-in awarded nothing');
+  35, 'the rejected second check-in awarded nothing (20 check-in + 5 meal logged + 10 First Bite)');
 select results_eq(
   $$ select weight_kg from public.body_metrics where user_id = '11111111-1111-1111-1111-111111111111' $$,
   $$ values (79.40::numeric(5,2)) $$, 'editing check-in weight updates the same trend point');
@@ -74,7 +74,7 @@ reset role;
 insert into public.ad_unlocks (user_id, unlock_type, target_id)
   values ('11111111-1111-1111-1111-111111111111', 'meal_plan', current_date::text);
 select is((select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  70, 'a meal-plan ad unlock awards 50 XP');
+  85, 'a meal-plan ad unlock awards 50 XP');
 select throws_ok(
   $$ insert into public.ad_unlocks (user_id, unlock_type, target_id)
      values ('11111111-1111-1111-1111-111111111111', 'meal_plan', current_date::text) $$,

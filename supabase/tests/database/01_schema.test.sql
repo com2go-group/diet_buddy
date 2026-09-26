@@ -6,7 +6,7 @@ select tables_are('public', array[
   'profiles', 'goals', 'preferences', 'body_metrics', 'plans', 'meal_plans', 'food_logs',
   'water_logs', 'checkins', 'progress_photos', 'coach_conversations', 'coach_messages',
   'achievements', 'user_achievements', 'ad_unlocks', 'notifications', 'device_connections',
-  'consents', 'consent_events', 'app_config', 'ai_usage', 'push_tokens', 'notification_preferences'
+  'consents', 'consent_events', 'app_config', 'ai_usage', 'push_tokens', 'notification_preferences', 'xp_events'
 ]);
 
 select is(
@@ -32,7 +32,7 @@ select ok(not has_function_privilege('authenticated', 'public.refresh_streak(uui
 select ok(has_function_privilege('authenticated', 'public.bmi(numeric, numeric)', 'execute'),
   'bmi() is callable by the app');
 
-select is((select count(*)::int from public.achievements), 6, 'six achievements are seeded');
+select is((select count(*)::int from public.achievements), 11, 'eleven achievements are seeded');
 select is((select value from public.app_config where key = 'coach_daily_message_limit_free'),
   '5'::jsonb, 'free-tier coach limit is 5 messages per day');
 

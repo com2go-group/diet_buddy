@@ -41,7 +41,7 @@ select throws_ok($$ insert into public.achievements (code, title, description) v
 select throws_ok($$ update public.app_config set value = '1000' $$, '42501', null,
   'users cannot raise their coach limit');
 
-select is((select count(*)::int from public.achievements), 6, 'users can read the achievements catalogue');
+select is((select count(*)::int from public.achievements), 11, 'users can read the achievements catalogue');
 
 select lives_ok(
   $$ insert into public.plans (version, daily_calories, protein_g, carbs_g, fat_g, fiber_g, water_ml)

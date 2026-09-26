@@ -8,7 +8,12 @@ insert into public.achievements (code, title, description, emoji, xp_reward) val
   ('hydration_hero', 'Hydration Hero', 'Hit water goal 7 days in a row', '💧', 70),
   ('protein_pro', 'Protein Pro', 'Hit protein target 10 days', '💪', 100),
   ('scale_master', 'Scale Master', 'Lost 2kg toward goal', '⚖️', 150),
-  ('two_week_warrior', 'Two Week Warrior', 'Log for 14 consecutive days', '🏆', 200)
+  ('two_week_warrior', 'Two Week Warrior', 'Log for 14 consecutive days', '🏆', 200),
+  ('first_log', 'First Bite', 'Log your first meal', '🍽️', 10),
+  ('hydration_starter', 'Hydrated', 'Hit your water goal for the first time', '🥤', 20),
+  ('check_in_7', 'Check-In Champ', 'Complete 7 daily check-ins', '✅', 50),
+  ('plan_follower', 'Plan Follower', 'Log 10 items from your AI meal plan', '📋', 60),
+  ('streak_30', '30 Day Streak', 'Log every day for 30 days', '🌟', 300)
 on conflict (code) do update
   set title = excluded.title, description = excluded.description,
       emoji = excluded.emoji, xp_reward = excluded.xp_reward;

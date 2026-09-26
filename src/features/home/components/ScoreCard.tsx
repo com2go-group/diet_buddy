@@ -2,6 +2,7 @@ import { View } from 'react-native';
 
 import { Ring, Text } from '@/components';
 import { t } from '@/i18n';
+import { levelFor } from '@/lib/gamification/levels';
 import { ACCENTS } from '@/theme';
 
 import { scoreMessage } from '../summary';
@@ -23,6 +24,7 @@ export function ScoreCard({
   streak: number;
   xp: number;
 }) {
+  const lvl = levelFor(xp);
   return (
     <View
       className="mb-4 flex-row items-center gap-4 rounded-3xl p-4"
@@ -63,7 +65,30 @@ export function ScoreCard({
             🔥 {t('homeScreen.streak', { count: streak })}
           </Text>
           <Text variant="label" className="font-bold" style={{ color: ACCENTS.green.dark }}>
-            ⚡ {t('homeScreen.xp', { count: xp })}
+            ⚡ {t('homeScreen.level', { level: lvl.level })} · {t('homeScreen.xp', { count: xp })}
+          </Text>
+        </View>
+        <View
+          accessible
+          accessibilityRole="progressbar"
+          accessibilityLabel={t('homeScreen.toNextLevel', {
+            count: lvl.forNext,
+            next: lvl.level + 1,
+          })}
+          accessibilityValue={{ min: 0, max: 100, now: Math.round(lvl.progress * 100) }}
+          className="mt-2 gap-1"
+        >
+          <View
+            className="h-1.5 overflow-hidden rounded-full"
+            style={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
+          >
+            <View
+              className="h-full rounded-full"
+              style={{ width: `${lvl.progress * 100}%`, backgroundColor: ACCENTS.green.dark }}
+            />
+          </View>
+          <Text variant="caption" style={{ color: '#94A3B8' }}>
+            {t('homeScreen.toNextLevel', { count: lvl.forNext, next: lvl.level + 1 })}
           </Text>
         </View>
       </View>

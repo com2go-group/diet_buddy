@@ -68,6 +68,7 @@ export function ProfileScreen() {
           name={profile.name ?? ''}
           contact={user?.email || user?.phone || ''}
           premium={premium}
+          xp={profile.xp}
           stats={data.stats}
         />
         {!data.checkedInToday ? (
