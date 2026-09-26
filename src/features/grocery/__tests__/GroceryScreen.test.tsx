@@ -130,7 +130,7 @@ describe('GroceryScreen', () => {
     await waitFor(() =>
       expect(saveChecked).toHaveBeenCalledWith('user-1', dates[0], ['usda:1', 'usda:2']),
     );
-    expect(screen.getByText('2 of 2 ticked')).toBeOnTheScreen();
+    expect(await screen.findByText('2 of 2 ticked')).toBeOnTheScreen();
     // With a list, the button updates it.
     await fireEvent.press(screen.getByRole('button', { name: 'Update the list' }));
     await waitFor(() => expect(generateGroceryList).toHaveBeenCalledWith(dates[0], true));
