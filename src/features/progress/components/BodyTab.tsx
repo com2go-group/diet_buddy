@@ -6,9 +6,10 @@ import { formatDecimal, formatWeight } from '@/lib/format';
 import { cmToIn, type UnitSystem } from '@/lib/nutrition';
 import { accentColor, useTheme } from '@/theme';
 
+import { PhotosSection } from '../photos/PhotosSection';
 import { metricChanges, type MetricKey, type MetricRow } from '../stats';
 
-/** Body metrics (weight, BMI, waist, body fat) with change since the first entry. */
+/** Body metrics (weight, BMI, waist, body fat) with change since the first entry, and photos. */
 export function BodyTab({ metrics, units }: { metrics: MetricRow[]; units: UnitSystem }) {
   const { scheme } = useTheme();
   const changes = metricChanges(metrics);
@@ -69,15 +70,7 @@ export function BodyTab({ metrics, units }: { metrics: MetricRow[]; units: UnitS
           );
         })}
       </View>
-      <View className="mb-4 items-center gap-2 rounded-2xl border border-dashed border-border bg-card p-6">
-        <Text className="text-3xl leading-10">📸</Text>
-        <Text variant="heading" className="text-base">
-          {t('progress.photosTitle')}
-        </Text>
-        <Text tone="muted" className="text-center text-[13px]">
-          {t('progress.photosSoon')}
-        </Text>
-      </View>
+      <PhotosSection metrics={metrics} units={units} />
     </>
   );
 }

@@ -3,11 +3,13 @@
  * swapped). Functions depend on LlmProvider only.
  */
 
+import type { ImageMediaType } from './image.ts';
+
+export type { ImageMediaType };
+
 /** A content block of a multimodal message (vision functions). */
 export type LlmContentBlock =
   { type: 'text'; text: string } | { type: 'image'; mediaType: ImageMediaType; base64: string };
-
-export type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/webp';
 
 export interface LlmMessage {
   role: 'user' | 'assistant';

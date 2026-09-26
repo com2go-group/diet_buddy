@@ -5,10 +5,11 @@ import { View } from 'react-native';
 import { Button, Callout, EmptyState, ErrorState, SkeletonCard, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatDecimal, formatNumber } from '@/lib/format';
+import { pickPhoto } from '@/lib/images';
 
 import { FormMessage } from '../../auth/components/FormMessage';
 import { FoodPhotoError } from '../api';
-import { PHOTO_GRAMS, photoItemMacros, pickFoodPhoto } from '../photo';
+import { PHOTO_GRAMS, photoItemMacros } from '../photo';
 import { photoWarningText } from '../photoWarnings';
 import type { FoodPhotoResult, Macros, PhotoItem } from '../types';
 import { usePhotoScan } from '../useMeals';
@@ -56,9 +57,10 @@ export function PhotoPanel({
 
   const start = async (source: 'camera' | 'library') => {
     setNotice(null);
-    const picked = await pickFoodPhoto(source).catch(() => ({ kind: 'cancelled' as const }));
+    const picked = await pickPhoto(source).catch(() => ({ kind: 'cancelled' as const }));
     if (picked.kind === 'denied') return setNotice(t('foodPhoto.permissionDenied'));
     if (picked.kind === 'tooLarge') return setNotice(t('foodPhoto.tooLarge'));
+    if (picked.kind === 'unsupported') return setNotice(t('foodPhoto.invalidImage'));
     if (picked.kind !== 'photo') return;
     scan.mutate(picked.base64, {
       onSuccess: (result: FoodPhotoResult) =>

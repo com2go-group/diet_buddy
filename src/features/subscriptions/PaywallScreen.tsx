@@ -22,15 +22,15 @@ const MANAGE_URL = Platform.select({
   default: 'https://play.google.com/store/account/subscriptions',
 });
 
-const NOW = ['featureNoAds', 'featureCoach', 'featureMealPlans', 'featureSupport'] as const;
-const SOON = [
-  'soonBodyScan',
-  'soonRestaurant',
-  'soonGrocery',
-  'soonPhotos',
-  'soonTwin',
-  'soonStory',
+const NOW = [
+  'featureNoAds',
+  'featureCoach',
+  'featureMealPlans',
+  'featurePhotos',
+  'featureFoodPhotos',
+  'featureSupport',
 ] as const;
+const SOON = ['soonBodyScan', 'soonRestaurant', 'soonGrocery', 'soonTwin', 'soonStory'] as const;
 
 /** Store-required terms under the button (CLAUDE.md §12: trial terms and renewal price). */
 export function termsFor(plan: PlanOption): string {

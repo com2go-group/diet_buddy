@@ -5,7 +5,9 @@ import { renderScreen } from '@/test/render';
 
 import { analyzeFoodPhoto, FoodPhotoError, loadRecentLogs, logFood } from '../api';
 import { LogFoodScreen } from '../LogFoodScreen';
-import { MAX_PHOTO_BASE64, photoItemMacros } from '../photo';
+import { MAX_PHOTO_BASE64 } from '@/lib/images';
+
+import { photoItemMacros } from '../photo';
 import { photoWarningText } from '../photoWarnings';
 import type { FoodPhotoResult, PhotoItem } from '../types';
 
@@ -28,6 +30,8 @@ jest.mock('expo-router', () => ({
 const { router } = jest.requireMock('expo-router') as {
   router: { push: jest.Mock; back: jest.Mock };
 };
+// A minimal JPEG: SOI, one quantisation segment, start of scan.
+const JPEG = btoa('\xff\xd8\xff\xdb\x00\x04qq\xff\xda\x00\x02data\xff\xd9');
 const picker = ImagePicker as jest.Mocked<typeof ImagePicker>;
 
 const usda = (ref: string, name: string, kcal: number, proteinG: number) => ({
@@ -67,7 +71,7 @@ beforeEach(() => {
   picker.requestCameraPermissionsAsync.mockResolvedValue({ granted: true } as never);
   picker.launchCameraAsync.mockResolvedValue({
     canceled: false,
-    assets: [{ uri: 'file://x.jpg', base64: '/9j/abc' }],
+    assets: [{ uri: 'file://x.jpg', base64: JPEG }],
   } as never);
 });
 
@@ -83,7 +87,7 @@ describe('food photo logging', () => {
     expect(screen.getByText(/never stored/)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Take photo' }));
     expect(await screen.findByText('What we found')).toBeOnTheScreen();
-    expect(analyzeFoodPhoto).toHaveBeenCalledWith('/9j/abc');
+    expect(analyzeFoodPhoto).toHaveBeenCalledWith(JPEG);
     expect(picker.launchCameraAsync).toHaveBeenCalledWith(
       expect.objectContaining({ base64: true, exif: false }),
     );

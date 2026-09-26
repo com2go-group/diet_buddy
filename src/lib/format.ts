@@ -33,6 +33,11 @@ export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
+/** "12 Sep". */
+export function formatShortDate(date: Date): string {
+  return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+}
+
 /** "25 September 2026". */
 export function formatLongDate(date: Date): string {
   return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
