@@ -14,6 +14,8 @@ module.exports = {
         primary: {
           DEFAULT: withVar('primary'),
           foreground: withVar('primary-foreground'),
+          // Text on light surfaces: amber-700 meets 4.5:1 where the brand amber is ~2:1.
+          text: withVar('primary-text'),
           dark: '#D97706',
         },
         muted: { DEFAULT: withVar('muted'), foreground: withVar('muted-foreground') },

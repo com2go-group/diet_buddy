@@ -15,7 +15,8 @@ const variants = {
 const tones = {
   default: 'text-foreground',
   muted: 'text-muted-foreground',
-  primary: 'text-primary',
+  // Brand amber is too light for text on light surfaces; primary-text is AA-compliant.
+  primary: 'text-primary-text',
   accent: 'text-accent-foreground',
   destructive: 'text-destructive',
   success: 'text-success',
