@@ -13,6 +13,7 @@ import { FormMessage } from '../auth/components/FormMessage';
 import { NotificationBell } from '../notifications';
 import { DayNav, dayLabel } from './components/DayNav';
 import { FoodLogRow } from './components/FoodLogRow';
+import { MealPlanSection } from './components/MealPlanSection';
 import { MealsSummary } from './components/MealsSummary';
 import { SlotTabs } from './components/SlotTabs';
 import { MEAL_SLOTS, SLOT_EMOJI, slotTarget, totals } from './portion';
@@ -69,6 +70,7 @@ export function MealsScreen() {
           }
         />
         <SlotTabs value={slot} onChange={setSlot} counts={counts} />
+        <MealPlanSection day={day} slot={slot} isToday={isToday} logs={logs} />
         <View className="mb-3 flex-row items-center justify-between">
           <View className="flex-1">
             <Text variant="heading" accessibilityRole="header" className="text-base">
@@ -117,9 +119,6 @@ export function MealsScreen() {
           </View>
         )}
         <FormMessage message={remove.isError ? t('meals.deleteFailed') : undefined} />
-        <Text variant="caption" tone="muted" className="mt-2 text-center">
-          {t('meals.planSoon')}
-        </Text>
       </>
     );
   };
