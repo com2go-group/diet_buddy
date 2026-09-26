@@ -1,5 +1,5 @@
 import { bmi } from './bmi';
-import type { Body } from './types';
+import type { Body, Sex } from './types';
 import { assertValidBody } from './validation';
 
 /**
@@ -63,4 +63,47 @@ export function roundToTotal(values: number[], total: number): number[] {
     remaining -= 1;
   }
   return result;
+}
+
+export interface TapeMeasurements {
+  waistCm: number;
+  neckCm: number;
+  /** Required for women; used for 'unspecified' only when present. */
+  hipCm?: number;
+}
+
+/**
+ * U.S. Navy circumference method (Hodgdon & Beckett, 1984), metric form:
+ *   men:   495 / (1.0324 − 0.19077·log10(waist − neck) + 0.15456·log10(height)) − 450
+ *   women: 495 / (1.29579 − 0.35004·log10(waist + hip − neck) + 0.22100·log10(height)) − 450
+ * 'unspecified' averages both, which needs a hip measurement. Returns null when the inputs
+ * can't produce a valid estimate (missing hip, waist not larger than neck); callers then fall
+ * back to the BMI-based estimate. Clamped to 3–60 %.
+ */
+export function navyBodyFatPct(
+  sex: Sex,
+  heightCm: number,
+  { waistCm, neckCm, hipCm }: TapeMeasurements,
+): number | null {
+  if (!(heightCm > 0) || !(waistCm > neckCm) || !(neckCm > 0)) return null;
+  const male =
+    495 / (1.0324 - 0.19077 * Math.log10(waistCm - neckCm) + 0.15456 * Math.log10(heightCm)) - 450;
+  const female =
+    hipCm && hipCm > 0
+      ? 495 /
+          (1.29579 -
+            0.35004 * Math.log10(waistCm + hipCm - neckCm) +
+            0.221 * Math.log10(heightCm)) -
+        450
+      : null;
+  const value =
+    sex === 'male'
+      ? male
+      : sex === 'female'
+        ? female
+        : female === null
+          ? null
+          : (male + female) / 2;
+  if (value === null || !Number.isFinite(value)) return null;
+  return Math.min(60, Math.max(3, value));
 }

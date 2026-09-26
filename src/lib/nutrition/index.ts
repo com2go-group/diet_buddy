@@ -8,3 +8,5 @@ export * from './pace';
 export * from './plan';
 export { BODY_LIMITS, assertValidBody } from './validation';
 export { ageOn, isAdult } from './age';
+export * from './exercise';
+export * from './forecast';
