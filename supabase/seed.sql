@@ -20,5 +20,7 @@ on conflict (code) do update
 
 insert into public.app_config (key, value, description) values
   ('coach_daily_message_limit_free', '5', 'Coach messages per day on the free tier (decision log 2026-09-25)'),
-  ('food_photo_daily_limit_free', '3', 'Food photo scans per day on the free tier')
+  ('food_photo_daily_limit_free', '3', 'Food photo scans per day on the free tier'),
+  ('sms_provider', '"smsto"', 'SMS provider for verification codes (send-sms hook)'),
+  ('sms_sender_id', '"DietBuddy"', 'Sender name shown on SMS codes')
 on conflict (key) do nothing;

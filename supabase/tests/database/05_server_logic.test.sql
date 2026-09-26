@@ -72,13 +72,17 @@ select throws_ok($$ delete from public.consent_events $$, '42501', null,
 -- Rewarded ad unlock recorded by the server
 reset role;
 insert into public.ad_unlocks (user_id, unlock_type, target_id)
-  values ('11111111-1111-1111-1111-111111111111', 'meal_plan', current_date::text);
+  values ('11111111-1111-1111-1111-111111111111', 'meal_plan', current_date::text || ':lunch');
 select is((select xp from public.profiles where user_id = '11111111-1111-1111-1111-111111111111'),
-  85, 'a meal-plan ad unlock awards 50 XP');
+  50, 'a meal ad unlock awards 15 XP');
+select throws_ok(
+  $$ insert into public.ad_unlocks (user_id, unlock_type, target_id)
+     values ('11111111-1111-1111-1111-111111111111', 'meal_plan', current_date::text || ':lunch') $$,
+  '23505', null, 'the same meal cannot be unlocked twice');
 select throws_ok(
   $$ insert into public.ad_unlocks (user_id, unlock_type, target_id)
      values ('11111111-1111-1111-1111-111111111111', 'meal_plan', current_date::text) $$,
-  '23505', null, 'the same day cannot be unlocked twice');
+  '23514', null, 'meal unlocks name the meal');
 
 -- Account deletion hard-deletes everything (CLAUDE.md §13)
 delete from auth.users where id = '11111111-1111-1111-1111-111111111111';

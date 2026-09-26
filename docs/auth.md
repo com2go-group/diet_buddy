@@ -21,12 +21,12 @@ Do these once the project exists (see `docs/backend.md`). Items 1–2 are needed
 
 - **Authentication → Providers → Email**: enabled, **Confirm email** on, OTP length **6**.
 - **Authentication → Email Templates**: paste `supabase/templates/confirmation.html` into _Confirm signup_ and `supabase/templates/recovery.html` into _Reset password_. They send a code, not a link.
-- **Project Settings → Authentication → SMTP**: add a real email provider (Resend, Postmark, Amazon SES or Brevo, ideally with EU sending). Supabase's built-in email only reaches your own team and is heavily rate-limited, so real users won't get codes without this.
+- **Project Settings → Authentication → SMTP**: use **Brevo** (decision log 2026-09-28); steps in `docs/setup/email-sms.md`. Supabase's built-in email only reaches your own team and is heavily rate-limited, so real users won't get codes without this.
 - **Authentication → URL Configuration**: Site URL `dietbuddy://`, redirect URLs `dietbuddy://**`.
 
 ### 2. Phone / SMS (optional, has running costs)
 
-- **Authentication → Providers → Phone**: enable, turn on **Confirm phone**, pick a provider (Twilio, Twilio Verify, MessageBird, Vonage or Textlocal) and paste its credentials. Each code is a paid SMS, typically €0.05–0.10 per message in the EU.
+- **Authentication → Providers → Phone**: enable and turn on **Confirm phone**. Codes are sent by **sms.to** through the `send-sms` Edge Function (a Send SMS hook), not a built-in provider; steps in `docs/setup/email-sms.md`. Each code is a paid SMS.
 - In the app's `.env`: `EXPO_PUBLIC_AUTH_PHONE_ENABLED=true`. Until then the Email/Phone switch is hidden.
 
 ### 3. Sign in with Apple (iOS)

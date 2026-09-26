@@ -16,7 +16,7 @@ import { useMealPlan } from '../useMealPlan';
 
 /**
  * The day's AI plan for one meal (CLAUDE.md §7.6). Free users see the first item of each meal;
- * the rest unlocks for the day with an opt-in rewarded video (+50 XP) or Premium.
+ * the rest of a meal unlocks with an opt-in rewarded video for that meal (+15 XP) or Premium.
  */
 export function MealPlanSection({
   day,
@@ -30,7 +30,7 @@ export function MealPlanSection({
   logs: FoodLog[];
 }) {
   const { scheme } = useTheme();
-  const { query, generate, premium, locked, watching, watchToUnlock } = useMealPlan(day);
+  const { query, generate, premium, locked, watching, watchToUnlock } = useMealPlan(day, slot);
   const log = useLogFood();
   const errorCode =
     generate.error instanceof MealPlanError

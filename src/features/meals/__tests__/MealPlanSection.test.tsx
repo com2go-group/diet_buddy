@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { showRewarded } from '@/lib/ads';
+import { dayKey } from '@/lib/dates';
 import { renderScreen } from '@/test/render';
 
 import { useStorePremium } from '../../subscriptions/usePremium';
@@ -63,7 +64,7 @@ describe('MealPlanSection', () => {
   });
 
   it('offers to create today’s plan and shows errors', async () => {
-    (loadMealPlan as jest.Mock).mockResolvedValue({ plan: null, unlocked: false });
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan: null, unlockedSlots: [] });
     (generateMealPlan as jest.Mock)
       .mockRejectedValueOnce(new MealPlanError('generation_failed'))
       .mockResolvedValueOnce(plan);
@@ -77,28 +78,33 @@ describe('MealPlanSection', () => {
   });
 
   it('shows free users the first item and locks the rest behind an opt-in video', async () => {
-    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlocked: false });
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
     (showRewarded as jest.Mock).mockResolvedValue('earned');
     await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
     expect(await screen.findByText('Rolled oats')).toBeOnTheScreen();
     expect(screen.queryByText('Blueberries')).toBeNull();
     expect(screen.getByText('2 more items hidden')).toBeOnTheScreen();
     await fireEvent.press(
-      screen.getByRole('button', { name: 'Watch a short video to reveal · +50 XP' }),
+      screen.getByRole('button', { name: 'Watch a short video to reveal this meal · +15 XP' }),
     );
     expect(await screen.findByText('Blueberries')).toBeOnTheScreen();
-    expect((showRewarded as jest.Mock).mock.calls[0][0]).toMatchObject({ type: 'meal_plan' });
+    expect((showRewarded as jest.Mock).mock.calls[0][0]).toMatchObject({
+      type: 'meal_plan',
+      target: `${dayKey(today)}:breakfast`,
+    });
   });
 
-  it('shows everything to Premium users and when the day is unlocked', async () => {
-    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlocked: true });
+  it('unlocks only the meal whose video was watched', async () => {
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: ['lunch'] });
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    expect(await screen.findByText('2 more items hidden')).toBeOnTheScreen();
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: ['breakfast'] });
     await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
     expect(await screen.findByText('Greek yogurt')).toBeOnTheScreen();
-    expect(screen.queryByText(/items hidden/)).toBeNull();
   });
 
   it('logs a planned item with its USDA numbers', async () => {
-    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlocked: false });
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
     await renderScreen(<MealPlanSection day={today} slot="lunch" isToday logs={[]} />);
     await fireEvent.press(await screen.findByRole('button', { name: 'Log Roast chicken' }));
     await waitFor(() => expect(logFood).toHaveBeenCalled());

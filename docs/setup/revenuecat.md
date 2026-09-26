@@ -26,24 +26,23 @@ Store products can only be tested in a development build installed from EAS, not
 
 Use the same product IDs in both stores so RevenueCat maps them easily.
 
-| Plan     | Type                                                       | Product ID                   | Price (CLAUDE.md §12) |
-| -------- | ---------------------------------------------------------- | ---------------------------- | --------------------- |
-| Monthly  | Auto-renewable subscription, 1 month, **7-day free trial** | `dietbuddy_premium_monthly`  | $9.99                 |
-| Annual   | Auto-renewable subscription, 1 year                        | `dietbuddy_premium_annual`   | $71.88                |
-| Lifetime | Non-consumable (Apple) / One-time product (Google)         | `dietbuddy_premium_lifetime` | $149                  |
+| Plan    | Type                                                       | Product ID                  | Price (CLAUDE.md §12) |
+| ------- | ---------------------------------------------------------- | --------------------------- | --------------------- |
+| Monthly | Auto-renewable subscription, 1 month, **7-day free trial** | `dietbuddy_premium_monthly` | $9.99                 |
+| Annual  | Auto-renewable subscription, 1 year                        | `dietbuddy_premium_annual`  | $71.88                |
 
-- **Apple**: App → Monetization → Subscriptions → create a subscription group "Premium", add Monthly and Annual (with the 7-day free introductory offer on Monthly). Lifetime: Monetization → In-App Purchases → Non-Consumable.
-- **Google**: Monetize → Products → Subscriptions → create `dietbuddy_premium_monthly` with a base plan and a **free trial offer** (7 days), and `dietbuddy_premium_annual`. Lifetime: Monetize → Products → In-app products.
+- **Apple**: App → Monetization → Subscriptions → create a subscription group "Premium", add Monthly and Annual (with the 7-day free introductory offer on Monthly).
+- **Google**: Monetize → Products → Subscriptions → create `dietbuddy_premium_monthly` with a base plan and a **free trial offer** (7 days), and `dietbuddy_premium_annual`.
 
-Lifetime is still an open decision (CLAUDE.md §17.8). If you drop it, just don't create it; the paywall only shows what the store offers.
+There is no Lifetime plan (decision log 2026-09-28); the app ignores one if it is ever added.
 
 ## 3. Configure RevenueCat
 
 1. Create a project "DietBuddy".
 2. **Apps**: add an App Store app (bundle ID, plus an **In-App Purchase key** from App Store Connect → Users and Access → Integrations → In-App Purchase) and a Play Store app (package name, plus a **service account JSON** with Play Console financial access; RevenueCat's guide walks through it).
-3. **Products**: import the three products from both stores.
-4. **Entitlements**: create one entitlement with identifier **`premium`** and attach all three products.
-5. **Offerings**: create the default offering with packages **Monthly** (`$rc_monthly`), **Annual** (`$rc_annual`) and **Lifetime** (`$rc_lifetime`). The app reads the package types to label plans.
+3. **Products**: import the two products from both stores.
+4. **Entitlements**: create one entitlement with identifier **`premium`** and attach both products.
+5. **Offerings**: create the default offering with packages **Monthly** (`$rc_monthly`) and **Annual** (`$rc_annual`). The app reads the package types to label plans.
 6. **API keys**: copy the **public** Apple and Google SDK keys into `.env` and into the EAS environment variables:
    ```
    EXPO_PUBLIC_REVENUECAT_IOS_KEY=appl_...

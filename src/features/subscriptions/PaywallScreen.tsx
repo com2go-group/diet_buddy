@@ -37,7 +37,6 @@ const SOON = ['soonBodyScan', 'soonTwin', 'soonStory'] as const;
 
 /** Store-required terms under the button (CLAUDE.md §12: trial terms and renewal price). */
 export function termsFor(plan: PlanOption): string {
-  if (plan.kind === 'lifetime') return t('paywall.termsLifetime', { price: plan.price });
   const period = plan.kind === 'annual' ? t('paywall.year') : t('paywall.month');
   return plan.trialDays !== null
     ? t('paywall.termsTrial', { days: plan.trialDays, price: plan.price, period, store: store() })
@@ -46,13 +45,7 @@ export function termsFor(plan: PlanOption): string {
 
 function ctaFor(plan: PlanOption): string {
   if (plan.trialDays !== null) return t('paywall.ctaTrial', { days: plan.trialDays });
-  return t(
-    plan.kind === 'annual'
-      ? 'paywall.ctaAnnual'
-      : plan.kind === 'lifetime'
-        ? 'paywall.ctaLifetime'
-        : 'paywall.ctaMonthly',
-  );
+  return t(plan.kind === 'annual' ? 'paywall.ctaAnnual' : 'paywall.ctaMonthly');
 }
 
 /** Paywall (CLAUDE.md §12, prototype SubscriptionsScreen). Prices come from the store. */

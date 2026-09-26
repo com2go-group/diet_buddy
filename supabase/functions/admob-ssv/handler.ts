@@ -27,7 +27,7 @@ export interface SsvDeps {
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const customDataSchema = z.object({
   type: z.enum(['meal_plan', 'ai_plan']),
-  target: z.string().max(20),
+  target: z.string().max(24),
 });
 
 const b64urlToBytes = (s: string): Uint8Array => {
@@ -91,11 +91,16 @@ export async function verifySignature(
 
 const dayKeyUtc = (d: Date) => d.toISOString().slice(0, 10);
 
-/** Meal plans unlock for "today" in any time zone (server date ±1 day); the AI plan once. */
+/**
+ * Meal plans unlock one meal ("YYYY-MM-DD:slot") for "today" in any time zone (server date
+ * ±1 day); the AI plan once.
+ */
 export function validTarget(type: 'meal_plan' | 'ai_plan', target: string, now: Date): boolean {
   if (type === 'ai_plan') return target === 'initial';
+  const match = /^(\d{4}-\d{2}-\d{2}):(breakfast|lunch|snack|dinner)$/.exec(target);
+  if (!match) return false;
   const day = 86_400_000;
-  return [-day, 0, day].some((d) => dayKeyUtc(new Date(now.getTime() + d)) === target);
+  return [-day, 0, day].some((d) => dayKeyUtc(new Date(now.getTime() + d)) === match[1]);
 }
 
 export async function handleAdmobSsv(req: Request, deps: SsvDeps): Promise<Response> {

@@ -18,7 +18,7 @@ const pkg = (
 });
 
 describe('store plans', () => {
-  it('orders monthly, annual, lifetime with store prices and the annual saving', () => {
+  it('orders monthly and annual with store prices and the annual saving, ignoring lifetime', () => {
     const plans = toPlans([
       pkg('LIFETIME', 149),
       pkg('ANNUAL', 71.88),
@@ -41,14 +41,6 @@ describe('store plans', () => {
         perMonth: '$5.99',
         trialDays: null,
         savingPct: 40,
-      },
-      {
-        id: '$rc_lifetime',
-        kind: 'lifetime',
-        price: '$149.00',
-        perMonth: null,
-        trialDays: null,
-        savingPct: null,
       },
     ]);
   });

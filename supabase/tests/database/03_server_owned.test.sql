@@ -23,7 +23,7 @@ select throws_ok($$ insert into public.profiles (user_id) values (auth.uid()) $$
   'users cannot create profiles (created on sign-up)');
 
 select throws_ok(
-  $$ insert into public.ad_unlocks (user_id, unlock_type, target_id) values (auth.uid(), 'meal_plan', '2026-09-25') $$,
+  $$ insert into public.ad_unlocks (user_id, unlock_type, target_id) values (auth.uid(), 'meal_plan', '2026-09-25:lunch') $$,
   '42501', null, 'users cannot record their own ad unlocks');
 select throws_ok(
   $$ insert into public.coach_messages (conversation_id, user_id, persona, role, content)

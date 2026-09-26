@@ -6,9 +6,10 @@ import { dayKey } from '@/lib/dates';
 import { useSessionStore } from '../auth/sessionStore';
 import { useRewardedUnlock } from '../ads/useAds';
 import { usePremium } from '../subscriptions/usePremium';
-import { generateMealPlan, loadMealPlan, type MealPlanDay } from './mealPlanApi';
+import { generateMealPlan, loadMealPlan, unlockTarget, type MealPlanDay } from './mealPlanApi';
+import type { MealSlot } from './types';
 
-export function useMealPlan(day: Date) {
+export function useMealPlan(day: Date, slot: MealSlot) {
   const userId = useSessionStore((s) => s.session?.user.id);
   const date = dayKey(day);
   const key = ['mealPlan', userId, date];
@@ -16,7 +17,7 @@ export function useMealPlan(day: Date) {
   const { premium } = usePremium();
   const unlockAd = useRewardedUnlock();
   const [watching, setWatching] = useState(false);
-  const [localUnlock, setLocalUnlock] = useState<string | null>(null);
+  const [localUnlocks, setLocalUnlocks] = useState<string[]>([]);
 
   const query = useQuery({
     queryKey: key,
@@ -28,20 +29,25 @@ export function useMealPlan(day: Date) {
     onSuccess: (plan) =>
       queryClient.setQueryData<MealPlanDay>(key, (old) => ({
         plan,
-        unlocked: old?.unlocked ?? false,
+        unlockedSlots: old?.unlockedSlots ?? [],
       })),
   });
 
-  /** Opt-in rewarded video; the server records the unlock (and XP) from Google's callback. */
+  const target = unlockTarget(date, slot);
+  /**
+   * Opt-in rewarded video for this meal; the server records the unlock (and XP) from Google's
+   * callback.
+   */
   const watchToUnlock = async () => {
     setWatching(true);
-    const outcome = await unlockAd('meal_plan', date).finally(() => setWatching(false));
+    const outcome = await unlockAd('meal_plan', target).finally(() => setWatching(false));
     if (outcome === 'earned') {
-      setLocalUnlock(date);
+      setLocalUnlocks((s) => [...s, target]);
       queryClient.invalidateQueries({ queryKey: key });
     }
   };
 
-  const locked = !premium && !query.data?.unlocked && localUnlock !== date;
+  const locked =
+    !premium && !query.data?.unlockedSlots.includes(slot) && !localUnlocks.includes(target);
   return { date, query, generate, premium, locked, watching, watchToUnlock };
 }

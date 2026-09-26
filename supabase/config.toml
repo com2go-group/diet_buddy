@@ -242,15 +242,16 @@ content_path = "./supabase/templates/confirmation.html"
 subject = "Your DietBuddy password reset code"
 content_path = "./supabase/templates/recovery.html"
 
-# Use a production-ready SMTP server
+# Production email goes through Brevo's SMTP relay (decision log 2026-09-28; docs/setup/email-sms.md).
+# Locally, Inbucket catches emails instead.
 # [auth.email.smtp]
 # enabled = true
-# host = "smtp.sendgrid.net"
+# host = "smtp-relay.brevo.com"
 # port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# user = "env(BREVO_SMTP_LOGIN)"
+# pass = "env(BREVO_SMTP_KEY)"
+# admin_email = "no-reply@yourdomain.com"
+# sender_name = "DietBuddy"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
@@ -295,7 +296,15 @@ max_frequency = "60s"
 # enabled = true
 # uri = "pg-functions://<database>/<schema>/<hook_name>"
 
-# Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
+# SMS codes go through sms.to via the send-sms Edge Function (Send SMS hook; decision log
+# 2026-09-28). Enable on the hosted project (docs/setup/email-sms.md); locally the test OTP above
+# is used instead.
+# [auth.hook.send_sms]
+# enabled = true
+# uri = "https://<project-ref>.supabase.co/functions/v1/send-sms"
+# secrets = "env(SEND_SMS_HOOK_SECRET)"
+
+# Built-in SMS providers are not used.
 [auth.sms.twilio]
 enabled = false
 account_sid = ""

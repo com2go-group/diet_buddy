@@ -46,7 +46,7 @@ The app shows this message (Google UMP) before any ad request, and mirrors the p
 2. AdMob → your Rewarded ad unit → **Server-side verification** → callback URL:
    `https://<project-ref>.supabase.co/functions/v1/admob-ssv`
    AdMob sends a test request when you save; the function answers 200.
-3. Rewards are written to `ad_unlocks` only when Google's signature checks out; the database then adds the XP (+50 meal plan, +100 AI plan). The app never writes rewards itself.
+3. Rewards are written to `ad_unlocks` only when Google's signature checks out; the database then adds the XP (+15 per meal of the plan, +100 AI plan). The app never writes rewards itself.
 
 ## 4. Test on a device
 

@@ -37,7 +37,6 @@ jest.mock('expo-router', () => ({
 const plans: PlanOption[] = [
   { id: 'm', kind: 'monthly', price: '$9.99', perMonth: '$9.99', trialDays: 7, savingPct: null },
   { id: 'a', kind: 'annual', price: '$71.88', perMonth: '$5.99', trialDays: null, savingPct: 40 },
-  { id: 'l', kind: 'lifetime', price: '$149.00', perMonth: null, trialDays: null, savingPct: null },
 ];
 
 describe('PaywallScreen', () => {
@@ -75,13 +74,10 @@ describe('PaywallScreen', () => {
   it('buys the selected plan and shows the premium state', async () => {
     (purchase as jest.Mock).mockResolvedValue(true);
     await renderScreen(<PaywallScreen />);
-    await fireEvent.press(await screen.findByRole('radio', { name: /Lifetime/ }));
-    expect(
-      screen.getByText('One-time payment of $149.00. Not a subscription; no renewals.'),
-    ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Get Lifetime Access' }));
+    await fireEvent.press(await screen.findByRole('radio', { name: /Monthly/ }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Start 7-Day Free Trial' }));
     expect(await screen.findByText('You’re Premium 👑')).toBeOnTheScreen();
-    expect(purchase).toHaveBeenCalledWith('l');
+    expect(purchase).toHaveBeenCalledWith('m');
   });
 
   it('stays quiet when the user cancels, and explains a failure', async () => {

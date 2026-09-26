@@ -1,9 +1,10 @@
 /**
  * Store products → the plans the paywall shows. Prices always come from the store (App Store /
- * Play Billing via RevenueCat), never from the app (CLAUDE.md §12).
+ * Play Billing via RevenueCat), never from the app (CLAUDE.md §12). Subscriptions only: the
+ * Lifetime plan was removed (decision log 2026-09-28), so a lifetime package is ignored.
  */
 
-export type PlanKind = 'monthly' | 'annual' | 'lifetime';
+export type PlanKind = 'monthly' | 'annual';
 
 export interface PlanOption {
   id: string;
@@ -34,7 +35,6 @@ export interface StorePackage {
 const KIND: Record<string, PlanKind> = {
   MONTHLY: 'monthly',
   ANNUAL: 'annual',
-  LIFETIME: 'lifetime',
 };
 const UNIT_DAYS: Record<string, number> = { DAY: 1, WEEK: 7, MONTH: 30, YEAR: 365 };
 
@@ -49,7 +49,7 @@ export function trialDays(product: StorePackage['product']): number | null {
 
 export function toPlans(packages: StorePackage[]): PlanOption[] {
   const monthly = packages.find((p) => p.packageType === 'MONTHLY');
-  const order: PlanKind[] = ['monthly', 'annual', 'lifetime'];
+  const order: PlanKind[] = ['monthly', 'annual'];
   return packages
     .filter((p) => KIND[p.packageType])
     .map((p) => {
@@ -62,8 +62,8 @@ export function toPlans(packages: StorePackage[]): PlanOption[] {
         id: p.identifier,
         kind,
         price: p.product.priceString,
-        perMonth: kind === 'lifetime' ? null : p.product.pricePerMonthString,
-        trialDays: kind === 'lifetime' ? null : trialDays(p.product),
+        perMonth: p.product.pricePerMonthString,
+        trialDays: trialDays(p.product),
         savingPct: saving !== null && saving > 0 ? saving : null,
       };
     })

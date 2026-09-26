@@ -59,11 +59,11 @@ describe('admob-ssv', () => {
   it('records a correctly signed reward', async () => {
     const { sign, deps, unlocks } = await setup();
     const res = await handleAdmobSsv(
-      get(await sign(params({ type: 'meal_plan', target: '2026-09-27' }))),
+      get(await sign(params({ type: 'meal_plan', target: '2026-09-27:lunch' }))),
       deps,
     );
     expect(res.status).toBe(200);
-    expect(unlocks).toEqual([[USER, 'meal_plan', '2026-09-27']]);
+    expect(unlocks).toEqual([[USER, 'meal_plan', '2026-09-27:lunch']]);
   });
 
   it('rejects tampered or unsigned rewards', async () => {
@@ -80,13 +80,15 @@ describe('admob-ssv', () => {
   it('refuses unlocks for other days or unknown targets', async () => {
     const { sign, deps, unlocks } = await setup();
     const res = await handleAdmobSsv(
-      get(await sign(params({ type: 'meal_plan', target: '2026-09-01' }))),
+      get(await sign(params({ type: 'meal_plan', target: '2026-09-01:lunch' }))),
       deps,
     );
     expect(res.status).toBe(400);
     expect(unlocks).toEqual([]);
-    expect(validTarget('meal_plan', '2026-09-26', NOW)).toBe(true);
-    expect(validTarget('meal_plan', '2026-09-28', NOW)).toBe(true);
+    expect(validTarget('meal_plan', '2026-09-26:dinner', NOW)).toBe(true);
+    expect(validTarget('meal_plan', '2026-09-26', NOW)).toBe(false);
+    expect(validTarget('meal_plan', '2026-09-26:brunch', NOW)).toBe(false);
+    expect(validTarget('meal_plan', '2026-09-28:breakfast', NOW)).toBe(true);
     expect(validTarget('ai_plan', 'other', NOW)).toBe(false);
   });
 

@@ -46,7 +46,8 @@ function safeEqual(a: string, b: string): boolean {
 export function premiumAfter(event: RcEvent, now: Date): boolean {
   if (event.type === 'EXPIRATION') return false;
   if (!(event.entitlement_ids ?? []).includes(PREMIUM_ENTITLEMENT)) return false;
-  // Lifetime purchases have no expiry; cancelled subscriptions stay premium until they expire.
+  // Non-expiring purchases (none are sold now) stay premium; cancelled subscriptions stay premium
+  // until they expire.
   return event.expiration_at_ms == null || event.expiration_at_ms > now.getTime();
 }
 

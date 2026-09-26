@@ -24,23 +24,34 @@ export interface MealPlan {
 
 export interface MealPlanDay {
   plan: MealPlan | null;
-  /** Unlocked for this day by a verified rewarded ad. */
-  unlocked: boolean;
+  /** Meals of this day unlocked by a verified rewarded ad (one video per meal). */
+  unlockedSlots: MealSlot[];
 }
+
+const MEAL_SLOT_LIST: MealSlot[] = ['breakfast', 'lunch', 'snack', 'dinner'];
+
+/** ad_unlocks.target_id for one meal: "YYYY-MM-DD:slot". */
+export const unlockTarget = (date: string, slot: MealSlot) => `${date}:${slot}`;
 
 export async function loadMealPlan(userId: string, date: string): Promise<MealPlanDay> {
   const [plans, unlocks] = await Promise.all([
     supabase.from('meal_plans').select('meals').eq('user_id', userId).eq('date', date).limit(1),
     supabase
       .from('ad_unlocks')
-      .select('id')
+      .select('target_id')
       .eq('user_id', userId)
       .eq('unlock_type', 'meal_plan')
-      .eq('target_id', date)
-      .limit(1),
+      .in(
+        'target_id',
+        MEAL_SLOT_LIST.map((s) => unlockTarget(date, s)),
+      ),
   ]);
   const meals = optional(plans)?.[0]?.meals as MealPlan | undefined;
-  return { plan: meals?.slots ? meals : null, unlocked: (optional(unlocks) ?? []).length > 0 };
+  const targets = new Set((optional(unlocks) ?? []).map((u) => u.target_id));
+  return {
+    plan: meals?.slots ? meals : null,
+    unlockedSlots: MEAL_SLOT_LIST.filter((s) => targets.has(unlockTarget(date, s))),
+  };
 }
 
 export type MealPlanErrorCode =

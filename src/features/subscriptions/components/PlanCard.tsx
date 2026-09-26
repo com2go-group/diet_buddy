@@ -20,12 +20,9 @@ export function PlanCard({
       ? t('paywall.trialBadge', { days: plan.trialDays })
       : plan.savingPct !== null
         ? t('paywall.saveBadge', { pct: plan.savingPct })
-        : plan.kind === 'lifetime'
-          ? t('paywall.bestValue')
-          : null;
+        : null;
   const main = plan.kind === 'annual' && plan.perMonth ? plan.perMonth : plan.price;
-  const suffix =
-    plan.kind === 'lifetime' ? ` ${t('paywall.oneTime')}` : t('paywall.perMonthSuffix');
+  const suffix = t('paywall.perMonthSuffix');
   const sub = plan.kind === 'annual' ? t('paywall.perYear', { price: plan.price }) : null;
   return (
     <Pressable
