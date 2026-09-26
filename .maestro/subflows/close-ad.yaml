@@ -1,0 +1,11 @@
+# Free users on phones see a Google test interstitial here. Close it if it is showing.
+appId: com.com2go.dietbuddy
+---
+- runFlow:
+    when:
+      visible: 'Test Ad.*'
+    commands:
+      - tapOn:
+          text: 'Close.*'
+          optional: true
+      - back

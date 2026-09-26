@@ -1,0 +1,17 @@
+# Manual body scan with the onboarding weight, then the initial plan, then Home.
+appId: com.com2go.dietbuddy
+---
+- runFlow: close-ad.yaml
+- assertVisible: 'Body Scan'
+- tapOn: 'Manual Entry.*'
+- tapOn: 'Calculate My Stats'
+- assertVisible: 'Your results'
+- tapOn: 'Save & Continue'
+# Free users on phones get the opt-in "Your AI Plan" video gate; skipping always shows the plan.
+- tapOn:
+    text: 'Skip'
+    optional: true
+- assertVisible: 'Your AI Plan is Ready!.*'
+- assertVisible: 'Daily Nutrition Plan'
+- tapOn: 'Start My Journey.*'
+- assertVisible: 'Today’s Nutrition'

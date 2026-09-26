@@ -1,0 +1,6 @@
+# Maestro workspace (docs/testing.md). `maestro test .maestro` runs the native flows below;
+# `.maestro/web` holds the same journey for the web build.
+flows:
+  - '*.yaml'
+executionOrder:
+  continueOnFailure: false

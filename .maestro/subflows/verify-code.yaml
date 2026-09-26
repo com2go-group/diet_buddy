@@ -1,0 +1,15 @@
+# Types the 6-digit code emailed to ${output.email} and lands on onboarding.
+appId: com.com2go.dietbuddy
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - runScript:
+          file: ../scripts/otp.js
+          env:
+            EMAIL: ${output.email}
+- tapOn:
+    id: 'Verification code'
+- inputText: ${output.code}
+- tapOn: 'Verify'
+- assertVisible: 'Tell us about yourself'

@@ -1,0 +1,9 @@
+# Open the paywall from Home and check it states what Premium includes.
+appId: com.com2go.dietbuddy
+---
+- tapOn:
+    id: 'Home'
+- tapOn: 'Subscribe'
+- assertVisible: 'DietBuddy Premium'
+- assertVisible: 'Included now'
+- assertVisible: 'No ads'

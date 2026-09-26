@@ -1,0 +1,13 @@
+# The store-submission journey on a phone (development or preview build with test ads):
+# sign up → onboarding → body scan → plan → log food → paywall. See docs/testing.md.
+appId: com.com2go.dietbuddy
+env:
+  PASSWORD: diet2buddy
+---
+- launchApp:
+    clearState: true
+- runFlow: subflows/signup.yaml
+- runFlow: subflows/onboarding.yaml
+- runFlow: subflows/plan.yaml
+- runFlow: subflows/log-food.yaml
+- runFlow: subflows/paywall.yaml

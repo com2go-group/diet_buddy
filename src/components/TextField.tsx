@@ -44,6 +44,8 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
       >
         <TextInput
           ref={ref}
+          // Stable ID for UI tests (Maestro `id:`), same as the label; callers may override.
+          testID={label}
           accessibilityLabel={label}
           accessibilityHint={error ?? hint}
           placeholderTextColor={colors.mutedForeground}

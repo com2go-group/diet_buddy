@@ -1,0 +1,12 @@
+# Same journey on the web build (Maestro web is in beta; see docs/testing.md). The account is
+# created through the API because the web driver can't fill the date-of-birth boxes.
+url: ${WEB_URL}
+env:
+  PASSWORD: diet2buddy
+---
+- launchApp
+- runFlow: ../subflows/web-signin-new-account.yaml
+- runFlow: ../subflows/onboarding.yaml
+- runFlow: ../subflows/plan.yaml
+- runFlow: ../subflows/log-food.yaml
+- runFlow: ../subflows/paywall.yaml

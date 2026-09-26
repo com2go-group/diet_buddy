@@ -1,0 +1,25 @@
+# Log a snack by manual entry from the Meals tab and see it counted.
+appId: com.com2go.dietbuddy
+---
+- tapOn:
+    id: 'Meals'
+- assertVisible: 'Calories Today'
+- tapOn: 'Log Food'
+- tapOn: 'Manual entry'
+- tapOn: 'Snack'
+- tapOn:
+    id: 'Food name'
+- inputText: 'Protein bar'
+- tapOn:
+    id: "Calories \\(kcal\\)"
+- inputText: '210'
+- tapOn:
+    id: "Protein \\(g\\)"
+- inputText: '20'
+- hideKeyboard
+- tapOn: 'Add to Snack'
+# The sheet closes back to the previous screen; check the entry on the Meals tab.
+- tapOn:
+    id: 'Meals'
+- tapOn: 'Snack'
+- assertVisible: 'Protein bar.*'

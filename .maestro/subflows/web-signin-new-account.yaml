@@ -1,0 +1,17 @@
+# Web only: create the account through the API, sign in, then verify the emailed code in the app.
+appId: com.com2go.dietbuddy
+---
+- runScript: ../scripts/new-account.js
+- runScript: ../scripts/api-signup.js
+- tapOn: 'I already have an account'
+- tapOn: 'alex@example.com'
+- inputText: ${output.email}
+- tapOn:
+    id: 'Password'
+- inputText: ${PASSWORD}
+# The first "Sign In" is the Sign In / Sign Up switch; the second is the button.
+- tapOn:
+    text: 'Sign In'
+    index: 1
+- assertVisible: 'Enter your code'
+- runFlow: verify-code.yaml

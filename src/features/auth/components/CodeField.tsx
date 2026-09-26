@@ -30,6 +30,7 @@ export function CodeField({ value, onChange, error, autoFocus = true }: CodeFiel
         placeholder="••••••"
         placeholderTextColor={colors.mutedForeground}
         accessibilityLabel={t('auth.code')}
+        testID={t('auth.code')}
         accessibilityHint={error}
         maxFontSizeMultiplier={1.4}
         style={{ color: colors.foreground, letterSpacing: 12, minHeight: 64 }}

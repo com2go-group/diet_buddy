@@ -1,0 +1,31 @@
+# Welcome → create an account with email → verify the 6-digit code → onboarding starts.
+appId: com.com2go.dietbuddy
+---
+- runScript: ../scripts/new-account.js
+- tapOn: 'Get Started — It’s Free'
+- assertVisible: 'Create your account'
+- tapOn: 'Alex Johnson'
+- inputText: 'Maestro Tester'
+- tapOn: 'alex@example.com'
+- inputText: ${output.email}
+- tapOn: 'DD'
+- inputText: '17'
+- tapOn: 'MM'
+- inputText: '05'
+- tapOn: 'YYYY'
+- inputText: '1990'
+- tapOn:
+    id: 'Password'
+- inputText: ${PASSWORD}
+- scrollUntilVisible:
+    element:
+      id: 'Confirm Password'
+- tapOn:
+    id: 'Confirm Password'
+- inputText: ${PASSWORD}
+- hideKeyboard
+- scrollUntilVisible:
+    element: 'Create Account'
+- tapOn: 'Create Account'
+- assertVisible: 'Enter your code'
+- runFlow: verify-code.yaml

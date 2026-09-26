@@ -54,6 +54,7 @@ export function DateField({ label, value, onChange, onBlur, error, hint }: DateF
             placeholder={part.placeholder}
             placeholderTextColor={colors.mutedForeground}
             accessibilityLabel={`${label}, ${t(part.label)}`}
+            testID={`${label}, ${t(part.label)}`}
             maxFontSizeMultiplier={1.8}
             // minWidth 0 lets the inputs shrink to fit; web inputs otherwise keep an intrinsic width.
             style={{

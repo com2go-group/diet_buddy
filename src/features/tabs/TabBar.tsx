@@ -38,6 +38,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
             accessibilityRole="tab"
             aria-selected={focused}
             accessibilityLabel={t(tab.label)}
+            testID={t(tab.label)}
             onPress={() => {
               const event = navigation.emit({
                 type: 'tabPress',
