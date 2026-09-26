@@ -38,3 +38,10 @@ All three prototype bugs are fixed and have regression tests: the ~7× timeline 
 11. **Body fat estimate** (manual body scan): Deurenberg 1991, `1.2 × BMI + 0.23 × age − 10.8 × S − 5.4`, clamped to 3–60 %. The fat / muscle / water / bone split uses fixed heuristic ratios of lean mass (55 / 38 / 7). The UI must label it as an estimate.
 12. **Input limits**: age 18–120, height 100–250 cm, weight 30–350 kg. Anything outside throws `RangeError`. Forms should validate earlier with zod.
 13. **User overrides**: an edited BMR or TDEE from the body-scan screen replaces the calculated value (`PlanInput.overrides`). An edited BMR also feeds the calorie floor.
+
+## Body scan and initial plan
+
+14. **Body fat from tape measurements**: U.S. Navy method (Hodgdon & Beckett 1984, metric). Men need waist and neck, women also need hips. "Unspecified" averages both formulas when hips are given. Without valid measurements the BMI-based estimate (item 11) is used. Results are clamped to 3–60 %.
+15. **Edited values**: an edited body fat drives fat and lean mass, and an edited BMR drives TDEE. An edited TDEE, fat mass or lean mass stands on its own. Edited BMR/TDEE are passed to `computePlan` as overrides. The calorie floor still applies, and uses the edited BMR.
+16. **Exercise recommendation** (`exercise.ts`): weekly templates by current training frequency (0–1, 2–3, 4–5, 6+ days). Fat loss adds 10 minutes to cardio. Performance goals turn one cardio session into intervals (≤30 min). Calorie burn = MET × kg × hours (strength 5, cardio 4.3, intervals 8, active rest 2.5), rounded to 10 kcal. It is shown as an estimate only and never added to food targets.
+17. **Forecast** (`forecast.ts`): milestones at −1 kg, halfway and the goal, at the plan's actual weekly rate after safety caps. A milestone that falls in the same week as a later one is dropped. The chart is a weekly projected-weight line that never overshoots the goal.
