@@ -18,12 +18,12 @@ import { NotificationBell } from '../notifications';
 import { ChoiceSheet } from './components/ChoiceSheet';
 import { GoalEditSheet, type GoalEdit } from './components/GoalEditSheet';
 import { ProfileHeader } from './components/ProfileHeader';
+import { ProfileInfoSheet, type ProfileInfo } from './components/ProfileInfoSheet';
 import { SettingsRow, SettingsSection } from './components/Settings';
 import { minCalories } from './goals';
+import { usePaywall } from '../subscriptions/usePaywall';
+import { usePremium } from '../subscriptions/usePremium';
 import { useProfileOverview } from './useProfile';
-
-type Info = 'premium' | 'notifications' | 'rate' | 'faq' | 'weightGoal' | null;
-const FAQ = [1, 2, 3, 4, 5] as const;
 
 /** Profile & settings (CLAUDE.md §7.14). */
 export function ProfileScreen() {
@@ -31,9 +31,11 @@ export function ProfileScreen() {
   const user = useSessionStore((s) => s.session?.user);
   const { preference, setPreference } = useThemeStore();
   const { query, units, plan } = useProfileOverview();
+  const { premium } = usePremium();
+  const { available: purchasesOn, restore } = usePaywall();
   const [sheet, setSheet] = useState<'theme' | 'units' | null>(null);
   const [edit, setEdit] = useState<GoalEdit | null>(null);
-  const [info, setInfo] = useState<Info>(null);
+  const [info, setInfo] = useState<ProfileInfo>(null);
   const [signingOut, setSigningOut] = useState(false);
 
   const body = () => {
@@ -61,7 +63,7 @@ export function ProfileScreen() {
         <ProfileHeader
           name={profile.name ?? ''}
           contact={user?.email || user?.phone || ''}
-          premium={profile.is_premium}
+          premium={premium}
           stats={data.stats}
         />
         {!data.checkedInToday ? (
@@ -73,7 +75,7 @@ export function ProfileScreen() {
             />
           </View>
         ) : null}
-        {!profile.is_premium ? (
+        {!premium ? (
           <View
             className="mb-5 rounded-2xl border border-primary/30 p-4"
             style={{ backgroundColor: '#1A1A2E' }}
@@ -84,7 +86,7 @@ export function ProfileScreen() {
             <Text className="mb-3 mt-1 text-[14px]" style={{ color: '#F1F5F9' }}>
               {t('profile.upgradeDesc')}
             </Text>
-            <Button label={t('profile.upgradeTitle')} onPress={() => setInfo('premium')} />
+            <Button label={t('profile.upgradeTitle')} onPress={() => router.push('/paywall')} />
           </View>
         ) : null}
 
@@ -234,13 +236,6 @@ export function ProfileScreen() {
     );
   };
 
-  const infoText: Record<Exclude<Info, null | 'faq'>, [string, string]> = {
-    premium: [t('profile.upgradeTitle'), t('profile.upgradeSoon')],
-    notifications: [t('profile.notifications'), t('profile.notificationsSoon')],
-    rate: [t('profile.rate'), t('profile.rateSoon')],
-    weightGoal: [t('profile.weightGoal'), t('profile.weightGoalNote')],
-  };
-
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-background">
       <ScrollView
@@ -262,37 +257,7 @@ export function ProfileScreen() {
         </View>
         {body()}
       </ScrollView>
-      <Sheet
-        visible={info !== null}
-        onClose={() => setInfo(null)}
-        title={info === 'faq' ? t('profile.help') : info ? infoText[info][0] : undefined}
-      >
-        <View className="gap-4 pb-2">
-          {info === 'faq' ? (
-            FAQ.map((n) => (
-              <View key={n} className="gap-1">
-                <Text variant="label" className="font-bold">
-                  {t(`profile.faq${n}q`)}
-                </Text>
-                <Text tone="muted" className="text-[14px] leading-5">
-                  {t(`profile.faq${n}a`)}
-                </Text>
-              </View>
-            ))
-          ) : info ? (
-            <Text>{infoText[info][1]}</Text>
-          ) : null}
-          {info === 'premium' ? (
-            <Button
-              label={t('profile.restore')}
-              variant="outline"
-              disabled
-              onPress={() => undefined}
-            />
-          ) : null}
-          <Button label={t('common.close')} variant="ghost" onPress={() => setInfo(null)} />
-        </View>
-      </Sheet>
+      <ProfileInfoSheet info={info} onClose={() => setInfo(null)} />
     </SafeAreaView>
   );
 }

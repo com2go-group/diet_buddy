@@ -660,6 +660,7 @@ export type Database = {
           name: string | null
           onboarding_completed_at: string | null
           onboarding_step: string | null
+          premium_event_at: string | null
           streak_days: number
           units: Database["public"]["Enums"]["unit_system"]
           updated_at: string
@@ -676,6 +677,7 @@ export type Database = {
           name?: string | null
           onboarding_completed_at?: string | null
           onboarding_step?: string | null
+          premium_event_at?: string | null
           streak_days?: number
           units?: Database["public"]["Enums"]["unit_system"]
           updated_at?: string
@@ -692,6 +694,7 @@ export type Database = {
           name?: string | null
           onboarding_completed_at?: string | null
           onboarding_step?: string | null
+          premium_event_at?: string | null
           streak_days?: number
           units?: Database["public"]["Enums"]["unit_system"]
           updated_at?: string
@@ -797,6 +800,10 @@ export type Database = {
       achievement_progress: {
         Args: { target_user: string }
         Returns: { code: string; current: number; target: number }[]
+      }
+      apply_premium_event: {
+        Args: { target_user: string; premium: boolean; event_at: string }
+        Returns: boolean
       }
       award_xp: {
         Args: { target_user: string; amount: number }

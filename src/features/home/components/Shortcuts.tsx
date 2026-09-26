@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -30,7 +31,7 @@ export function Shortcuts() {
               key={s.key}
               accessibilityRole="button"
               accessibilityLabel={t(`homeScreen.${s.key}`)}
-              onPress={() => setOpen(s)}
+              onPress={() => (s.key === 'subscribe' ? router.push('/paywall') : setOpen(s))}
               style={{ backgroundColor: `${color}1A`, borderColor: `${color}38` }}
               className="flex-1 items-center gap-1 rounded-2xl border py-3 active:opacity-80"
             >
