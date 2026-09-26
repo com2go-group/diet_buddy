@@ -1,5 +1,6 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
+import { userIdFromRequest } from '../_shared/auth.ts';
 import { anthropicProvider } from '../_shared/llm.ts';
 import { handleCoachChat } from './handler.ts';
 import { supabaseCoachStore } from './store.ts';
@@ -17,11 +18,6 @@ Deno.serve((req) =>
   handleCoachChat(req, {
     store,
     llm,
-    async getUserId(request) {
-      const token = request.headers.get('Authorization')?.replace(/^Bearer /, '');
-      if (!token) return null;
-      const { data } = await admin.auth.getUser(token);
-      return data.user?.id ?? null;
-    },
+    getUserId: (request) => userIdFromRequest(admin, request),
   }),
 );
