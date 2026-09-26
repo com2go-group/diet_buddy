@@ -24,6 +24,31 @@ const tones = {
 } as const;
 
 export type TextVariant = keyof typeof variants;
+
+// Class groups a caller's className may override. Two classes from one group conflict, and which
+// wins depends on stylesheet order, so the variant's class is dropped when the caller sets one.
+const groups = [
+  /^text-(xs|sm|base|lg|\d?xl|\[[\d.]+px\])$/,
+  /^leading-/,
+  /^font-(sans|medium|semibold|bold|extrabold)$/,
+];
+
+const isColor = (c: string) =>
+  c.startsWith('text-') && !groups[0]!.test(c) && !/^text-(center|left|right|justify)$/.test(c);
+
+/** The tone's colour class, unless the caller's className sets its own text colour. */
+export function toneClass(tone: TextTone, className?: string): string | undefined {
+  return className?.split(/\s+/).some(isColor) ? undefined : tones[tone];
+}
+
+/** The variant's classes, minus any group the caller's className overrides. */
+export function variantClasses(variant: TextVariant, className?: string): string {
+  const own = className?.split(/\s+/) ?? [];
+  return variants[variant]
+    .split(' ')
+    .filter((c) => !groups.some((g) => g.test(c) && own.some((o) => g.test(o))))
+    .join(' ');
+}
 export type TextTone = keyof typeof tones;
 
 export interface TextProps extends RNTextProps {
@@ -41,7 +66,7 @@ export function Text({ variant = 'body', tone = 'default', className, ...props }
   return (
     <RNText
       maxFontSizeMultiplier={variant === 'kpi' ? 1.3 : 1.8}
-      className={cn(variants[variant], tones[tone], className)}
+      className={cn(variantClasses(variant, className), toneClass(tone, className), className)}
       {...props}
     />
   );

@@ -17,7 +17,7 @@ export function ExerciseCard({ sessions }: { sessions: ExerciseSession[] }) {
         </Text>
       </View>
       {sessions.map((s, i) => {
-        const days = s.days.map((d) => t(`exercise.${d}`)).join(' / ');
+        const days = s.days.map((d) => t(`weekdays.${d}`)).join(' / ');
         const duration = s.minutes ? t('initialPlan.minutes', { count: s.minutes }) : '—';
         const burn = s.kcal ? t('initialPlan.kcalApprox', { kcal: s.kcal }) : '—';
         return (

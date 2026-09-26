@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { Button, Chip, EmptyState, ErrorState, KpiTile, Ring } from '..';
+import { toneClass, variantClasses } from '../Text';
 
 describe('Button', () => {
   it('is an accessible button that fires onPress', async () => {
@@ -66,5 +67,19 @@ describe('states', () => {
     expect(screen.getByRole('alert')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
     expect(onRetry).toHaveBeenCalled();
+  });
+});
+
+describe('Text class overrides', () => {
+  it('drops the variant classes the caller overrides', () => {
+    expect(variantClasses('body')).toBe('text-base leading-6 font-sans');
+    expect(variantClasses('body', 'text-2xl')).toBe('leading-6 font-sans');
+    expect(variantClasses('label', 'font-bold text-[15px] leading-7')).toBe('');
+    expect(variantClasses('caption', 'mt-1 uppercase')).toBe('text-xs leading-4 font-medium');
+  });
+
+  it('keeps the tone unless a text colour is given', () => {
+    expect(toneClass('muted', 'text-center text-lg')).toBe('text-muted-foreground');
+    expect(toneClass('default', 'font-bold text-white')).toBeUndefined();
   });
 });

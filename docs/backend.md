@@ -55,6 +55,7 @@ Server-side rules (database triggers):
 - Weight-loss goals must be below the current weight and at or above BMI 18.5.
 - Plans below 1,200 kcal are rejected.
 - A check-in awards +20 XP (one per day) and refreshes the streak.
+- A check-in's `date` is the device's local date and must be within one day of the server date (covers every time zone), so check-ins can't be back- or future-dated to collect XP.
 - Check-in weight feeds the weight trend.
 - Ad unlocks award XP: +50 for a meal plan, +100 for the AI plan.
 - Every consent change is written to `consent_events`.
