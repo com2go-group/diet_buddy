@@ -43,11 +43,8 @@ export function PersonaPicker({
             className="min-h-[56px] flex-1 items-center justify-center rounded-2xl border-[1.5px] border-border bg-card py-2 active:opacity-80"
           >
             <Text className="text-lg leading-6">{p.emoji}</Text>
-            <Text
-              variant="caption"
-              className="font-bold"
-              style={{ color: selected ? color : undefined }}
-            >
+            {/* Selection shows in the border and tint; the name keeps full-contrast text. */}
+            <Text variant="caption" className="font-bold">
               {t(`coach.${p.id}`)}
             </Text>
             <Text variant="caption" tone="muted" className="text-[10px]">

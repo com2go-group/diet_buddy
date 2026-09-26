@@ -17,5 +17,6 @@ export { SelectTile, TileGrid, type SelectTileProps } from './SelectTile';
 export { SegmentedControl, type SegmentedControlProps } from './SegmentedControl';
 export { Sheet, type SheetProps } from './Sheet';
 export { Skeleton, SkeletonCard, type SkeletonProps } from './Skeleton';
+export { SwitchRow, type SwitchRowProps } from './SwitchRow';
 export { Text, type TextProps, type TextTone, type TextVariant } from './Text';
 export { TextField, type TextFieldProps } from './TextField';

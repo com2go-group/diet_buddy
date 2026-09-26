@@ -182,7 +182,7 @@ export function CoachScreen() {
                 aria-disabled={blocked || send.isPending}
                 disabled={blocked || send.isPending}
                 onPress={() => submit(t(key))}
-                style={{ minHeight: 36 }}
+                style={{ minHeight: MIN_TOUCH_TARGET }}
                 className="justify-center rounded-full border border-primary/25 bg-primary/10 px-3 active:opacity-70"
               >
                 <Text variant="caption" tone="primary" className="font-semibold text-[13px]">

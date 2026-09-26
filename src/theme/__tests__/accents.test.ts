@@ -16,15 +16,15 @@ const contrast = (a: string, b: string) => {
 };
 
 describe.each(Object.entries(ACCENTS))('%s accent', (_, { light, dark }) => {
-  it('meets 3:1 (large text) on light surfaces', () => {
-    expect(contrast(light, palette.light.background)).toBeGreaterThanOrEqual(3);
-    expect(contrast(light, palette.light.card)).toBeGreaterThanOrEqual(3);
-    expect(contrast(light, palette.light.muted)).toBeGreaterThanOrEqual(3);
+  it('meets 4.5:1 (normal text) on light surfaces', () => {
+    expect(contrast(light, palette.light.background)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(light, palette.light.card)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(light, palette.light.muted)).toBeGreaterThanOrEqual(4.5);
   });
 
-  it('meets 3:1 (large text) on dark surfaces', () => {
-    expect(contrast(dark, palette.dark.background)).toBeGreaterThanOrEqual(3);
-    expect(contrast(dark, palette.dark.card)).toBeGreaterThanOrEqual(3);
+  it('meets 4.5:1 (normal text) on dark surfaces', () => {
+    expect(contrast(dark, palette.dark.background)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(dark, palette.dark.card)).toBeGreaterThanOrEqual(4.5);
   });
 });
 
@@ -42,5 +42,14 @@ describe('primary text colour', () => {
         expect(contrast(p.primaryText, surface)).toBeGreaterThanOrEqual(4.5);
       }
     }
+  });
+});
+
+describe('secondary and primary text on tinted surfaces (light)', () => {
+  // Muted panels, amber and blue tints used behind selected chips, callouts and notes.
+  const tints = ['#F3F4F6', '#FEF3C7', '#F9EEDD', '#F1E3D8', '#E6EBF4'];
+  it.each(tints)('muted and primary text meet 4.5:1 on %s', (tint) => {
+    expect(contrast(palette.light.mutedForeground, tint)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(palette.light.primaryText, tint)).toBeGreaterThanOrEqual(4.5);
   });
 });

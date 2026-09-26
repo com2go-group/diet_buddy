@@ -41,7 +41,8 @@ export function ModeChooser({
         </Text>
         <View className="mt-3 flex-row gap-2">
           <View className="rounded-full bg-primary/20 px-2.5 py-1">
-            <Text variant="caption" tone="primary" className="font-bold">
+            {/* The card is always dark, so the badge uses the light amber, not the theme's. */}
+            <Text variant="caption" className="font-bold" style={{ color: '#FCD34D' }}>
               {t('bodyScan.premium')}
             </Text>
           </View>

@@ -1,9 +1,9 @@
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Linking, Pressable, ScrollView, Switch, View } from 'react-native';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, ErrorState, SkeletonCard, Text } from '@/components';
+import { Button, ErrorState, SkeletonCard, SwitchRow, Text } from '@/components';
 import { t } from '@/i18n';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
@@ -23,26 +23,15 @@ export function NotificationSettingsScreen() {
     consents.query.data?.find((c) => c.consent_type === 'marketing')?.granted ?? false;
 
   const toggle = (key: keyof NotificationPrefs, label: string, desc: string, disabled = false) => (
-    <View key={key} className="flex-row items-center gap-3 py-2.5">
-      <View className="flex-1">
-        <Text variant="label" className="font-semibold text-[15px]">
-          {label}
-        </Text>
-        <Text variant="caption" tone="muted" className="text-[13px]">
-          {desc}
-        </Text>
-      </View>
-      <Switch
-        accessibilityLabel={label}
-        aria-checked={Boolean(query.data?.[key])}
-        value={Boolean(query.data?.[key]) && !disabled}
-        disabled={disabled}
-        aria-disabled={disabled}
-        onValueChange={(v) => update.mutate({ [key]: v })}
-        trackColor={{ true: colors.primary, false: colors.mutedForeground }}
-        thumbColor="#FFFFFF"
-      />
-    </View>
+    <SwitchRow
+      key={key}
+      className="py-1.5"
+      label={label}
+      description={desc}
+      value={Boolean(query.data?.[key]) && !disabled}
+      disabled={disabled}
+      onChange={(v) => update.mutate({ [key]: v })}
+    />
   );
 
   const permissionCard = () => {

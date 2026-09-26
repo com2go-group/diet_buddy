@@ -1,10 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, Switch, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, ErrorState, Sheet, SkeletonCard, Text, TextField } from '@/components';
+import { Button, ErrorState, Sheet, SkeletonCard, SwitchRow, Text, TextField } from '@/components';
 import { t } from '@/i18n';
 import { formatLongDate } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
@@ -36,31 +36,15 @@ export function PrivacyScreen() {
   const [typed, setTyped] = useState('');
 
   const consent = (type: string) => query.data?.find((c) => c.consent_type === type);
-  const toggle = (type: OptionalConsent, label: string, desc: string) => {
-    const granted = consent(type)?.granted ?? false;
-    return (
-      <View className="flex-row items-center gap-3">
-        <View className="flex-1">
-          <Text variant="label" className="font-semibold text-[15px]">
-            {label}
-          </Text>
-          <Text variant="caption" tone="muted" className="text-[13px]">
-            {desc}
-          </Text>
-        </View>
-        <Switch
-          accessibilityLabel={label}
-          aria-checked={granted}
-          value={granted}
-          disabled={update.isPending}
-          aria-disabled={update.isPending}
-          onValueChange={(v) => update.mutate({ type, granted: v })}
-          trackColor={{ true: colors.primary, false: colors.mutedForeground }}
-          thumbColor="#FFFFFF"
-        />
-      </View>
-    );
-  };
+  const toggle = (type: OptionalConsent, label: string, desc: string) => (
+    <SwitchRow
+      label={label}
+      description={desc}
+      value={consent(type)?.granted ?? false}
+      disabled={update.isPending}
+      onChange={(v) => update.mutate({ type, granted: v })}
+    />
+  );
 
   const health = consent('health_data');
   return (

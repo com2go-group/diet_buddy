@@ -2,11 +2,19 @@ import { Feather } from '@expo/vector-icons';
 import { useMutation } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, Switch, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import type Svg from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Callout, EmptyState, ErrorState, SkeletonCard, Text } from '@/components';
+import {
+  Button,
+  Callout,
+  EmptyState,
+  ErrorState,
+  SkeletonCard,
+  SwitchRow,
+  Text,
+} from '@/components';
 import { t } from '@/i18n';
 import { formatShortDate } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
@@ -50,26 +58,7 @@ export function StoryScreen() {
   }, [query.data, now]);
 
   const toggle = (label: string, value: boolean, onChange: (v: boolean) => void, desc?: string) => (
-    <View className="flex-row items-center gap-3">
-      <View className="flex-1">
-        <Text variant="label" className="font-semibold text-[15px]">
-          {label}
-        </Text>
-        {desc ? (
-          <Text variant="caption" tone="muted" className="text-[13px]">
-            {desc}
-          </Text>
-        ) : null}
-      </View>
-      <Switch
-        accessibilityLabel={label}
-        aria-checked={value}
-        value={value}
-        onValueChange={onChange}
-        trackColor={{ true: colors.primary, false: colors.mutedForeground }}
-        thumbColor="#FFFFFF"
-      />
-    </View>
+    <SwitchRow label={label} description={desc} value={value} onChange={onChange} />
   );
 
   const body = () => {

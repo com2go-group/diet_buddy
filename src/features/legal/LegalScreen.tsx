@@ -52,6 +52,8 @@ export function LegalScreen({ doc }: { doc: LegalDoc }) {
         </Text>
       </View>
       <ScrollView
+        // Keyboard users can focus and scroll the page (it has no other focusable content).
+        focusable
         contentContainerClassName="gap-4 px-5 pb-12"
         style={{ maxWidth: 760, width: '100%', alignSelf: 'center' }}
       >

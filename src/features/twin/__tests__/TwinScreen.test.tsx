@@ -50,17 +50,17 @@ describe('TwinScreen', () => {
 
   it('lets Premium users step through the timeline to the projected goal', async () => {
     await renderScreen(<TwinScreen />);
-    await fireEvent.press(await screen.findByRole('button', { name: /^Goal/ }));
+    await fireEvent.press(await screen.findByRole('radio', { name: /^Goal/ }));
     expect(screen.getByText(/^66 kg · body fat about/)).toBeOnTheScreen();
     expect(screen.getByText(/Projected for about .* if you follow your plan\./)).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: /^Start/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: /^Start/ }));
     expect(screen.getByText(/^78 kg · body fat about .*% \(estimate\)$/)).toBeOnTheScreen();
   });
 
   it('locks the timeline for free users', async () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<TwinScreen />);
-    await fireEvent.press(await screen.findByRole('button', { name: /^Goal.*🔒$/ }));
+    await fireEvent.press(await screen.findByRole('radio', { name: /^Goal.*🔒$/ }));
     expect(screen.queryByText(/^66 kg/)).toBeNull();
     expect(
       screen.getByText("Your twin's timeline and goal projection are part of Premium."),

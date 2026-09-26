@@ -45,7 +45,7 @@ export function SignInForm({ method }: { method: AuthMethod }) {
               <Pressable
                 accessibilityRole="link"
                 onPress={() => router.push('/forgot-password')}
-                hitSlop={12}
+                hitSlop={14}
               >
                 <Text variant="caption" tone="primary" className="font-semibold">
                   {t('auth.forgotPassword')}

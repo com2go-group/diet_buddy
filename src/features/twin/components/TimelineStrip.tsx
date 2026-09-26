@@ -36,16 +36,22 @@ export function TimelineStrip({
   onSelect: (index: number) => void;
 }) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerClassName="gap-2"
+      accessibilityRole="radiogroup"
+      accessibilityLabel={t('twin.timeline')}
+    >
       {frames.map((frame, i) => {
         const locked = isLocked(frame);
         const active = i === selected;
         return (
           <Pressable
             key={`${frame.kind}-${frame.date ?? i}`}
-            accessibilityRole="button"
+            accessibilityRole="radio"
             accessibilityLabel={`${t('twin.frameA11y', { frame: frameName(frame), date: frameDate(frame) })}${locked ? ' 🔒' : ''}`}
-            aria-selected={active}
+            aria-checked={active}
             onPress={() => onSelect(i)}
             style={{ minWidth: 64, minHeight: 44 }}
             className={
