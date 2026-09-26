@@ -44,6 +44,7 @@ function render(shape: Shape, key: number) {
           stroke={shape.stroke}
           strokeWidth={shape.width}
           strokeLinecap="round"
+          opacity={shape.opacity}
         />
       );
   }
