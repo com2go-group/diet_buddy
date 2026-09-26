@@ -33,6 +33,20 @@ export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
+/** Food amounts: "450 g" / "1.2 kg", or "9.5 oz" / "2.6 lb". */
+export function formatFoodAmount(grams: number, units: UnitSystem): string {
+  if (units === 'imperial') {
+    const oz = grams / 28.3495;
+    return oz < 16 ? `${formatDecimal(oz)} oz` : `${formatDecimal(oz / 16)} lb`;
+  }
+  return grams < 1000 ? `${Math.round(grams)} g` : `${formatDecimal(grams / 1000)} kg`;
+}
+
+/** "€12.40". */
+export function formatMoney(value: number, currency: string): string {
+  return value.toLocaleString(locale, { style: 'currency', currency });
+}
+
 /** "12 Sep". */
 export function formatShortDate(date: Date): string {
   return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });

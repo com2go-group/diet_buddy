@@ -526,6 +526,51 @@ export type Database = {
         }
         Relationships: []
       }
+      grocery_lists: {
+        Row: {
+          checked: string[]
+          created_at: string
+          currency: string
+          days: number
+          estimated_cost: number | null
+          id: string
+          items: Json
+          model: string
+          prompt_version: string
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checked?: string[]
+          created_at?: string
+          currency?: string
+          days: number
+          estimated_cost?: number | null
+          id?: string
+          items: Json
+          model: string
+          prompt_version: string
+          start_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checked?: string[]
+          created_at?: string
+          currency?: string
+          days?: number
+          estimated_cost?: number | null
+          id?: string
+          items?: Json
+          model?: string
+          prompt_version?: string
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       meal_plans: {
         Row: {
           created_at: string

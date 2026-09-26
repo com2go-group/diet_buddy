@@ -24,6 +24,7 @@ export const EXPORT_TABLES = [
   'notification_preferences',
   'xp_events',
   'ai_insights',
+  'grocery_lists',
   'ai_usage',
 ] as const;
 

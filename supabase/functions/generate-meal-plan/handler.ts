@@ -6,6 +6,7 @@ import {
   retryFeedback,
 } from '../_prompts/mealPlan.v1.ts';
 import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
+import { dayOffset } from '../_shared/dates.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
 import type { FoodResult } from '../_shared/usda.ts';
@@ -59,16 +60,24 @@ export const MAX_ATTEMPTS = 3;
 export const PREMIUM_REGENERATIONS = 3;
 export const DAILY_CALL_CAP = 15;
 
+/** Premium can plan this many days ahead (for the week's grocery list). */
+export const PREMIUM_DAYS_AHEAD = 7;
+
 /** Plans can be made for "today" in any time zone (server date ±1 day). */
 export function validDate(date: string, now: Date): boolean {
-  const day = 86_400_000;
-  return [-day, 0, day].some(
-    (d) => new Date(now.getTime() + d).toISOString().slice(0, 10) === date,
-  );
+  const offset = dayOffset(date, now);
+  return offset >= -1 && offset <= 1;
+}
+
+/** Premium: today in any time zone up to 7 days ahead. */
+function validPremiumDate(date: string, now: Date): boolean {
+  const offset = dayOffset(date, now);
+  return offset >= -1 && offset <= PREMIUM_DAYS_AHEAD + 1;
 }
 
 /**
- * POST { date, regenerate? } → { plan }. Returns the stored plan when there is one; otherwise
+ * POST { date, regenerate? } → { plan }. Dates: today in any time zone; Premium also the next 7
+ * days (for the weekly grocery list). Returns the stored plan when there is one; otherwise
  * generates: model picks foods → USDA numbers → allergy/restriction check in code → retry with
  * feedback on any problem (up to 3 attempts) → portions scaled to the targets → stored.
  */
@@ -80,7 +89,13 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
     if (!userId) return fail('unauthorized', 401);
     const parsed = requestSchema.safeParse(await req.json().catch(() => null));
     const now = deps.now?.() ?? new Date();
-    if (!parsed.success || !validDate(parsed.data.date, now)) return fail('invalid_request', 400);
+    if (
+      !parsed.success ||
+      Number.isNaN(Date.parse(parsed.data.date)) ||
+      !validPremiumDate(parsed.data.date, now)
+    ) {
+      return fail('invalid_request', 400);
+    }
     const { date, regenerate = false } = parsed.data;
     const { store } = deps;
 
@@ -88,6 +103,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
     if (existing && !regenerate) return json({ plan: existing.plan });
 
     const ctx = await store.context(userId);
+    if (!validDate(date, now) && !ctx.premium) return fail('premium_required', 403);
     if (existing && (!ctx.premium || existing.regenerations >= PREMIUM_REGENERATIONS)) {
       return fail(ctx.premium ? 'regenerate_limit' : 'premium_required', 403);
     }

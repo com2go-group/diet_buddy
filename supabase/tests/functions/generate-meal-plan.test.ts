@@ -211,8 +211,19 @@ describe('generate-meal-plan', () => {
     ).toEqual({ error: 'regenerate_limit' });
   });
 
-  it('only plans for today (±1 day for time zones)', async () => {
+  it('plans today (±1 day for time zones); Premium also the next 7 days', async () => {
     const { deps } = setup({ replies: [] });
-    expect((await handleGenerateMealPlan(post({ date: '2026-10-05' }), deps)).status).toBe(400);
+    expect((await handleGenerateMealPlan(post({ date: '2026-09-25' }), deps)).status).toBe(400);
+    const future = await handleGenerateMealPlan(post({ date: '2026-10-01' }), deps);
+    expect(await future.json()).toEqual({ error: 'premium_required' });
+    expect((await handleGenerateMealPlan(post({ date: '2026-02-31' }), deps)).status).toBe(400);
+
+    const premium = setup({ premium: true, replies: [planJson(item('Apple', 'apple', 150))] });
+    const res = await handleGenerateMealPlan(post({ date: '2026-10-04' }), premium.deps);
+    expect(res.status).toBe(200);
+    expect((await res.json()).plan.date).toBe('2026-10-04');
+    expect((await handleGenerateMealPlan(post({ date: '2026-10-06' }), premium.deps)).status).toBe(
+      400,
+    );
   });
 });

@@ -15,8 +15,8 @@ const SHORTCUTS = [
 type Shortcut = (typeof SHORTCUTS)[number];
 
 /**
- * Grocery AI, Restaurant and Subscribe shortcuts. Their screens arrive in Phases 2–3, so each
- * opens a short "coming soon" sheet instead of a mock screen.
+ * Grocery AI, Restaurant and Subscribe shortcuts. Restaurant mode isn't built yet, so it opens a
+ * short "coming soon" sheet instead of a mock screen.
  */
 export function Shortcuts() {
   const { scheme } = useTheme();
@@ -31,7 +31,13 @@ export function Shortcuts() {
               key={s.key}
               accessibilityRole="button"
               accessibilityLabel={t(`homeScreen.${s.key}`)}
-              onPress={() => (s.key === 'subscribe' ? router.push('/paywall') : setOpen(s))}
+              onPress={() =>
+                s.key === 'subscribe'
+                  ? router.push('/paywall')
+                  : s.key === 'grocery'
+                    ? router.push('/grocery')
+                    : setOpen(s)
+              }
               style={{ backgroundColor: `${color}1A`, borderColor: `${color}38` }}
               className="flex-1 items-center gap-1 rounded-2xl border py-3 active:opacity-80"
             >
