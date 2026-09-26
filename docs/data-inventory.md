@@ -35,4 +35,6 @@ Food search: the search text (e.g. "chicken breast") goes to USDA FoodData Centr
 
 Ads (free tier): the Google Mobile Ads SDK collects the device's advertising ID and ad interaction data after the UMP consent flow; non-personalised ads are requested unless the user allows personalisation. No health data, keywords or content URLs are sent with ad requests. Rewarded-ad callbacks from Google contain only our user ID and `{type, target}`.
 
+Health stores (when the user connects Apple Health or Health Connect): weight samples are imported into `body_metrics` (`source` healthkit / health_connect); steps and active energy are read for display only and not stored; check-in weights and water glasses are written back to the store. The connection is recorded in `device_connections`. None of it goes to ad or analytics SDKs.
+
 Not collected: precise location, contacts, analytics and crash data (PostHog/Sentry, later).

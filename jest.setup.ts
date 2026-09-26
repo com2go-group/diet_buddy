@@ -49,3 +49,22 @@ jest.mock('react-native-google-mobile-ads', () => ({
   BannerAd: () => null,
   BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
 }));
+
+// Health stores: native only. Feature tests mock '@/lib/health' when they need data.
+jest.mock('@kingstinct/react-native-healthkit', () => ({
+  isHealthDataAvailableAsync: jest.fn(() => Promise.resolve(false)),
+  requestAuthorization: jest.fn(() => Promise.resolve(false)),
+  queryQuantitySamples: jest.fn(() => Promise.resolve([])),
+  queryStatisticsForQuantity: jest.fn(() => Promise.resolve({})),
+  saveQuantitySample: jest.fn(() => Promise.resolve(undefined)),
+}));
+jest.mock('react-native-health-connect', () => ({
+  SdkAvailabilityStatus: { SDK_UNAVAILABLE: 1, SDK_AVAILABLE: 3 },
+  getSdkStatus: jest.fn(() => Promise.resolve(1)),
+  initialize: jest.fn(() => Promise.resolve(false)),
+  requestPermission: jest.fn(() => Promise.resolve([])),
+  readRecords: jest.fn(() => Promise.resolve({ records: [] })),
+  aggregateRecord: jest.fn(() => Promise.resolve(null)),
+  insertRecords: jest.fn(() => Promise.resolve([])),
+  openHealthConnectSettings: jest.fn(),
+}));

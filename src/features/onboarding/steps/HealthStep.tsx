@@ -3,6 +3,7 @@ import { Linking, Platform, View } from 'react-native';
 import { Button, Callout, Text } from '@/components';
 import { t } from '@/i18n';
 
+import { useHealthConnection } from '../../health/useHealth';
 import { HEALTH_PLATFORMS, SMART_SCALES, WEARABLES } from '../options';
 import { StepHeader } from './shared';
 
@@ -13,10 +14,38 @@ const platformName = t(
 );
 
 /**
- * Health syncing (HealthKit / Health Connect) is Phase 2, so nothing is connected here yet. The
- * step explains what will sync and asks for nothing.
+ * Connects Apple Health (iOS) or Health Connect (Android). Optional: onboarding continues either
+ * way, and it can be connected later in Profile → Health apps.
  */
 export function HealthAppsStep() {
+  const { platform, query, connect } = useHealthConnection();
+  const status = (id: string) => {
+    if (!platform || id !== platform) return null;
+    if (query.data?.connected) {
+      return (
+        <Text variant="caption" tone="success" className="font-bold">
+          {t('healthApps.connected')}
+        </Text>
+      );
+    }
+    if (query.data && !query.data.available) {
+      return (
+        <Text variant="caption" tone="muted" className="max-w-[96px] text-right">
+          {t('healthApps.notAvailable')}
+        </Text>
+      );
+    }
+    return (
+      <Button
+        label={t('healthApps.connect')}
+        size="md"
+        fullWidth={false}
+        loading={connect.isPending}
+        disabled={query.isPending}
+        onPress={() => connect.mutate()}
+      />
+    );
+  };
   return (
     <>
       <StepHeader emoji="📲" title={t('healthApps.title')} subtitle={t('healthApps.subtitle')} />
@@ -27,7 +56,7 @@ export function HealthAppsStep() {
         {platforms.map((p) => (
           <View
             key={p.id}
-            accessible
+            accessible={!platform}
             className="flex-row items-center gap-3.5 rounded-2xl border-[1.5px] border-border bg-card p-4"
           >
             <View className="h-12 w-12 items-center justify-center rounded-2xl bg-muted">
@@ -41,16 +70,12 @@ export function HealthAppsStep() {
                 {t(`healthApps.${p.id}Sub`)}
               </Text>
             </View>
-            <View className="rounded-full bg-muted px-2.5 py-1">
-              <Text variant="caption" tone="muted" className="font-bold">
-                {t('healthApps.comingSoon')}
-              </Text>
-            </View>
+            {status(p.id)}
           </View>
         ))}
       </View>
-      <Callout emoji="⏳" className="mt-4">
-        {t('healthApps.comingSoonNote')}
+      <Callout emoji="💡" className="mt-4">
+        {platform ? t('healthApps.optional') : t('healthApps.phoneOnly')}
       </Callout>
     </>
   );

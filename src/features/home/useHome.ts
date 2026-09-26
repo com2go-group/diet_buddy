@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { haptics } from '@/lib/haptics';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { mirrorToHealth } from '../health/useHealth';
 import { addGlass, loadHome, removeWaterLog } from './api';
 import { GLASS_ML, type HomeData } from './summary';
 
@@ -44,7 +45,10 @@ export function useHome() {
         { id: `pending-${Date.now()}`, logged_at: new Date().toISOString(), ml: GLASS_ML },
       ],
     })),
-    onSuccess: () => haptics.selection(),
+    onSuccess: () => {
+      haptics.selection();
+      mirrorToHealth.water(GLASS_ML);
+    },
     onError: rollback,
     onSettled: settle,
   });

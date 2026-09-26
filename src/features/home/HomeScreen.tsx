@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorState, SkeletonCard } from '@/components';
 import { AppBanner } from '@/features/ads';
+import { ActivityCard } from '@/features/health';
 import { t } from '@/i18n';
 import { useTheme } from '@/theme';
 
@@ -105,6 +106,7 @@ export function HomeScreen() {
         ) : (
           <ErrorState message={t('homeScreen.noPlan')} onRetry={() => query.refetch()} />
         )}
+        <ActivityCard />
         <SectionTitle
           title={t('homeScreen.meals')}
           action={t('homeScreen.logMeal')}

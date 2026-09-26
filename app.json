@@ -21,7 +21,16 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.com2go.dietbuddy"
+      "package": "com.com2go.dietbuddy",
+      "permissions": [
+        "android.permission.health.READ_WEIGHT",
+        "android.permission.health.WRITE_WEIGHT",
+        "android.permission.health.READ_BODY_FAT",
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
+        "android.permission.health.READ_HYDRATION",
+        "android.permission.health.WRITE_HYDRATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -47,6 +56,23 @@
         "expo-notifications",
         {
           "color": "#F59E0B"
+        }
+      ],
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "DietBuddy reads your weight, body fat, steps, active energy and water to track your progress. This data is never used for advertising.",
+          "NSHealthUpdateUsageDescription": "DietBuddy saves the weight and water you log so they appear in Apple Health.",
+          "background": false
+        }
+      ],
+      "react-native-health-connect",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
         }
       ]
     ],
