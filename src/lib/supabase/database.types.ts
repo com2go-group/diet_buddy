@@ -75,6 +75,60 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          target: string | null
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target?: string | null
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          role: Database["public"]["Enums"]["admin_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          role: Database["public"]["Enums"]["admin_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          role?: Database["public"]["Enums"]["admin_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_insights: {
         Row: {
           created_at: string
@@ -424,6 +478,36 @@ export type Database = {
           scopes?: string[]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      faq_entries: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          published: boolean
+          question: string
+          sort: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          question: string
+          sort?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          question?: string
+          sort?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -877,6 +961,78 @@ export type Database = {
         }
         Relationships: []
       }
+      safety_events: {
+        Row: {
+          created_at: string
+          flag: string
+          id: string
+          persona: Database["public"]["Enums"]["coach_persona"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flag: string
+          id?: string
+          persona: Database["public"]["Enums"]["coach_persona"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flag?: string
+          id?: string
+          persona?: Database["public"]["Enums"]["coach_persona"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          replied_at: string | null
+          replied_by: string | null
+          reply: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          replied_at?: string | null
+          replied_by?: string | null
+          reply?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          replied_at?: string | null
+          replied_by?: string | null
+          reply?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -974,6 +1130,74 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_audit: {
+        Args: { p_limit?: number }
+        Returns: { id: string; admin_email: string | null; action: string; target: string | null; details: Json; created_at: string }[]
+      }
+      admin_delete_faq: {
+        Args: { p_id: string }
+        Returns: undefined
+      }
+      admin_list_config: {
+        Args: never
+        Returns: { key: string; value: Json; description: string | null; created_at: string; updated_at: string }[]
+      }
+      admin_list_faq: {
+        Args: never
+        Returns: { id: string; question: string; answer: string; sort: number; published: boolean; created_at: string; updated_at: string }[]
+      }
+      admin_list_safety_events: {
+        Args: { p_open_only?: boolean }
+        Returns: { id: string; user_id: string; email: string | null; persona: Database["public"]["Enums"]["coach_persona"]; flag: string; created_at: string; reviewed_at: string | null }[]
+      }
+      admin_list_tickets: {
+        Args: { p_status?: string | null }
+        Returns: { id: string; user_id: string; email: string | null; subject: string; message: string; status: string; reply: string | null; created_at: string; replied_at: string | null }[]
+      }
+      admin_list_users: {
+        Args: { p_search?: string; p_limit?: number; p_offset?: number }
+        Returns: { user_id: string; email: string | null; phone: string | null; name: string | null; created_at: string; last_sign_in_at: string | null; is_premium: boolean; onboarded: boolean; xp: number; streak_days: number; banned: boolean; admin_role: Database["public"]["Enums"]["admin_role"] | null }[]
+      }
+      admin_me: {
+        Args: never
+        Returns: { role: Database["public"]["Enums"]["admin_role"]; mfa_verified: boolean }[]
+      }
+      admin_reply_ticket: {
+        Args: { p_id: string; p_reply: string; p_status: string }
+        Returns: undefined
+      }
+      admin_review_safety_event: {
+        Args: { p_id: string }
+        Returns: undefined
+      }
+      admin_save_faq: {
+        Args: { p_id: string | null; p_question: string; p_answer: string; p_sort: number; p_published: boolean }
+        Returns: string
+      }
+      admin_send_campaign: {
+        Args: { p_title: string; p_body: string }
+        Returns: number
+      }
+      admin_set_config: {
+        Args: { p_key: string; p_value: Json }
+        Returns: undefined
+      }
+      admin_set_role: {
+        Args: { p_user: string; p_role: Database["public"]["Enums"]["admin_role"] | null }
+        Returns: undefined
+      }
+      admin_stats: {
+        Args: never
+        Returns: Json
+      }
+      admin_update_achievement: {
+        Args: { p_code: string; p_title: string; p_description: string; p_emoji: string; p_xp: number }
+        Returns: undefined
+      }
+      admin_user_detail: {
+        Args: { p_user: string }
+        Returns: Json
+      }
       achievement_progress: {
         Args: { target_user: string }
         Returns: { code: string; current: number; target: number }[]
@@ -1024,6 +1248,7 @@ export type Database = {
       }
     }
     Enums: {
+      admin_role: "support" | "admin" | "owner"
       activity_level: "sedentary" | "lightly_active" | "active" | "very_active"
       coach_persona: "aria" | "max" | "luna"
       consent_type: "health_data" | "ads_personalization" | "analytics" | "marketing"
@@ -1057,6 +1282,7 @@ export type Enums<T extends keyof PublicSchema["Enums"]> = PublicSchema["Enums"]
 export const Constants = {
   public: {
     Enums: {
+      admin_role: ["support", "admin", "owner"],
       activity_level: ["sedentary", "lightly_active", "active", "very_active"],
       coach_persona: ["aria", "max", "luna"],
       consent_type: ["health_data", "ads_personalization", "analytics", "marketing"],

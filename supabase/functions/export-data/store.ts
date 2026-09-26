@@ -25,3 +25,18 @@ export function supabaseExportStore(db: SupabaseClient): ExportStore {
     },
   };
 }
+
+/** Deletes every file in the user's private photo folder; returns how many were removed. */
+export async function removeUserFiles(db: SupabaseClient, userId: string): Promise<number> {
+  let removed = 0;
+  for (;;) {
+    const { data, error } = await db.storage.from(PHOTO_BUCKET).list(userId, { limit: 100 });
+    if (error) throw new Error(error.message);
+    if (!data?.length) return removed;
+    const { error: removeError } = await db.storage
+      .from(PHOTO_BUCKET)
+      .remove(data.map((f) => `${userId}/${f.name}`));
+    if (removeError) throw new Error(removeError.message);
+    removed += data.length;
+  }
+}

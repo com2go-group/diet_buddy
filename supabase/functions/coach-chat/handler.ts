@@ -45,6 +45,12 @@ export interface CoachStore {
     reply: string,
   ): Promise<{ user: StoredMessage; assistant: StoredMessage }>;
   logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  /** Records that a reply was flagged (flag and persona only, never the text) for admin review. */
+  recordSafetyEvent(
+    userId: string,
+    persona: Persona,
+    flag: Exclude<SafetyFlag, 'none'>,
+  ): Promise<void>;
 }
 
 export interface CoachDeps {
@@ -146,6 +152,12 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
 
   conversation ??= await store.createConversation(userId, persona, message.slice(0, 60));
   const saved = await store.saveExchange(userId, conversation, persona, message, content);
+  if (safety !== 'none') {
+    // Best effort: the user's reply matters more than the review queue.
+    await store.recordSafetyEvent(userId, persona, safety).catch((e) => {
+      console.error('safety event not recorded', e);
+    });
+  }
   return json({
     conversationId: conversation,
     messages: [saved.user, saved.assistant],

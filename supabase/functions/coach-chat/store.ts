@@ -256,6 +256,10 @@ export function supabaseCoachStore(db: SupabaseClient): CoachStore {
       return { user, assistant };
     },
 
+    async recordSafetyEvent(userId, persona, flag) {
+      must(await db.from('safety_events').insert({ user_id: userId, persona, flag }));
+    },
+
     async logUsage(userId, model, inputTokens, outputTokens) {
       must(
         await db.from('ai_usage').insert({

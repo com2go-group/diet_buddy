@@ -24,7 +24,10 @@ grant usage on schema auth to anon, authenticated, service_role;
 create table auth.users (
   id uuid primary key,
   email text unique,
+  phone text unique,
   raw_user_meta_data jsonb not null default '{}',
+  last_sign_in_at timestamptz,
+  banned_until timestamptz,
   created_at timestamptz not null default now()
 );
 

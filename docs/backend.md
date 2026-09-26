@@ -55,6 +55,7 @@ Server-side code that needs a secret or an outside API lives in `supabase/functi
 | `generate-grocery-list` | Premium weekly shopping list: reads the stored `meal_plans` for start date … +6 days (already allergy-checked), sums grams per USDA food in code (`list.ts`), then Claude (`_prompts/grocery.v1.ts`) only adds an aisle, a pack to buy and a rough price; unknown ids are ignored and missing ones kept (aisle "other", no price). Stored in `grocery_lists` (one per week start); users may only update `checked`. Regenerating resets the ticks. Cost cap 6 calls/day.                                                                                                                                         | `ANTHROPIC_API_KEY`; optional `GROCERY_MODEL`, `GROCERY_CURRENCY` (default EUR) |
 | `analyze-menu`          | Premium restaurant mode: a menu photo (metadata stripped, never stored) or typed dishes go to Claude (`_prompts/menu.v1.ts`), which only lists each dish's typical ingredients and grams; numbers come from USDA generic foods (a dish needs 60% of its grams matched, else no estimate); dish name and ingredients are checked with `dietRules.ts` (warnings, score 0, listed last); others are scored against this meal's budget (`score.ts`: slot share of calories, lowered to what's left today but never below a quarter; slot share of protein). Cost cap 20 calls/day.                                   | `ANTHROPIC_API_KEY`, `USDA_API_KEY`; optional `VISION_MODEL`                    |
 | `send-sms`              | Supabase Auth Send SMS hook: verifies the Standard Webhooks signature, then sends the code through the provider in `app_config.sms_provider` (sms.to) with `app_config.sms_sender_id`. No Supabase JWT. Setup: `docs/setup/email-sms.md`.                                                                                                                                                                                                                                                                                                                                                                        | `SEND_SMS_HOOK_SECRET`, `SMSTO_API_KEY`                                         |
+| `admin-users`           | Admin dashboard actions that need the service role: GDPR export (same document as `export-data`), account deletion (files, then the auth user; typed ID confirmation), ban and unban. Admins and owners with a two-factor session only; never on yourself; staff accounts only by an owner; every action written to `admin_audit_log` first.                                                                                                                                                                                                                                                                     | —                                                                               |
 
 Set secrets and deploy:
 
@@ -71,6 +72,7 @@ npx supabase functions deploy generate-insights
 npx supabase functions deploy generate-grocery-list
 npx supabase functions deploy analyze-menu
 npx supabase functions deploy send-sms --no-verify-jwt
+npx supabase functions deploy admin-users
 ```
 
 Supabase checks the caller's JWT before a function runs (the default `verify_jwt`). Locally, `npx supabase functions serve` runs them with secrets from `supabase/functions/.env` (not committed).
@@ -107,3 +109,22 @@ Server-side rules (database triggers):
 - Streak milestones (3, 7, 14, 30, 60, 100, 365 days) create a notification; `create_weekly_reports()` creates the weekly report for users who logged food that week. `register_push_token()` moves a device token to the account now signed in on it.
 
 Deleting the auth user cascades to every table. The `delete-account` Edge Function removes the user's Storage files first, then the user.
+
+## Admin access
+
+The admin dashboard (web, `/admin`) reads and writes only through `admin_*` database functions and the `admin-users` Edge Function. Each checks the caller's role in `admin_users` **and** that the session passed two-factor sign-in (`aal2` claim, Supabase MFA with an authenticator app). Roles, lowest to highest:
+
+- **support**: overview, users (read), support replies, safety queue.
+- **admin**: plus settings and limits, content (achievements, FAQ), push campaigns (marketing consent only), GDPR export, delete, ban, audit log.
+- **owner**: plus managing admin roles and acting on staff accounts.
+
+Settings are an allow-list with validation (`admin_set_config`): free coach and photo-scan limits, AI budget (null = no cap) and model prices, SMS provider and sender, minimum app version, `feature_*` switches. Every change lands in `admin_audit_log`. Coach safety flags are stored as metadata only (`safety_events`: persona, flag, time; never message text).
+
+**First owner** (once, in the SQL editor, after that person has signed up and set up two-factor in the dashboard):
+
+```sql
+insert into public.admin_users (user_id, role)
+select id, 'owner' from auth.users where email = 'you@example.com';
+```
+
+Enable MFA in Supabase: **Authentication → Multi-Factor → TOTP** on.

@@ -25,6 +25,9 @@ export const EXPORT_TABLES = [
   'xp_events',
   'ai_insights',
   'grocery_lists',
+  'safety_events',
+  'support_tickets',
+  'admin_users',
   'ai_usage',
 ] as const;
 
@@ -44,6 +47,19 @@ export interface ExportDeps {
   now?: () => Date;
 }
 
+/** Everything stored about one user, as one JSON document (also used by admin-users). */
+export async function buildExport(store: ExportStore, userId: string, now: Date) {
+  const tables: Record<string, Record<string, unknown>[]> = {};
+  for (const table of EXPORT_TABLES) tables[table] = await store.rows(table, userId);
+  return {
+    format: 'dietbuddy-export-v1',
+    exported_at: now.toISOString(),
+    account: await store.account(userId),
+    tables,
+    files: { 'progress-photos': await store.files(userId) },
+  };
+}
+
 /** POST → the user's data as one JSON document (GDPR art. 15 and 20). */
 export async function handleExportData(req: Request, deps: ExportDeps): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -51,15 +67,7 @@ export async function handleExportData(req: Request, deps: ExportDeps): Promise<
   try {
     const userId = await deps.getUserId(req);
     if (!userId) return fail('unauthorized', 401);
-    const tables: Record<string, Record<string, unknown>[]> = {};
-    for (const table of EXPORT_TABLES) tables[table] = await deps.store.rows(table, userId);
-    const body = {
-      format: 'dietbuddy-export-v1',
-      exported_at: (deps.now?.() ?? new Date()).toISOString(),
-      account: await deps.store.account(userId),
-      tables,
-      files: { 'progress-photos': await deps.store.files(userId) },
-    };
+    const body = await buildExport(deps.store, userId, deps.now?.() ?? new Date());
     return new Response(JSON.stringify(body, null, 2), {
       headers: {
         ...corsHeaders,

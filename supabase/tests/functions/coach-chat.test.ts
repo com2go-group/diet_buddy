@@ -32,6 +32,7 @@ const context: CoachContextData = {
 function memoryStore(opts: { premium?: boolean; used?: number; limit?: number } = {}) {
   const messages: (StoredMessage & { conversation: string; user: string })[] = [];
   const usage: { model: string; inputTokens: number; outputTokens: number }[] = [];
+  const safetyEvents: [string, string, string][] = [];
   const conversations = new Map<string, { user: string; persona: 'aria' | 'max' | 'luna' }>();
   let seq = 0;
   const store: CoachStore = {
@@ -71,8 +72,9 @@ function memoryStore(opts: { premium?: boolean; used?: number; limit?: number } 
     },
     logUsage: async (_u, model, inputTokens, outputTokens) =>
       void usage.push({ model, inputTokens, outputTokens }),
+    recordSafetyEvent: async (user, persona, flag) => void safetyEvents.push([user, persona, flag]),
   };
-  return { store, messages, usage, conversations };
+  return { store, messages, usage, conversations, safetyEvents };
 }
 
 function fakeLlm(...replies: string[]) {
@@ -176,6 +178,8 @@ describe('coach-chat handler', () => {
     const body = await res.json();
     expect(body.safety).toBe('disordered_eating');
     expect(body.messages[1].content).toContain(SUPPORT_NOTES.disordered_eating);
+    // Flag and persona only go to the admin review queue, never the message text.
+    expect(mem.safetyEvents).toEqual([[expect.any(String), 'luna', 'disordered_eating']]);
   });
 
   it('retries once on invalid output, then fails gracefully', async () => {
