@@ -16,6 +16,7 @@ export default function AppLayout() {
       <Stack.Screen name="body-check" options={{ presentation: 'modal' }} />
       <Stack.Screen name="twin" options={{ presentation: 'modal' }} />
       <Stack.Screen name="story" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="wellness" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

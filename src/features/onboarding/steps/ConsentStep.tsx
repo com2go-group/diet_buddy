@@ -39,6 +39,15 @@ export function ConsentStep({ draft, update, errors }: StepProps) {
           onPress={() => update({ healthConsent: !draft.healthConsent })}
         />
         <FieldError error={errors.consent} />
+        <Text variant="label" className="mt-2 font-bold">
+          {t('consent.optionalTitle')}
+        </Text>
+        <SelectCard
+          title={t('consent.coachInsights')}
+          description={t('consent.coachInsightsHint')}
+          selected={draft.coachInsightsConsent}
+          onPress={() => update({ coachInsightsConsent: !draft.coachInsightsConsent })}
+        />
         {authConfig.privacyUrl ? (
           <Text
             variant="label"

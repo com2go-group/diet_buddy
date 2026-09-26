@@ -30,12 +30,12 @@ export async function loadOnboarding(userId: string): Promise<OnboardingState> {
     supabase.from('preferences').select('*').eq('user_id', userId).maybeSingle().then(optional),
     supabase
       .from('consents')
-      .select('granted')
+      .select('consent_type, granted')
       .eq('user_id', userId)
-      .eq('consent_type', 'health_data')
-      .maybeSingle()
+      .in('consent_type', ['health_data', 'coach_insights'])
       .then(optional),
   ]);
+  const granted = (type: string) => consent?.find((c) => c.consent_type === type)?.granted ?? false;
 
   const draft: OnboardingDraft = {
     ...EMPTY_DRAFT,
@@ -44,7 +44,8 @@ export async function loadOnboarding(userId: string): Promise<OnboardingState> {
     sex: profile.gender,
     units: profile.units,
     heightCm: profile.height_cm,
-    healthConsent: consent?.granted ?? false,
+    healthConsent: granted('health_data'),
+    coachInsightsConsent: granted('coach_insights'),
     ...(goal && {
       goals: goal.goal_types,
       weightKg: goal.start_weight_kg,
@@ -162,6 +163,14 @@ export async function saveStep(
       await supabase.rpc('set_consent', {
         p_type: 'health_data',
         p_granted: true,
+        p_version: HEALTH_CONSENT_VERSION,
+      }),
+    );
+    // Separate and optional (GDPR Art. 9): recorded either way, never bundled with the above.
+    optional(
+      await supabase.rpc('set_consent', {
+        p_type: 'coach_insights',
+        p_granted: draft.coachInsightsConsent,
         p_version: HEALTH_CONSENT_VERSION,
       }),
     );

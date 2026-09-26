@@ -104,6 +104,7 @@ export function PrivacyScreen() {
               {toggle('analytics', t('privacy.analytics'), t('privacy.analyticsDesc'))}
               {toggle('marketing', t('privacy.marketing'), t('privacy.marketingDesc'))}
               {toggle('body_photos', t('privacy.bodyPhotos'), t('privacy.bodyPhotosDesc'))}
+              {toggle('coach_insights', t('privacy.coachInsights'), t('privacy.coachInsightsDesc'))}
               <View>
                 <Text variant="label" className="font-semibold text-[15px]">
                   {t('privacy.ads')}

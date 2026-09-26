@@ -27,6 +27,8 @@ export interface OnboardingDraft {
   birthDate: DateParts;
   sex: Sex | null;
   healthConsent: boolean;
+  /** Optional, separate consent to analyse coach chats for wellness insights (off by default). */
+  coachInsightsConsent: boolean;
   units: UnitSystem;
   weightKg: number | null;
   heightCm: number | null;
@@ -54,6 +56,7 @@ export const EMPTY_DRAFT: OnboardingDraft = {
   birthDate: emptyDate,
   sex: null,
   healthConsent: false,
+  coachInsightsConsent: false,
   units: 'metric',
   weightKg: null,
   heightCm: null,

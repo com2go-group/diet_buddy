@@ -169,6 +169,10 @@ export const en = {
     agreeHint: 'Required to create your plan. You can withdraw consent later in Profile.',
     privacyLink: 'Read the Privacy Policy',
     mustAgree: 'Please give your consent to continue. Without it we can’t create your plan.',
+    optionalTitle: 'Optional',
+    coachInsights: 'Also analyse my coach chats for wellness insights (Premium).',
+    coachInsightsHint:
+      'Your messages to Aria, Max and Luna are analysed by AI for themes like sleep, stress and energy. Only short insights are kept, never your words. Not needed for your plan; change it any time in Privacy & Data.',
   },
   measurements: {
     title: 'Current measurements',
@@ -1118,6 +1122,52 @@ export const en = {
       'After 7+ hours of sleep your energy averages {{rested}}/10, vs {{short}}/10 after shorter nights.',
     loadFailed: 'We couldn’t load your progress.',
   },
+  wellness: {
+    title: 'Wellness Insights',
+    close: 'Close',
+    intro:
+      'Themes from your own coach chats, like sleep, stress and energy, with small ideas to try.',
+    open: '🌿 Wellness insights from your coach chats',
+    locked: 'Wellness insights from your coach chats are part of Premium.',
+    upgrade: 'See Premium',
+    reading: 'Reading your recent coach chats…',
+    consentTitle: 'Your permission first',
+    consentBody:
+      'To find themes, DietBuddy sends the messages you wrote to Aria, Max and Luna in the last 2 weeks to our AI provider (Anthropic). Their replies, your profile and your name are not sent.',
+    consentPoint1: 'Only short insights are stored, never your words.',
+    consentPoint2: 'One new set a week, visible only to you.',
+    consentPoint3: 'Turn it off any time in Privacy & Data; that deletes your insights.',
+    consentButton: 'I agree, analyse my coach chats',
+    consentFailed: "We couldn't save your choice. Please try again.",
+    supportTitle: 'Let’s put insights aside for now',
+    supportBody:
+      'Some of your recent messages mention things that deserve real support, so we’re not making wellness insights at the moment.',
+    notEnoughTitle: 'Chat a little more first',
+    notEnoughDesc:
+      'Insights need at least {{needed}} of your messages from the last 2 weeks. You have {{count}} so far.',
+    openCoach: 'Open the coach',
+    basedOn: 'From {{count}} of your messages · {{range}}',
+    all: 'All',
+    theme_sleep: 'Sleep',
+    theme_stress: 'Stress',
+    theme_energy: 'Energy',
+    theme_mood: 'Mood',
+    theme_motivation: 'Motivation',
+    theme_habits: 'Habits',
+    theme_nutrition: 'Nutrition',
+    theme_movement: 'Movement',
+    note: 'AI-generated from your own messages · not medical advice. A new set comes each week.',
+    delete: 'Delete my insights',
+    deleteConfirm: 'Tap again to delete',
+    deleteFailed: "We couldn't delete your insights. Please try again.",
+    deletedTitle: 'Insights deleted',
+    deletedDesc: 'Your wellness insights are gone. New ones are only made when you ask.',
+    makeNew: 'Make new insights',
+    manage: 'Turn off in Privacy & Data',
+    notConfigured: 'Wellness insights aren’t available yet. Please try again later.',
+    rateLimited: 'You’ve checked a lot today. Please try again tomorrow.',
+    failed: 'We couldn’t make your insights. Please try again.',
+  },
   story: {
     title: 'Weekly Progress Story',
     close: 'Close',
@@ -1309,6 +1359,9 @@ export const en = {
     bodyPhotos: 'AI body scan photos',
     bodyPhotosDesc:
       'Lets the AI body scan send your two photos once for an estimate. They are never stored.',
+    coachInsights: 'Wellness insights from coach chats',
+    coachInsightsDesc:
+      'Lets AI find themes like sleep and stress in your coach messages (Premium). Turning it off deletes your wellness insights.',
     ads: 'Ad personalisation',
     adsDesc:
       'Managed by the ad consent prompt when ads arrive. Health data is never shared with advertisers.',

@@ -1098,6 +1098,45 @@ export type Database = {
         }
         Relationships: []
       }
+      wellness_insights: {
+        Row: {
+          created_at: string
+          id: string
+          insights: Json
+          messages_analysed: number
+          model: string
+          period_end: string
+          period_start: string
+          prompt_version: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          insights: Json
+          messages_analysed: number
+          model: string
+          period_end: string
+          period_start: string
+          prompt_version: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          insights?: Json
+          messages_analysed?: number
+          model?: string
+          period_end?: string
+          period_start?: string
+          prompt_version?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       xp_events: {
         Row: {
           amount: number

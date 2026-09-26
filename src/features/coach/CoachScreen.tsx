@@ -1,4 +1,5 @@
 import { Feather } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -111,6 +112,15 @@ export function CoachScreen() {
             </View>
           </View>
           <View className="flex-row items-center gap-2">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('wellness.title')}
+              onPress={() => router.push('/wellness')}
+              style={{ width: MIN_TOUCH_TARGET, height: MIN_TOUCH_TARGET }}
+              className="items-center justify-center rounded-full border border-border bg-card active:opacity-70"
+            >
+              <Feather name="sun" size={17} color={colors.foreground} />
+            </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t('coach.newChat')}

@@ -51,7 +51,12 @@ export function useConsents() {
   const update = useMutation({
     mutationFn: ({ type, granted }: { type: OptionalConsent; granted: boolean }) =>
       setConsent(type, granted),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
+    // Withdrawing coach-insights consent erases wellness insights on the server.
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: key }),
+        queryClient.invalidateQueries({ queryKey: ['wellness'] }),
+      ]),
   });
   return { query, update };
 }

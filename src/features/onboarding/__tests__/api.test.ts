@@ -15,6 +15,7 @@ function mockBuilder(table: string) {
     'update',
     'upsert',
     'eq',
+    'in',
     'is',
     'order',
     'limit',
@@ -91,12 +92,17 @@ describe('saveStep', () => {
     expect(writes('goals')).toHaveLength(0);
   });
 
-  it('records health-data consent with its version', async () => {
+  it('records health-data consent and, separately, the optional coach-insights choice', async () => {
     await saveStep(USER, 'consent', 'measurements', draft, null);
-    expect(mockCalls.find((c) => c.op === 'rpc')).toEqual({
-      table: 'rpc:set_consent',
-      op: 'rpc',
-      args: [{ p_type: 'health_data', p_granted: true, p_version: '2026-09-25' }],
+    expect(mockCalls.filter((c) => c.op === 'rpc').map((c) => c.args[0])).toEqual([
+      { p_type: 'health_data', p_granted: true, p_version: '2026-09-25' },
+      { p_type: 'coach_insights', p_granted: false, p_version: '2026-09-25' },
+    ]);
+    mockCalls.length = 0;
+    await saveStep(USER, 'consent', 'measurements', { ...draft, coachInsightsConsent: true }, null);
+    expect(mockCalls.filter((c) => c.op === 'rpc')[1]?.args[0]).toMatchObject({
+      p_type: 'coach_insights',
+      p_granted: true,
     });
   });
 
@@ -202,7 +208,15 @@ describe('loadOnboarding', () => {
         error: null,
       },
     ];
-    mockResponses['consents.select'] = [{ data: { granted: true }, error: null }];
+    mockResponses['consents.select'] = [
+      {
+        data: [
+          { consent_type: 'health_data', granted: true },
+          { consent_type: 'coach_insights', granted: true },
+        ],
+        error: null,
+      },
+    ];
 
     const state = await loadOnboarding(USER);
     expect(state.step).toBe('goalDate');
@@ -211,6 +225,7 @@ describe('loadOnboarding', () => {
       name: 'Alex',
       birthDate: { day: '17', month: '5', year: '1990' },
       healthConsent: true,
+      coachInsightsConsent: true,
       weightKg: 80,
       pace: 'sustainable',
       goalDate: 'custom',

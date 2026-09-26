@@ -1,6 +1,7 @@
+import { router } from 'expo-router';
 import { View } from 'react-native';
 
-import { EmptyState, Text } from '@/components';
+import { Button, EmptyState, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatDecimal } from '@/lib/format';
 
@@ -75,6 +76,11 @@ export function InsightsTab({ insights }: { insights: Insight[] }) {
   return (
     <View className="mb-4 gap-3">
       <AiInsightsCard />
+      <Button
+        label={t('wellness.open')}
+        variant="outline"
+        onPress={() => router.push('/wellness')}
+      />
       {insights.length ? (
         <>
           <Text tone="muted" className="text-[13px]">

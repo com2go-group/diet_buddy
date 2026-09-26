@@ -5,6 +5,7 @@ import { renderScreen } from '@/test/render';
 import { CoachError, loadThread, sendMessage, type CoachThread } from '../api';
 import { CoachScreen } from '../CoachScreen';
 
+jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 jest.mock('../api', () => ({
   ...jest.requireActual('../api'),
   loadThread: jest.fn(),
@@ -97,5 +98,14 @@ describe('CoachScreen', () => {
     await fireEvent.changeText(screen.getByLabelText('Message Aria'), 'Follow-up');
     await fireEvent.press(screen.getByRole('button', { name: 'Send message' }));
     expect(sendMessage).toHaveBeenCalledWith('aria', 'Follow-up', 'c9');
+  });
+});
+
+describe('CoachScreen wellness entry', () => {
+  it('opens the Wellness Insights hub from the header', async () => {
+    const { router } = jest.requireMock('expo-router') as { router: { push: jest.Mock } };
+    await renderScreen(<CoachScreen />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Wellness Insights' }));
+    expect(router.push).toHaveBeenCalledWith('/wellness');
   });
 });
