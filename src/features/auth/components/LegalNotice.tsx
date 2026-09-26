@@ -1,24 +1,16 @@
-import { Linking } from 'react-native';
-
 import { Text } from '@/components';
 import { t } from '@/i18n';
 
-import { authConfig } from '../config';
+import { openLegal, type LegalKind } from '../../legal/legal';
 
-function LegalLink({ label, url }: { label: string; url?: string }) {
-  if (!url)
-    return (
-      <Text variant="caption" className="font-semibold">
-        {label}
-      </Text>
-    );
+function LegalLink({ label, kind }: { label: string; kind: LegalKind }) {
   return (
     <Text
       variant="caption"
       tone="primary"
       className="font-semibold"
       accessibilityRole="link"
-      onPress={() => Linking.openURL(url)}
+      onPress={() => openLegal(kind)}
     >
       {label}
     </Text>
@@ -30,9 +22,9 @@ export function LegalNotice() {
   return (
     <Text variant="caption" tone="muted" className="text-center">
       {t('auth.legalPrefix')}
-      <LegalLink label={t('auth.terms')} url={authConfig.termsUrl} />
+      <LegalLink label={t('auth.terms')} kind="terms" />
       {t('auth.legalAnd')}
-      <LegalLink label={t('auth.privacy')} url={authConfig.privacyUrl} />
+      <LegalLink label={t('auth.privacy')} kind="privacy" />
     </Text>
   );
 }

@@ -128,6 +128,9 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
       {signedIn ? <SignedInServices /> : null}
       <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
         <Stack.Screen name="index" />
+        {/* Public: linked from sign-up, onboarding and Profile, and served as the live URLs. */}
+        <Stack.Screen name="legal/privacy" />
+        <Stack.Screen name="legal/terms" />
         <Stack.Protected guard={route === 'welcome'}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>

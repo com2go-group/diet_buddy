@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, RefreshControl, ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, ErrorState, SkeletonCard, Text } from '@/components';
@@ -11,7 +11,7 @@ import { parseDayKey } from '@/lib/dates';
 import { ACCENTS, useThemeStore, useTheme, type ThemePreference } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
-import { authConfig } from '../auth/config';
+import { openLegal } from '../legal/legal';
 import { signOut } from '../auth';
 import { useSessionStore } from '../auth/sessionStore';
 import { NotificationBell } from '../notifications';
@@ -197,20 +197,16 @@ export function ProfileScreen() {
             onPress={() => router.push('/help')}
           />
           <SettingsRow icon="star" label={t('profile.rate')} onPress={() => setInfo('rate')} />
-          {authConfig.termsUrl ? (
-            <SettingsRow
-              icon="file-text"
-              label={t('profile.terms')}
-              onPress={() => Linking.openURL(authConfig.termsUrl!)}
-            />
-          ) : null}
-          {authConfig.privacyUrl ? (
-            <SettingsRow
-              icon="lock"
-              label={t('profile.privacyPolicy')}
-              onPress={() => Linking.openURL(authConfig.privacyUrl!)}
-            />
-          ) : null}
+          <SettingsRow
+            icon="file-text"
+            label={t('profile.terms')}
+            onPress={() => openLegal('terms')}
+          />
+          <SettingsRow
+            icon="lock"
+            label={t('profile.privacyPolicy')}
+            onPress={() => openLegal('privacy')}
+          />
           <SettingsRow
             icon="log-out"
             label={t('profile.signOut')}

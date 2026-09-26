@@ -1122,6 +1122,10 @@ export const en = {
       'After 7+ hours of sleep your energy averages {{rested}}/10, vs {{short}}/10 after shorter nights.',
     loadFailed: 'We couldn’t load your progress.',
   },
+  legal: {
+    back: 'Back',
+    updated: 'Last updated {{date}}',
+  },
   wellness: {
     title: 'Wellness Insights',
     close: 'Close',

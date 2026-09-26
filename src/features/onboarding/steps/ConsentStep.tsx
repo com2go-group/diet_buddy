@@ -1,9 +1,9 @@
-import { Linking, View } from 'react-native';
+import { View } from 'react-native';
 
 import { Callout, SelectCard, Text } from '@/components';
 import { t } from '@/i18n';
 
-import { authConfig } from '../../auth/config';
+import { openLegal } from '../../legal/legal';
 import { FieldError, StepHeader, type StepProps } from './shared';
 
 const POINTS = [
@@ -48,16 +48,14 @@ export function ConsentStep({ draft, update, errors }: StepProps) {
           selected={draft.coachInsightsConsent}
           onPress={() => update({ coachInsightsConsent: !draft.coachInsightsConsent })}
         />
-        {authConfig.privacyUrl ? (
-          <Text
-            variant="label"
-            tone="primary"
-            accessibilityRole="link"
-            onPress={() => Linking.openURL(authConfig.privacyUrl!)}
-          >
-            {t('consent.privacyLink')}
-          </Text>
-        ) : null}
+        <Text
+          variant="label"
+          tone="primary"
+          accessibilityRole="link"
+          onPress={() => openLegal('privacy')}
+        >
+          {t('consent.privacyLink')}
+        </Text>
         <Callout emoji="ℹ️" tone="info">
           {t('common.notMedicalAdvice')}
         </Callout>
