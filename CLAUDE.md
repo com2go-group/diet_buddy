@@ -286,7 +286,7 @@ All tables have `id uuid`, `created_at`, `updated_at`, and RLS so users can only
 
 **Premium**: everything in Free plus no ads, AI camera body scan, Digital AI Twin, Restaurant Mode, Grocery AI, before/after photos, unlimited coach, advanced analytics & projections, custom AI meal plans, weekly progress story, detailed body composition, priority support.
 
-Prices (configure in App Store Connect / Play Console and RevenueCat, never hardcode): Monthly $9.99 with 7-day free trial; Annual $71.88 ($5.99/mo); Lifetime $149 one-time.
+Prices (configure in App Store Connect / Play Console and RevenueCat, never hardcode): Monthly $9.99 with 7-day free trial; Annual $71.88 ($5.99/mo). The Lifetime plan was removed (decision log 2026-09-28).
 
 ### Entitlements
 - Single RevenueCat entitlement `premium`. The app checks entitlement via RevenueCat SDK; the backend trusts only the RevenueCat webhook.
@@ -370,16 +370,16 @@ AI camera body scan, Digital AI Twin, Weekly Progress Story, admin dashboard (we
 
 Ask the owner before making these choices; record answers in the decision log.
 
-1. AI camera body scan: licensed SDK vs in-house estimate vs defer to Phase 4 (current default: defer, ship manual only).
+1. ~~AI camera body scan approach.~~ Decided 2026-09-28: both (in-house estimate first, licensed SDK behind an adapter).
 2. ~~Free-tier coach message limit per day.~~ Decided 2026-09-25.
-3. Whether meal-plan ad unlock is per meal or per day.
-4. ~~LLM provider/model~~ (decided 2026-09-25); monthly AI budget still open.
-5. Nutrition API beyond USDA (needed for barcode scanning and branded foods).
+3. ~~Meal-plan ad unlock per meal or per day.~~ Decided 2026-09-28: per meal.
+4. ~~LLM provider/model~~ (decided 2026-09-25); ~~monthly AI budget~~ decided 2026-09-28: no cap, editable in the admin dashboard.
+5. Nutrition API beyond USDA: include European options (research in progress, 2026-09-28).
 6. ~~Gender options beyond male/female and how BMR handles them.~~ Decided 2026-09-25.
-7. Human coaching: in scope or not.
-8. Whether the Lifetime plan stays (it creates long-term AI cost with no recurring revenue).
-9. SMS provider for phone verification (Twilio, MessageBird, Vonage…) and its budget.
-10. Transactional email provider for verification codes (Resend, Postmark, SES…), ideally EU.
+7. ~~Human coaching.~~ Decided 2026-09-28: not in scope.
+8. ~~Lifetime plan.~~ Decided 2026-09-28: removed.
+9. ~~SMS provider.~~ Decided 2026-09-28: sms.to, no limit, changeable in the admin dashboard.
+10. ~~Transactional email provider.~~ Decided 2026-09-28: Brevo.
 
 ## 18. Decision log
 
@@ -452,3 +452,5 @@ Ask the owner before making these choices; record answers in the decision log.
 | 2026-09-28 | AI insights are Premium (free users keep the rule-based insights and see an upgrade card): `generate-insights` from 14 local days of aggregates only, at least 5 logged days, one set per day stored in `ai_insights` (server-written), restrictive advice screened in code (retry, then drop), shown with an "AI-generated · not medical advice" note | §7.8, §9, §11; cost control |
 | 2026-09-28 | Grocery AI (Premium, Home → Grocery AI): plans the next 7 days (Premium meal plans may be made up to 7 days ahead; free stays today only), then `generate-grocery-list` sums the week's grams per food in code and the model only adds aisle, pack and a rough price in EUR (labelled as an estimate). One list per week in `grocery_lists`; users can only tick items. Future days' plans are shown on the Grocery screen; the Meals tab still shows today | §7.10, §9 (plans already allergy-checked), §12 |
 | 2026-09-28 | Restaurant mode (Premium, Home → Restaurant): menu photo or typed dishes (no restaurant-name search: no menu database is available). The model only lists typical ingredients and grams; numbers from USDA, shown as estimates; allergy/restriction matches flagged and ranked last; ranked by fit to the meal's calories and protein. Logged dishes use new source `restaurant`. The Home "coming soon" sheet is gone | §7.11, §9 |
+| 2026-09-28 | Owner decisions: body scan uses both an in-house estimate and a licensed SDK (behind an adapter) (§17.1); meal-plan ad unlock is per meal (§17.3); no monthly AI budget cap, to be editable in the admin dashboard (§17.4); European nutrition APIs to be evaluated alongside USDA (§17.5); no human coaching (§17.7); Lifetime plan removed (§17.8); SMS via sms.to with no limit, changeable in admin (§17.9); email via Brevo (§17.10) | Owner answers |
+| 2026-09-28 | Phase 4 direction: AI Twin = cartoon avatar in three variants (male, female, other); Weekly Progress Story = a shareable image; Wellness Insights hub = insights drawn from AI coach chats; admin dashboard = admins only, covering price packages, users, pay codes, limits, analytics, content and support | Owner answers; details to confirm before building |
