@@ -1,5 +1,3 @@
-import { ComingNext } from '@/features/tabs';
+import { CoachScreen } from '@/features/coach';
 
-export default function CoachTab() {
-  return <ComingNext title="tabs.coach" description="tabs.coachSoon" emoji="💬" />;
-}
+export default CoachScreen;

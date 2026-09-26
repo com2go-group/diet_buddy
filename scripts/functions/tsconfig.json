@@ -11,7 +11,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "paths": {
-      "jsr:@supabase/supabase-js@2": ["../../node_modules/@supabase/supabase-js"]
+      "jsr:@supabase/supabase-js@2": ["../../node_modules/@supabase/supabase-js"],
+      "npm:zod@4": ["../../node_modules/zod"]
     }
   },
   "include": ["deno.d.ts", "../../supabase/functions/**/*.ts"]

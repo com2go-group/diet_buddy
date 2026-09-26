@@ -39,20 +39,22 @@ Put the printed API URL and anon key in `.env` to point the app at the local sta
 
 Server-side code that needs a secret or an outside API lives in `supabase/functions` (Deno). Each function has a thin `index.ts` (`Deno.serve`) and a `handler.ts` that takes its dependencies (keys, `fetch`, database client) as arguments, so Jest can test it (`supabase/tests/functions`). Shared, pure code is in `supabase/functions/_shared`. `npm run typecheck` also typechecks the functions using a small Deno type shim (`scripts/functions`), so no Deno install is needed on Windows.
 
-| Function      | Purpose                                                                                                                   | Secrets                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `food-search` | Searches USDA FoodData Central and returns foods per 100 g with household servings. Only the search text is sent to USDA. | `USDA_API_KEY` (free key from [api.data.gov](https://api.data.gov/signup/)) |
+| Function      | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Secrets                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `food-search` | Searches USDA FoodData Central and returns foods per 100 g with household servings. Only the search text is sent to USDA.                                                                                                                                                                                                                                                                                                                                        | `USDA_API_KEY` (free key from [api.data.gov](https://api.data.gov/signup/)) |
+| `coach-chat`  | AI coach (Aria, Max, Luna). Checks the burst limit (6/min) and the free daily limit (`app_config.coach_daily_message_limit_free`), builds a de-identified context, calls Claude through the provider adapter (`_shared/llm.ts`), validates the JSON reply (one retry), adds professional-help notes in code when a message shows signs of disordered eating or crisis, stores both messages and logs token usage to `ai_usage`. Prompts: `_prompts/coach.v1.ts`. | `ANTHROPIC_API_KEY`; optional `COACH_MODEL` (default `claude-sonnet-5`)     |
 
 Set secrets and deploy:
 
 ```bash
-npx supabase secrets set USDA_API_KEY=<key>
+npx supabase secrets set USDA_API_KEY=<key> ANTHROPIC_API_KEY=<key>
 npx supabase functions deploy food-search
+npx supabase functions deploy coach-chat
 ```
 
 Supabase checks the caller's JWT before a function runs (the default `verify_jwt`). Locally, `npx supabase functions serve` runs them with secrets from `supabase/functions/.env` (not committed).
 
-Until `USDA_API_KEY` is set, food search answers `not_configured` and the app points users to manual entry.
+Until `USDA_API_KEY` is set, food search answers `not_configured` and the app points users to manual entry; likewise the coach until `ANTHROPIC_API_KEY` is set. `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are provided to functions by Supabase automatically. Local secrets: copy `supabase/functions/.env.example` to `supabase/functions/.env`.
 
 ## Access model
 

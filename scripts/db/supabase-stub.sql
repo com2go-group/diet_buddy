@@ -78,3 +78,8 @@ begin
 end;
 $$;
 grant execute on function storage.foldername(text) to anon, authenticated, service_role;
+
+-- Like Supabase: the service role (Edge Functions) gets full access to objects created in public.
+alter default privileges in schema public grant all on tables to service_role;
+alter default privileges in schema public grant all on sequences to service_role;
+alter default privileges in schema public grant execute on functions to service_role;

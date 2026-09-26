@@ -76,7 +76,8 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/src/$1"
+      "^@/(.*)$": "<rootDir>/src/$1",
+      "^npm:zod@4$": "zod"
     },
     "testPathIgnorePatterns": [
       "/node_modules/",
