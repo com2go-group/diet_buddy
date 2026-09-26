@@ -1,7 +1,8 @@
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { Text } from '@/components';
+import { Button, Text } from '@/components';
 import { t } from '@/i18n';
 import { dayKey } from '@/lib/dates';
 import { formatDecimal, formatMonthYear, formatNumber, formatWeight } from '@/lib/format';
@@ -44,6 +45,9 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
 
   return (
     <>
+      <View className="mb-3">
+        <Button label={t('story.open')} variant="outline" onPress={() => router.push('/story')} />
+      </View>
       <View className="mb-3 flex-row gap-3">
         <StatTile
           emoji="📉"

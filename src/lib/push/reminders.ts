@@ -37,8 +37,9 @@ export function routeFor(data: { type?: unknown; route?: unknown } | undefined):
   if (typeof data?.route === 'string' && data.route.startsWith('/')) return data.route;
   switch (data?.type) {
     case 'achievement':
-    case 'weekly_report':
       return '/progress';
+    case 'weekly_report':
+      return '/story';
     case 'streak':
       return '/home';
     default:

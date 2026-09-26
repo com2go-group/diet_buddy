@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, EmptyState, ErrorState, GradientFill, SkeletonCard, Text } from '@/components';
 import { t } from '@/i18n';
 import type { PlanOption } from '@/lib/purchases';
-import { ACCENTS, MIN_TOUCH_TARGET, useTheme } from '@/theme';
+import { ACCENTS, MIN_TOUCH_TARGET } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import { authConfig } from '../auth/config';
@@ -33,10 +33,9 @@ const NOW = [
   'featureFoodPhotos',
   'featureBodyScan',
   'featureTwin',
+  'featureStory',
   'featureSupport',
 ] as const;
-const SOON = ['soonStory'] as const;
-
 /** Store-required terms under the button (CLAUDE.md §12: trial terms and renewal price). */
 export function termsFor(plan: PlanOption): string {
   const period = plan.kind === 'annual' ? t('paywall.year') : t('paywall.month');
@@ -52,7 +51,6 @@ function ctaFor(plan: PlanOption): string {
 
 /** Paywall (CLAUDE.md §12, prototype SubscriptionsScreen). Prices come from the store. */
 export function PaywallScreen() {
-  const { colors } = useTheme();
   const { premium } = usePremium();
   const { available, plans, buy, restore, cancelled } = usePaywall();
   const [selected, setSelected] = useState<string | null>(null);
@@ -158,17 +156,6 @@ export function PaywallScreen() {
               <View key={key} className="flex-row items-center gap-2">
                 <Feather name="check-circle" size={16} color={ACCENTS.green.light} />
                 <Text className="text-[14px]">{t(`paywall.${key}`)}</Text>
-              </View>
-            ))}
-            <Text variant="label" tone="muted" className="mt-3 font-bold">
-              {t('paywall.comingSoon')}
-            </Text>
-            {SOON.map((key) => (
-              <View key={key} className="flex-row items-center gap-2">
-                <Feather name="clock" size={15} color={colors.mutedForeground} />
-                <Text tone="muted" className="text-[14px]">
-                  {t(`paywall.${key}`)}
-                </Text>
               </View>
             ))}
           </View>

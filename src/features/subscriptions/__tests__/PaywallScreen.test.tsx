@@ -56,8 +56,9 @@ describe('PaywallScreen', () => {
     expect(
       screen.getByText(/\$71.88 per year, billed to your .* account. Renews automatically/),
     ).toBeOnTheScreen();
-    // Unbuilt features are labelled as coming, not sold as included.
-    expect(screen.getByText('Coming to Premium')).toBeOnTheScreen();
+    // Only built features are listed, all as included.
+    expect(screen.getByText('Weekly Progress Story to share')).toBeOnTheScreen();
+    expect(screen.queryByText('Coming to Premium')).toBeNull();
   });
 
   it('states the trial terms for the monthly plan', async () => {

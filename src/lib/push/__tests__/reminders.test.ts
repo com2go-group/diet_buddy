@@ -14,6 +14,7 @@ describe('reminders', () => {
   it('routes taps by notification type or explicit route', () => {
     expect(routeFor({ type: 'achievement' })).toBe('/progress');
     expect(routeFor({ type: 'streak' })).toBe('/home');
+    expect(routeFor({ type: 'weekly_report' })).toBe('/story');
     expect(routeFor({ route: '/check-in' })).toBe('/check-in');
     expect(routeFor({ route: 'https://evil.example' })).toBe('/home');
     expect(routeFor(undefined)).toBe('/home');

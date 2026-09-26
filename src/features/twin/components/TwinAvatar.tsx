@@ -16,7 +16,8 @@ export interface TwinAvatarProps {
   muted?: boolean;
 }
 
-function render(shape: Shape, key: number) {
+/** One geometry primitive as an SVG element (also used by the weekly story image). */
+export function renderShape(shape: Shape, key: number) {
   switch (shape.kind) {
     case 'circle':
       return <Circle key={key} {...shape} />;
@@ -70,7 +71,7 @@ export function TwinAvatar({ look, fullness, height, accessibilityLabel, muted }
       accessibilityLabel={accessibilityLabel}
       opacity={muted ? 0.55 : 1}
     >
-      {shapes.map(render)}
+      {shapes.map(renderShape)}
     </Svg>
   );
 }
