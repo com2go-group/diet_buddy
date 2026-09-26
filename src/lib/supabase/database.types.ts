@@ -1027,7 +1027,7 @@ export type Database = {
       activity_level: "sedentary" | "lightly_active" | "active" | "very_active"
       coach_persona: "aria" | "max" | "luna"
       consent_type: "health_data" | "ads_personalization" | "analytics" | "marketing"
-      food_source: "search" | "manual" | "photo" | "plan"
+      food_source: "search" | "manual" | "photo" | "plan" | "restaurant"
       gender: "male" | "female" | "unspecified"
       goal_type: "lose_fat" | "build_muscle" | "body_recomposition" | "improve_performance" | "healthy_lifestyle"
       health_platform: "healthkit" | "health_connect"
@@ -1060,7 +1060,7 @@ export const Constants = {
       activity_level: ["sedentary", "lightly_active", "active", "very_active"],
       coach_persona: ["aria", "max", "luna"],
       consent_type: ["health_data", "ads_personalization", "analytics", "marketing"],
-      food_source: ["search", "manual", "photo", "plan"],
+      food_source: ["search", "manual", "photo", "plan", "restaurant"],
       gender: ["male", "female", "unspecified"],
       goal_type: ["lose_fat", "build_muscle", "body_recomposition", "improve_performance", "healthy_lifestyle"],
       health_platform: ["healthkit", "health_connect"],

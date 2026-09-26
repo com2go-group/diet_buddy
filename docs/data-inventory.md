@@ -41,6 +41,8 @@ AI insights: `generate-insights` sends Anthropic the calorie, protein and water 
 
 Grocery AI: `generate-grocery-list` sends Anthropic the week's ingredient names, their USDA descriptions and total grams. Nothing else about the user. The list and its ticks are stored in `grocery_lists`, exported and deleted with the account.
 
+Restaurant mode: `analyze-menu` sends Anthropic the menu photo (JPEG metadata removed; not stored) or the dish names the user typed. Nothing else about the user; allergies and restrictions are checked in our code. A dish the user logs is a `food_logs` row with source `restaurant`.
+
 Food photo scan: `analyze-food-photo` sends the meal photo the user takes or picks to Anthropic (Claude vision) to name the foods and estimate portions, plus nothing else about the user (their allergies, restrictions and avoided foods are checked in our code, not sent). The photo is not stored by DietBuddy: it is held in memory for the request only. JPEG metadata (EXIF including GPS location, XMP, comments) is removed on the server before the photo is sent. The app asks users to keep people out of the shot and the prompt tells the model to ignore people. Recognised food names are searched in USDA. Logged items are ordinary `food_logs` rows with source `photo`.
 
 Food search: the search text (e.g. "chicken breast") goes to USDA FoodData Central through the `food-search` Edge Function. No user ID, name or other personal data is sent, and results are not stored except for the foods the user logs.

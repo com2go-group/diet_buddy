@@ -1,69 +1,39 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { Button, Sheet, Text } from '@/components';
+import { Text } from '@/components';
 import { t } from '@/i18n';
 import { accentColor, useTheme, type Accent } from '@/theme';
 
 const SHORTCUTS = [
-  { key: 'grocery', emoji: '🛒', accent: 'green', desc: 'homeScreen.groceryDesc' },
-  { key: 'restaurant', emoji: '🍽️', accent: 'blue', desc: 'homeScreen.restaurantDesc' },
-  { key: 'subscribe', emoji: '⭐', accent: 'amber', desc: 'homeScreen.subscribeDesc' },
-] as const satisfies readonly { key: string; emoji: string; accent: Accent; desc: string }[];
+  { key: 'grocery', emoji: '🛒', accent: 'green', route: '/grocery' },
+  { key: 'restaurant', emoji: '🍽️', accent: 'blue', route: '/restaurant' },
+  { key: 'subscribe', emoji: '⭐', accent: 'amber', route: '/paywall' },
+] as const satisfies readonly { key: string; emoji: string; accent: Accent; route: string }[];
 
-type Shortcut = (typeof SHORTCUTS)[number];
-
-/**
- * Grocery AI, Restaurant and Subscribe shortcuts. Restaurant mode isn't built yet, so it opens a
- * short "coming soon" sheet instead of a mock screen.
- */
+/** Grocery AI, Restaurant mode and Subscribe shortcuts (the first two explain Premium to free users). */
 export function Shortcuts() {
   const { scheme } = useTheme();
-  const [open, setOpen] = useState<Shortcut | null>(null);
   return (
-    <>
-      <View className="mb-4 flex-row gap-2.5">
-        {SHORTCUTS.map((s) => {
-          const color = accentColor(s.accent, scheme);
-          return (
-            <Pressable
-              key={s.key}
-              accessibilityRole="button"
-              accessibilityLabel={t(`homeScreen.${s.key}`)}
-              onPress={() =>
-                s.key === 'subscribe'
-                  ? router.push('/paywall')
-                  : s.key === 'grocery'
-                    ? router.push('/grocery')
-                    : setOpen(s)
-              }
-              style={{ backgroundColor: `${color}1A`, borderColor: `${color}38` }}
-              className="flex-1 items-center gap-1 rounded-2xl border py-3 active:opacity-80"
-            >
-              <Text className="text-xl">{s.emoji}</Text>
-              <Text variant="caption" className="font-bold" style={{ color }}>
-                {t(`homeScreen.${s.key}`)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-      <Sheet
-        visible={open !== null}
-        onClose={() => setOpen(null)}
-        title={open ? t(`homeScreen.${open.key}`) : undefined}
-      >
-        {open ? (
-          <View className="gap-3 pb-2">
-            <Text>{t(open.desc)}</Text>
-            <Text tone="muted">
-              {t('homeScreen.comingSoon')} · {t('homeScreen.premiumSoon')}
+    <View className="mb-4 flex-row gap-2.5">
+      {SHORTCUTS.map((s) => {
+        const color = accentColor(s.accent, scheme);
+        return (
+          <Pressable
+            key={s.key}
+            accessibilityRole="button"
+            accessibilityLabel={t(`homeScreen.${s.key}`)}
+            onPress={() => router.push(s.route)}
+            style={{ backgroundColor: `${color}1A`, borderColor: `${color}38` }}
+            className="flex-1 items-center gap-1 rounded-2xl border py-3 active:opacity-80"
+          >
+            <Text className="text-xl">{s.emoji}</Text>
+            <Text variant="caption" className="font-bold" style={{ color }}>
+              {t(`homeScreen.${s.key}`)}
             </Text>
-            <Button label={t('common.close')} variant="outline" onPress={() => setOpen(null)} />
-          </View>
-        ) : null}
-      </Sheet>
-    </>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }

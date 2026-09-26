@@ -11,6 +11,7 @@ export default function AppLayout() {
       <Stack.Screen name="notification-settings" />
       <Stack.Screen name="paywall" options={{ presentation: 'modal' }} />
       <Stack.Screen name="grocery" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="restaurant" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

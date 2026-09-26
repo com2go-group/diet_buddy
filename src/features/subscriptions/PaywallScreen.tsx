@@ -29,10 +29,11 @@ const NOW = [
   'featurePhotos',
   'featureInsights',
   'featureGrocery',
+  'featureRestaurant',
   'featureFoodPhotos',
   'featureSupport',
 ] as const;
-const SOON = ['soonBodyScan', 'soonRestaurant', 'soonTwin', 'soonStory'] as const;
+const SOON = ['soonBodyScan', 'soonTwin', 'soonStory'] as const;
 
 /** Store-required terms under the button (CLAUDE.md §12: trial terms and renewal price). */
 export function termsFor(plan: PlanOption): string {
