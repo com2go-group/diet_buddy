@@ -46,6 +46,8 @@ Grocery AI: `generate-grocery-list` sends Anthropic the week's ingredient names,
 
 Restaurant mode: `analyze-menu` sends Anthropic the menu photo (JPEG metadata removed; not stored) or the dish names the user typed. Nothing else about the user; allergies and restrictions are checked in our code. A dish the user logs is a `food_logs` row with source `restaurant`.
 
+AI body scan (Premium): with the separate `body_photos` consent (given in the scan, withdrawn in Privacy & Data), `analyze-body-scan` sends Anthropic the user's front and side photos (neck down, JPEG metadata removed), their height and sex. Photos are held in memory for the request only and never stored; a photo showing a face is refused. The result is estimated waist, hip and neck measurements, which become an ordinary `body_metrics` row (source `scan`) only if the user saves them. The Privacy Policy must describe this processing.
+
 Barcode scanning: the camera reads the barcode on the device (no photo is taken or stored); `food-barcode` sends only the barcode number to Open Food Facts. Nothing about the user is sent.
 
 Staff access (admin dashboard): support staff and admins can see account details (email/phone, name, sign-up and last sign-in dates, premium, XP, streak, counts of logs, consents, support tickets) and the list of safety flags; admins can export, delete or ban an account. They cannot read coach messages, food logs or photos in the dashboard. Every admin change is audit-logged. The Privacy Policy must describe staff access.

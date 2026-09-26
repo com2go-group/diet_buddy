@@ -11,6 +11,7 @@ import {
   savePlanVersion,
   setConsent,
   setUnits,
+  type OptionalConsent,
 } from './api';
 import type { CurrentPlan } from './goals';
 import { saveExport } from './saveExport';
@@ -48,7 +49,7 @@ export function useConsents() {
     queryFn: () => loadConsents(userId!),
   });
   const update = useMutation({
-    mutationFn: ({ type, granted }: { type: 'analytics' | 'marketing'; granted: boolean }) =>
+    mutationFn: ({ type, granted }: { type: OptionalConsent; granted: boolean }) =>
       setConsent(type, granted),
     onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
   });

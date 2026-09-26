@@ -1,6 +1,8 @@
 import { View } from 'react-native';
 
-import { Text } from '@/components';
+import { router } from 'expo-router';
+
+import { Button, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatDecimal, formatWeight } from '@/lib/format';
 import { cmToIn, type UnitSystem } from '@/lib/nutrition';
@@ -69,6 +71,13 @@ export function BodyTab({ metrics, units }: { metrics: MetricRow[]; units: UnitS
             </View>
           );
         })}
+      </View>
+      <View className="mb-4">
+        <Button
+          label={t('progress.bodyCheck')}
+          variant="outline"
+          onPress={() => router.push('/body-check')}
+        />
       </View>
       <PhotosSection metrics={metrics} units={units} />
     </>

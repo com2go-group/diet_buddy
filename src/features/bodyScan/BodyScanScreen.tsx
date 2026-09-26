@@ -12,12 +12,14 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 import { FormMessage } from '../auth/components/FormMessage';
 import type { OnboardingState } from '../onboarding/api';
 import { useSavedOnboarding } from '../onboarding/useOnboarding';
+import { usePremium } from '../subscriptions/usePremium';
+import { AiScanPanel } from './components/AiScanPanel';
 import { CompositionCard } from './components/CompositionCard';
 import { ManualForm } from './components/ManualForm';
 import { ModeChooser } from './components/ModeChooser';
 import { StatCard } from './components/StatCard';
 import type { MetricKey, ScanResults } from './results';
-import { useBodyScan } from './useBodyScan';
+import { useBodyScan, type ScanContext } from './useBodyScan';
 
 export function BodyScanScreen() {
   const saved = useSavedOnboarding();
@@ -61,12 +63,25 @@ const ROWS: MetricKey[][] = [
   ['tdee', 'bmi'],
 ];
 
-function BodyScan({ initial }: { initial: OnboardingState }) {
-  const c = useBodyScan(initial);
+export function BodyScan({
+  initial,
+  context = 'onboarding',
+  onSaved,
+  onExit,
+}: {
+  initial: OnboardingState;
+  context?: ScanContext;
+  onSaved?: () => void;
+  /** Where "back" goes from the first step (onboarding goes back to the questions). */
+  onExit?: () => void;
+}) {
+  const c = useBodyScan(initial, context, onSaved);
+  const { premium } = usePremium();
   const { colors } = useTheme();
   const back = () => {
-    if (c.mode === 'results') c.setMode('manual');
-    else if (c.mode === 'manual') c.setMode('choose');
+    if (c.mode === 'results') c.setMode(c.ai ? 'ai' : 'manual');
+    else if (c.mode === 'manual' || c.mode === 'ai') c.setMode('choose');
+    else if (onExit) onExit();
     else router.replace('/onboarding');
   };
 
@@ -87,7 +102,7 @@ function BodyScan({ initial }: { initial: OnboardingState }) {
           accessibilityRole="header"
           className="flex-1 font-extrabold text-xl"
         >
-          {t('bodyScan.title')}
+          {context === 'check' ? t('bodyScan.checkTitle') : t('bodyScan.title')}
         </Text>
         {c.mode === 'results' ? (
           <Button
@@ -102,7 +117,14 @@ function BodyScan({ initial }: { initial: OnboardingState }) {
 
       <ScrollView contentContainerClassName="px-5 pb-8" keyboardShouldPersistTaps="handled">
         <Animated.View key={c.mode} entering={FadeIn.duration(250)}>
-          {c.mode === 'choose' ? <ModeChooser onManual={() => c.setMode('manual')} /> : null}
+          {c.mode === 'choose' ? (
+            <ModeChooser
+              premium={premium}
+              onManual={() => c.setMode('manual')}
+              onAi={() => c.setMode('ai')}
+            />
+          ) : null}
+          {c.mode === 'ai' ? <AiScanPanel onMeasured={c.applyAi} /> : null}
           {c.mode === 'manual' ? (
             <ManualForm
               tape={c.tape}
@@ -142,10 +164,24 @@ function BodyScan({ initial }: { initial: OnboardingState }) {
                 ))}
               </View>
               <Text variant="caption" tone="muted">
-                {t(
-                  `bodyScan.method${c.results.method === 'navy' ? 'Navy' : c.results.method === 'user' ? 'User' : 'Bmi'}`,
-                )}
+                {c.ai && c.results.method === 'navy'
+                  ? t('bodyScan.methodAi')
+                  : t(
+                      `bodyScan.method${c.results.method === 'navy' ? 'Navy' : c.results.method === 'user' ? 'User' : 'Bmi'}`,
+                    )}
               </Text>
+              {c.ai ? (
+                <Callout emoji="📐" tone="info">
+                  <Text className="text-[13px]">
+                    {t('bodyScan.aiEstimateNote', {
+                      confidence: t(`bodyScan.confidence_${c.ai.confidence}`),
+                    })}
+                  </Text>
+                  <Text className="font-semibold text-[13px]">
+                    {`${t('bodyScan.waist')}: ${c.ai.waistCm} cm · ${t('bodyScan.hips')}: ${c.ai.hipCm} cm · ${t('bodyScan.neck')}: ${c.ai.neckCm} cm`}
+                  </Text>
+                </Callout>
+              ) : null}
               <CompositionCard
                 bodyFatPct={c.results.values.bodyFat}
                 caption={
@@ -160,7 +196,7 @@ function BodyScan({ initial }: { initial: OnboardingState }) {
                   <Button
                     variant="outline"
                     label={t('bodyScan.rescan')}
-                    onPress={() => c.setMode('manual')}
+                    onPress={() => c.setMode(c.ai ? 'ai' : 'manual')}
                   />
                 </View>
                 <View className="flex-1">

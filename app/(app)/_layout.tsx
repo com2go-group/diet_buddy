@@ -13,6 +13,7 @@ export default function AppLayout() {
       <Stack.Screen name="grocery" options={{ presentation: 'modal' }} />
       <Stack.Screen name="restaurant" options={{ presentation: 'modal' }} />
       <Stack.Screen name="help" />
+      <Stack.Screen name="body-check" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

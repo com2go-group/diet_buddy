@@ -1,23 +1,33 @@
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Card, SelectCard, Text } from '@/components';
 import { t } from '@/i18n';
 
 /**
- * Manual entry is the free default. The AI camera scan is Premium and deferred
- * (CLAUDE.md §17 decision 1), so it is shown as coming soon rather than faked.
+ * Manual entry is the free default. The AI camera scan is Premium (CLAUDE.md §7.3): Premium users
+ * can start it; others see what it is and where to find it once they upgrade.
  */
-export function ModeChooser({ onManual }: { onManual: () => void }) {
+export function ModeChooser({
+  premium,
+  onManual,
+  onAi,
+}: {
+  premium: boolean;
+  onManual: () => void;
+  onAi: () => void;
+}) {
   return (
     <View className="gap-4">
       <Text tone="muted" className="text-sm leading-6">
         {t('bodyScan.intro')}
       </Text>
-      <View
-        accessible
-        aria-disabled
-        accessibilityLabel={`${t('bodyScan.aiTitle')}, ${t('bodyScan.premium')}, ${t('bodyScan.comingSoon')}`}
-        className="rounded-3xl border-[1.5px] border-primary/30 p-5 opacity-70"
+      <Pressable
+        accessibilityRole="button"
+        aria-disabled={!premium}
+        disabled={!premium}
+        onPress={onAi}
+        accessibilityLabel={`${t('bodyScan.aiTitle')}, ${t('bodyScan.premium')}${premium ? '' : `, ${t('bodyScan.premiumOnly')}`}`}
+        className={`rounded-3xl border-[1.5px] border-primary/30 p-5 ${premium ? 'active:opacity-80' : 'opacity-80'}`}
         style={{ backgroundColor: '#1A1A2E' }}
       >
         <View className="mb-4 h-14 w-14 items-center justify-center rounded-2xl bg-primary/15">
@@ -35,16 +45,11 @@ export function ModeChooser({ onManual }: { onManual: () => void }) {
               {t('bodyScan.premium')}
             </Text>
           </View>
-          <View
-            className="rounded-full px-2.5 py-1"
-            style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
-          >
-            <Text variant="caption" className="font-bold" style={{ color: '#CBD5E1' }}>
-              {t('bodyScan.comingSoon')}
-            </Text>
-          </View>
         </View>
-      </View>
+        <Text variant="caption" className="mt-3 font-bold text-[13px]" style={{ color: '#FCD34D' }}>
+          {premium ? `${t('bodyScan.aiStart')} →` : t('bodyScan.premiumOnly')}
+        </Text>
+      </Pressable>
       <SelectCard
         emoji="📏"
         title={t('bodyScan.manualTitle')}

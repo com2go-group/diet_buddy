@@ -10,6 +10,7 @@ import { formatLongDate } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
+import type { OptionalConsent } from './api';
 import { useConsents, useDeleteAccount, useExportData } from './useProfile';
 
 const back = () => (router.canGoBack() ? router.back() : router.replace('/profile'));
@@ -35,7 +36,7 @@ export function PrivacyScreen() {
   const [typed, setTyped] = useState('');
 
   const consent = (type: string) => query.data?.find((c) => c.consent_type === type);
-  const toggle = (type: 'analytics' | 'marketing', label: string, desc: string) => {
+  const toggle = (type: OptionalConsent, label: string, desc: string) => {
     const granted = consent(type)?.granted ?? false;
     return (
       <View className="flex-row items-center gap-3">
@@ -102,6 +103,7 @@ export function PrivacyScreen() {
               </View>
               {toggle('analytics', t('privacy.analytics'), t('privacy.analyticsDesc'))}
               {toggle('marketing', t('privacy.marketing'), t('privacy.marketingDesc'))}
+              {toggle('body_photos', t('privacy.bodyPhotos'), t('privacy.bodyPhotosDesc'))}
               <View>
                 <Text variant="label" className="font-semibold text-[15px]">
                   {t('privacy.ads')}

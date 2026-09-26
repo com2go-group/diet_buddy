@@ -123,8 +123,10 @@ export async function loadConsents(userId: string): Promise<Consent[]> {
 /** Privacy notice version that optional consents are given against. */
 export const OPTIONAL_CONSENT_VERSION = '2026-09-26';
 
-/** Optional consents (analytics, marketing). Health data is withdrawn by deleting the account. */
-export async function setConsent(type: 'analytics' | 'marketing', granted: boolean): Promise<void> {
+/** Consents a user can change any time; health data is withdrawn by deleting the account. */
+export type OptionalConsent = 'analytics' | 'marketing' | 'body_photos' | 'coach_insights';
+
+export async function setConsent(type: OptionalConsent, granted: boolean): Promise<void> {
   optional(
     await supabase.rpc('set_consent', {
       p_type: type,
