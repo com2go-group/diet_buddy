@@ -9,7 +9,7 @@ export const profileQueryKey = (userId: string | undefined) => ['profile', userI
 async function fetchProfile(userId: string) {
   const result = await supabase
     .from('profiles')
-    .select('id, name, units, is_premium, onboarding_completed_at')
+    .select('id, name, units, is_premium, onboarding_step, onboarding_completed_at')
     .eq('user_id', userId)
     .single();
   return required(result);

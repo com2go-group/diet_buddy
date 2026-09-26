@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
 import { formatWeight } from '@/lib/format';
@@ -6,7 +7,7 @@ import { haptics } from '@/lib/haptics';
 
 import { profileQueryKey } from '../account/useProfile';
 import { useSessionStore } from '../auth/sessionStore';
-import { completeOnboarding, loadOnboarding, saveStep, type OnboardingState } from './api';
+import { loadOnboarding, saveStep, type OnboardingState } from './api';
 import { validateStep, type OnboardingDraft, type StepErrors } from './draft';
 import { buildSteps, type StepId } from './options';
 
@@ -14,10 +15,19 @@ import { buildSteps, type StepId } from './options';
  * Drives the onboarding flow: loads saved progress, keeps the draft, validates and saves each
  * step on Continue, and completes onboarding on the last step.
  */
+export const onboardingQueryKey = (userId: string | undefined) => ['onboarding', userId] as const;
+
+/**
+ * Saved onboarding answers. Refetched when a screen mounts so it sees the latest answers, but not
+ * on focus or reconnect: screens copy this into local state, and a refetch mid-edit would reset it.
+ */
 export function useSavedOnboarding() {
   const userId = useSessionStore((s) => s.session?.user.id);
   return useQuery({
-    queryKey: ['onboarding', userId],
+    queryKey: onboardingQueryKey(userId),
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     enabled: Boolean(userId),
     queryFn: () => loadOnboarding(userId!),
     staleTime: Infinity,
@@ -49,24 +59,23 @@ export function useOnboarding(initial: OnboardingState) {
 
   const save = useMutation({
     mutationFn: async ({ skip }: { skip: boolean }) => {
-      if (isLast) {
-        await completeOnboarding(userId, draft);
-        return null;
-      }
-      const next = steps[index + 1]!;
+      // After the last question comes the body scan (CLAUDE.md §6).
+      const next = isLast ? 'bodyScan' : steps[index + 1]!;
       // A skipped step saves no answers but still records progress.
       setGoalId(await saveStep(userId, skip ? null : step, next, draft, goalId));
       return next;
     },
     onSuccess: async (next) => {
-      if (next) {
+      if (next !== 'bodyScan') {
         setDirection(1);
         setStep(next);
         return;
       }
       haptics.success();
-      // Routing sees onboarding_completed_at and moves on to the app.
+      // The cached answers are from when this screen loaded; the body scan must read the saved ones.
+      queryClient.removeQueries({ queryKey: onboardingQueryKey(userId) });
       await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+      router.replace('/body-scan');
     },
   });
 

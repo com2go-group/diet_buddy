@@ -6,6 +6,8 @@ const destinations = {
   welcome: '/welcome',
   'new-password': '/new-password',
   onboarding: '/onboarding',
+  'body-scan': '/body-scan',
+  'initial-plan': '/initial-plan',
   home: '/home',
 } as const;
 

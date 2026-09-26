@@ -25,7 +25,7 @@ import { useOnboarding, useSavedOnboarding } from '../useOnboarding';
 /** Loads saved progress, then shows the flow from where the user left off. */
 export function OnboardingScreen() {
   const saved = useSavedOnboarding();
-  if (saved.isPending) {
+  if (saved.isPending || saved.isRefetching) {
     return (
       <SafeAreaView className="flex-1 gap-4 bg-background px-5 pt-16">
         <SkeletonCard lines={2} />

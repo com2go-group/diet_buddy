@@ -44,7 +44,7 @@ jest.mock('@/lib/supabase', () => ({
 }));
 
 // eslint-disable-next-line import/first
-import { completeOnboarding, loadOnboarding, saveStep } from '../api';
+import { loadOnboarding, saveStep } from '../api';
 
 const USER = 'user-1';
 const draft: OnboardingDraft = {
@@ -240,6 +240,23 @@ describe('loadOnboarding', () => {
     expect(state.draft.healthConsent).toBe(false);
   });
 
+  it('returns to the last question step from the body scan or plan screens', async () => {
+    mockResponses['profiles.select'] = [
+      {
+        data: {
+          name: '',
+          birth_date: null,
+          gender: null,
+          units: 'metric',
+          height_cm: null,
+          onboarding_step: 'bodyScan',
+        },
+        error: null,
+      },
+    ];
+    expect((await loadOnboarding(USER)).step).toBe('aiPlan');
+  });
+
   it('falls back to the start if the saved step no longer applies', async () => {
     mockResponses['profiles.select'] = [
       {
@@ -255,32 +272,5 @@ describe('loadOnboarding', () => {
       },
     ];
     expect((await loadOnboarding(USER)).step).toBe('personal');
-  });
-});
-
-describe('completeOnboarding', () => {
-  it('stores the first measurement and plan, then marks onboarding complete last', async () => {
-    mockResponses['plans.select'] = [{ data: [], error: null }];
-    const plan = await completeOnboarding(USER, draft);
-    const order = mockCalls
-      .filter((c) => ['insert', 'update'].includes(c.op))
-      .map((c) => `${c.table}.${c.op}`);
-    expect(order).toEqual(['body_metrics.insert', 'plans.insert', 'profiles.update']);
-    expect(writes('plans')[0]?.args[0]).toMatchObject({
-      user_id: USER,
-      version: 1,
-      daily_calories: plan.dailyCalories,
-      protein_g: plan.macros.proteinG,
-      generated_by: 'app',
-    });
-    expect(writes('profiles')[0]?.args[0]).toMatchObject({ onboarding_step: null });
-    expect(plan.dailyCalories).toBeGreaterThanOrEqual(1200);
-  });
-
-  it('refuses to complete an unfinished draft', async () => {
-    await expect(completeOnboarding(USER, { ...draft, activity: null })).rejects.toThrow(
-      'incomplete',
-    );
-    expect(mockCalls.filter((c) => c.op === 'insert')).toHaveLength(0);
   });
 });

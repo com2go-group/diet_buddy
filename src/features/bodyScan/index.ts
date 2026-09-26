@@ -1,0 +1,1 @@
+export { BodyScanScreen } from './BodyScanScreen';

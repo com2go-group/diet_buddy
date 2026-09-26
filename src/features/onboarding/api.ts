@@ -1,17 +1,9 @@
-import { computePlan, type Plan } from '@/lib/nutrition';
-import { roundTo } from '@/lib/nutrition';
 import { toIsoDateLocal } from '@/lib/format';
-import { optional, required, supabase, type Tables, type TablesUpdate } from '@/lib/supabase';
+import { optional, required, supabase, type TablesUpdate } from '@/lib/supabase';
 
 import { toIsoDate } from '../auth/schemas';
-import {
-  EMPTY_DRAFT,
-  goalDateFrom,
-  isoToParts,
-  planInputFrom,
-  type OnboardingDraft,
-} from './draft';
-import { buildSteps, type StepId } from './options';
+import { EMPTY_DRAFT, goalDateFrom, isoToParts, type OnboardingDraft } from './draft';
+import { buildSteps, type OnboardingProgress, type StepId } from './options';
 
 /** Version of the health-data consent text shown in onboarding (stored with the consent). */
 export const HEALTH_CONSENT_VERSION = '2026-09-25';
@@ -80,12 +72,15 @@ export async function loadOnboarding(userId: string): Promise<OnboardingState> {
   };
 
   const steps = buildSteps(draft.goals);
-  const saved = profile.onboarding_step as StepId | null;
-  return {
-    draft,
-    step: saved && steps.includes(saved) ? saved : 'personal',
-    goalId: goal?.id ?? null,
-  };
+  const saved = profile.onboarding_step as OnboardingProgress | null;
+  // Coming back from the body scan or plan screens lands on the last question step.
+  const step: StepId =
+    saved === 'bodyScan' || saved === 'initialPlan'
+      ? 'aiPlan'
+      : saved && steps.includes(saved)
+        ? saved
+        : 'personal';
+  return { draft, step, goalId: goal?.id ?? null };
 }
 
 const GOAL_STEPS: readonly StepId[] = [
@@ -144,7 +139,7 @@ export async function saveStep(
   userId: string,
   /** The step whose answers to save, or null to record progress only (a skipped step). */
   step: StepId | null,
-  next: StepId,
+  next: OnboardingProgress,
   draft: OnboardingDraft,
   goalId: string | null,
 ): Promise<string | null> {
@@ -193,61 +188,4 @@ export async function saveStep(
     );
   }
   return goalId;
-}
-
-/**
- * Finishes onboarding: first body-metrics entry, plan version 1, then marks the profile complete
- * (last, so a failure part-way leaves the user in onboarding to retry).
- */
-export async function completeOnboarding(userId: string, draft: OnboardingDraft): Promise<Plan> {
-  const input = planInputFrom(draft);
-  if (!input) throw new Error('Onboarding is incomplete');
-  const plan = computePlan(input);
-
-  optional(
-    await supabase.from('body_metrics').insert({
-      user_id: userId,
-      source: 'manual',
-      weight_kg: input.body.weightKg,
-      bmi: roundTo(plan.bmi, 1),
-      bmr: plan.bmr,
-      tdee: plan.tdee,
-    }),
-  );
-
-  const latest = required(
-    await supabase
-      .from('plans')
-      .select('version')
-      .eq('user_id', userId)
-      .order('version', { ascending: false })
-      .limit(1),
-  ) as Pick<Tables<'plans'>, 'version'>[];
-  optional(
-    await supabase.from('plans').insert({
-      user_id: userId,
-      version: (latest[0]?.version ?? 0) + 1,
-      daily_calories: plan.dailyCalories,
-      protein_g: plan.macros.proteinG,
-      carbs_g: plan.macros.carbsG,
-      fat_g: plan.macros.fatG,
-      fiber_g: plan.macros.fiberG,
-      water_ml: plan.waterMl,
-      forecast: {
-        weekly_change_kg: roundTo(plan.weeklyChangeKg, 3),
-        weeks: plan.timeline?.weeks ?? null,
-        goal_date: plan.timeline ? toIsoDateLocal(plan.timeline.goalDate) : null,
-        warnings: plan.warnings.map((w) => w.code),
-      },
-      generated_by: 'app',
-    }),
-  );
-
-  optional(
-    await supabase
-      .from('profiles')
-      .update({ onboarding_completed_at: new Date().toISOString(), onboarding_step: null })
-      .eq('user_id', userId),
-  );
-  return plan;
 }

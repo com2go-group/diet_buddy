@@ -109,6 +109,9 @@ export type StepId =
   | 'devices'
   | 'aiPlan';
 
+/** Where the user is, as stored in profiles.onboarding_step: a question step or a later screen. */
+export type OnboardingProgress = StepId | 'bodyScan' | 'initialPlan';
+
 export function buildSteps(goals: readonly GoalType[]): StepId[] {
   return [
     'personal',

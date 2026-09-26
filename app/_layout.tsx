@@ -25,7 +25,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { Button, ErrorState } from '@/components';
-import { useAppRoute } from '@/features/account';
+import { ONBOARDING_ROUTES, useAppRoute } from '@/features/account';
 import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
 import { t } from '@/i18n';
 import { queryClient } from '@/lib/query/queryClient';
@@ -124,7 +124,7 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
       <Stack.Protected guard={route === 'new-password'}>
         <Stack.Screen name="new-password" />
       </Stack.Protected>
-      <Stack.Protected guard={route === 'onboarding'}>
+      <Stack.Protected guard={ONBOARDING_ROUTES.includes(route)}>
         <Stack.Screen name="(onboarding)" />
       </Stack.Protected>
       <Stack.Protected guard={route === 'home'}>
