@@ -7,6 +7,7 @@ import { renderScreen } from '@/test/render';
 import { authConfig } from '../../auth/config';
 import { fillPlaceholders, legalEntity, openLegal } from '../legal';
 import { LegalScreen } from '../LegalScreen';
+import { DELETE_ACCOUNT } from '../deleteAccount.en';
 import { PRIVACY_POLICY } from '../privacy.en';
 import { TERMS_OF_SERVICE } from '../terms.en';
 import type { LegalDoc } from '../types';
@@ -30,7 +31,7 @@ describe('legal texts', () => {
   });
 
   it('uses only known placeholders', () => {
-    for (const doc of [PRIVACY_POLICY, TERMS_OF_SERVICE]) {
+    for (const doc of [PRIVACY_POLICY, TERMS_OF_SERVICE, DELETE_ACCOUNT]) {
       const keys = [...allText(doc).matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]);
       expect(keys.every((k) => k! in legalEntity)).toBe(true);
     }
@@ -50,6 +51,14 @@ describe('legal texts', () => {
     expect(policy).toMatch(/never used for advertising/);
     expect(allText(TERMS_OF_SERVICE)).toMatch(/18 or older/);
     expect(allText(TERMS_OF_SERVICE)).toMatch(/Not medical advice/);
+  });
+
+  it('explains deletion in the app, on the web and by email, and the subscription caveat', () => {
+    const text = allText(DELETE_ACCOUNT);
+    expect(text).toMatch(/Profile → Privacy & Data/);
+    expect(text).toMatch(/type DELETE/);
+    expect(text).toMatch(/\{\{email\}\}/);
+    expect(text).toMatch(/not cancelled by deleting your account/);
   });
 });
 

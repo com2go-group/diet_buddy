@@ -12,7 +12,12 @@ describe('ad config', () => {
   });
 
   it('never sends targeting data, only the personalisation choice', () => {
-    expect(requestOptions(false)).toEqual({ requestNonPersonalizedAdsOnly: true });
-    expect(requestOptions(true)).toEqual({ requestNonPersonalizedAdsOnly: false });
+    expect(requestOptions(false, 'android')).toEqual({ requestNonPersonalizedAdsOnly: true });
+    expect(requestOptions(true, 'android')).toEqual({ requestNonPersonalizedAdsOnly: false });
+  });
+
+  it('never requests personalised ads on iOS (no App Tracking Transparency prompt)', () => {
+    expect(requestOptions(true, 'ios')).toEqual({ requestNonPersonalizedAdsOnly: true });
+    expect(requestOptions(false, 'ios')).toEqual({ requestNonPersonalizedAdsOnly: true });
   });
 });

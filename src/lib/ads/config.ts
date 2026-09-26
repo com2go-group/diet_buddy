@@ -42,8 +42,9 @@ export function unitId(placement: Placement, os = Platform.OS, dev = __DEV__): s
 
 /**
  * Request options shared by every ad. No keywords or content URLs are ever passed, so health data
- * can't reach ad networks (CLAUDE.md §12, §13).
+ * can't reach ad networks (CLAUDE.md §12, §13). iOS always gets non-personalised ads: the app
+ * has no App Tracking Transparency prompt, and personalised ads would count as tracking.
  */
-export function requestOptions(personalised: boolean) {
-  return { requestNonPersonalizedAdsOnly: !personalised };
+export function requestOptions(personalised: boolean, os = Platform.OS) {
+  return { requestNonPersonalizedAdsOnly: os === 'ios' || !personalised };
 }

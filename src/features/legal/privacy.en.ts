@@ -30,7 +30,7 @@ export const PRIVACY_POLICY: LegalDoc = {
       heading: '2. What we collect and why',
       blocks: [
         'Account data: your email address or phone number, sign-in identifiers from Apple or Google if you use them, and your date of birth. We use them to create and secure your account and to confirm you are 18 or older. Legal basis: performance of our contract with you (GDPR Art. 6(1)(b)).',
-        'Health and fitness data: height, weight, body measurements and body-composition estimates, goals, activity and training level, diet style, restrictions, foods you avoid, allergies, food and water logs, daily check-ins (mood, energy, sleep, hunger, weight), your plan and your progress. We use it to calculate your plan, track your progress and personalise the coach, meal plans and insights. Legal basis: your explicit consent (GDPR Art. 9(2)(a)), which you give in onboarding, and our contract with you.',
+        'Health and fitness data: height, weight, body measurements and body-composition estimates, goals, activity and training level, diet style, restrictions (such as halal or kosher, which may reveal religious beliefs), foods you avoid, allergies, food and water logs, daily check-ins (mood, energy, sleep, hunger, weight), your plan and your progress. We use it to calculate your plan, track your progress and personalise the coach, meal plans and insights. Legal basis: your explicit consent (GDPR Art. 9(2)(a)), which you give in onboarding, and our contract with you.',
         'Progress photos: stored in a private storage area that only you can access, through links that expire after 10 minutes. Location data is removed from photos on your device before upload. Progress photos are never sent to the AI or anyone else.',
         'Coach conversations: the messages you exchange with Aria, Max and Luna are stored so you can continue them.',
         'Your name: used to greet you in the app. It is never sent to the AI.',
@@ -78,7 +78,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     {
       heading: '6. Advertising (free plan)',
       blocks: [
-        'The free plan shows ads from Google AdMob. Before any ad is requested, we ask for your choice about personalised ads (Google’s consent tool). Google may use your device’s advertising identifier and how you interact with ads; if you don’t agree to personalisation, only non-personalised ads are shown. We never pass health data, logs or anything you enter in the app to advertisers. Google acts as an independent controller for personalised advertising: see policies.google.com/privacy. Premium has no ads.',
+        'The free plan shows ads from Google AdMob. Before any ad is requested, we ask for your choice about personalised ads (Google’s consent tool). Google may use your device’s advertising identifier and how you interact with ads; if you don’t agree to personalisation, only non-personalised ads are shown. On iPhone and iPad, ads are always non-personalised and DietBuddy does not track you across other companies’ apps or websites. We never pass health data, logs or anything you enter in the app to advertisers. Google acts as an independent controller for personalised advertising: see policies.google.com/privacy. Premium has no ads.',
       ],
     },
     {

@@ -2,7 +2,8 @@
 
 The Privacy Policy and Terms of Service live in the app as data:
 `src/features/legal/privacy.en.ts` and `src/features/legal/terms.en.ts`. They are shown at
-`/legal/privacy` and `/legal/terms`: public routes that work before sign-in, inside the iOS and
+`/legal/privacy` and `/legal/terms`, with account-deletion instructions at `/legal/delete-account`
+(Google Play's account deletion URL): public routes that work before sign-in, inside the iOS and
 Android apps, and on the web build. Hosting the web build therefore gives the live URLs that
 App Store Connect and Google Play ask for.
 

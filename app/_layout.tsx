@@ -131,6 +131,7 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
         {/* Public: linked from sign-up, onboarding and Profile, and served as the live URLs. */}
         <Stack.Screen name="legal/privacy" />
         <Stack.Screen name="legal/terms" />
+        <Stack.Screen name="legal/delete-account" />
         <Stack.Protected guard={route === 'welcome'}>
           <Stack.Screen name="(auth)" />
         </Stack.Protected>
