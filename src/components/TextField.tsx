@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { forwardRef, useState } from 'react';
-import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
+import { Platform, Pressable, TextInput, View, type TextInputProps } from 'react-native';
 
 import { t } from '@/i18n';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
@@ -29,6 +29,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
 ) {
   const { colors } = useTheme();
   const [hidden, setHidden] = useState(password);
+  const [focused, setFocused] = useState(false);
   return (
     <View className={cn('gap-1.5', className)}>
       <View className="flex-row items-center justify-between">
@@ -38,7 +39,7 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
       <View
         className={cn(
           'flex-row items-center rounded-md border-[1.5px] bg-muted',
-          error ? 'border-destructive' : 'border-border',
+          error ? 'border-destructive' : focused ? 'border-primary' : 'border-border',
         )}
       >
         <TextInput
@@ -49,11 +50,26 @@ export const TextField = forwardRef<TextInput, TextFieldProps>(function TextFiel
           secureTextEntry={hidden}
           maxFontSizeMultiplier={1.8}
           style={[
-            { minWidth: 0, minHeight: MIN_TOUCH_TARGET + 6, color: colors.foreground },
+            // The whole field (input + unit/trailing) shows focus via its border, so the web
+            // browser outline, which would wrap only the input, is turned off.
+            {
+              minWidth: 0,
+              minHeight: MIN_TOUCH_TARGET + 6,
+              color: colors.foreground,
+              ...(Platform.OS === 'web' ? { outlineWidth: 0 } : null),
+            },
             style,
           ]}
           className="flex-1 px-4 py-3.5 font-sans text-base"
           {...props}
+          onFocus={(e) => {
+            setFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            props.onBlur?.(e);
+          }}
         />
         {trailing}
         {password ? (

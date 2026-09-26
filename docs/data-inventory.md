@@ -26,4 +26,6 @@ Everything is stored in Supabase in an EU region and is only visible to the user
 | Consent state and history                                                                                                                                          | `consents`, `consent_events`                                        | Legal                     | Demonstrate GDPR consent                    | No                                 | No                                                                  |
 | AI token usage                                                                                                                                                     | `ai_usage`                                                          | Diagnostics               | Cost monitoring, rate limits                | No                                 | No                                                                  |
 
+Food search: the search text (e.g. "chicken breast") goes to USDA FoodData Central through the `food-search` Edge Function. No user ID, name or other personal data is sent, and results are not stored except for the foods the user logs.
+
 Not collected in Phase 1: precise location, contacts, advertising ID (arrives with AdMob in Phase 2, behind UMP consent), analytics and crash data (PostHog/Sentry, later).

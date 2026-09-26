@@ -27,3 +27,11 @@ export type WeekdayKey = (typeof WEEKDAYS)[number];
 export function weekdayKey(date: Date): WeekdayKey {
   return WEEKDAYS[date.getDay()]!;
 }
+
+/** "2026-09-26" → local midnight of that day; null when malformed. */
+export function parseDayKey(key: string | undefined | null): Date | null {
+  const match = key ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(key) : null;
+  if (!match) return null;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return dayKey(date) === key ? date : null;
+}

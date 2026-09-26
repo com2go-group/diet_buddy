@@ -23,6 +23,11 @@ export function formatNumber(value: number): string {
   return Math.round(value).toLocaleString(locale);
 }
 
+/** Up to `decimals` fraction digits, trailing zeros dropped: 1.5 → "1.5", 2 → "2". */
+export function formatDecimal(value: number, decimals = 1): string {
+  return value.toLocaleString(locale, { maximumFractionDigits: decimals });
+}
+
 /** "March 2027". */
 export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });

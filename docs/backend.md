@@ -35,6 +35,25 @@ Put the printed API URL and anon key in `.env` to point the app at the local sta
 
 `npm run db:test:plain` runs the same migrations, seed and tests against any Postgres 15+ server that has pgTAP installed. It uses `scripts/db/supabase-stub.sql` to stand in for Supabase's `auth` and `storage` schemas. Set `DATABASE_URL` to a server where you can create databases; the script creates and drops a `dietbuddy_test` database. The real stack (`db:test`) remains the reference.
 
+## Edge Functions
+
+Server-side code that needs a secret or an outside API lives in `supabase/functions` (Deno). Each function has a thin `index.ts` (`Deno.serve`) and a `handler.ts` that takes its dependencies (keys, `fetch`, database client) as arguments, so Jest can test it (`supabase/tests/functions`). Shared, pure code is in `supabase/functions/_shared`. `npm run typecheck` also typechecks the functions using a small Deno type shim (`scripts/functions`), so no Deno install is needed on Windows.
+
+| Function      | Purpose                                                                                                                   | Secrets                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `food-search` | Searches USDA FoodData Central and returns foods per 100 g with household servings. Only the search text is sent to USDA. | `USDA_API_KEY` (free key from [api.data.gov](https://api.data.gov/signup/)) |
+
+Set secrets and deploy:
+
+```bash
+npx supabase secrets set USDA_API_KEY=<key>
+npx supabase functions deploy food-search
+```
+
+Supabase checks the caller's JWT before a function runs (the default `verify_jwt`). Locally, `npx supabase functions serve` runs them with secrets from `supabase/functions/.env` (not committed).
+
+Until `USDA_API_KEY` is set, food search answers `not_configured` and the app points users to manual entry.
+
 ## Access model
 
 | Data                                                                                                              | App (signed-in user)                      | Server (Edge Functions, service role)          |

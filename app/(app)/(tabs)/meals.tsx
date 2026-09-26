@@ -1,5 +1,3 @@
-import { ComingNext } from '@/features/tabs';
+import { MealsScreen } from '@/features/meals';
 
-export default function MealsTab() {
-  return <ComingNext title="tabs.meals" description="tabs.mealsSoon" emoji="🍽️" />;
-}
+export default MealsScreen;
