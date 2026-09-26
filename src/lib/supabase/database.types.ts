@@ -75,6 +75,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_insights: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          insights: Json
+          model: string
+          prompt_version: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          id?: string
+          insights: Json
+          model: string
+          prompt_version: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
+          insights?: Json
+          model?: string
+          prompt_version?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_usage: {
         Row: {
           created_at: string

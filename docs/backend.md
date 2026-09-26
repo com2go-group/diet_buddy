@@ -50,6 +50,7 @@ Server-side code that needs a secret or an outside API lives in `supabase/functi
 | `push-dispatch`      | Sends unsent `notifications` (last 24 h) as Expo pushes to the user's devices, honouring `notification_preferences` (promotions also need marketing consent); marks them `pushed_at`, deletes unregistered tokens. Run by pg_cron every 5 minutes; `create_weekly_reports()` runs weekly. Setup: `docs/setup/push.md`.                                                                                                                                                                                                                                           | `CRON_SECRET`; optional `EXPO_ACCESS_TOKEN`                                 |
 | `generate-meal-plan` | Daily AI meal plan: Claude picks foods and grams (`_prompts/mealPlan.v1.ts`); each food's numbers come from USDA (generic foods only); `_shared/dietRules.ts` checks names and USDA descriptions against allergies, restrictions (incl. kosher meat+dairy), diet style and avoided foods; any problem → retry with feedback (3 attempts max), else `generation_failed`; portions scaled to each meal's share of the target; stored in `meal_plans` (one per day). Free: one plan a day; Premium: up to 3 regenerations. Cost cap 15 model calls/day.             | `ANTHROPIC_API_KEY`, `USDA_API_KEY`; optional `MEAL_PLAN_MODEL`             |
 | `analyze-food-photo` | Food photo scan: the photo (base64 JPEG/PNG/WebP, type checked from its bytes, ≤5 MB) goes to Claude's vision model with `_prompts/foodPhoto.v1.ts`, which only names the foods and estimates grams; numbers come from USDA generic foods; each item and the plate are checked with `dietRules.ts` and returned with warnings (the user decides what to log). JSON validated with zod, one retry. The photo is never stored. Free: `food_photo_daily_limit_free` scans/day from `app_config` (default 3); Premium: 30/day cost cap. One `ai_usage` row per scan. | `ANTHROPIC_API_KEY`, `USDA_API_KEY`; optional `VISION_MODEL`                |
+| `generate-insights`  | Premium AI insights: aggregates the last 14 local days (per-day calories, protein, evening share, water, check-in answers, weight change; `generate-insights/aggregate.ts`) and sends only those plus targets and goal types to Claude (`_prompts/insights.v1.ts`). Needs 5+ logged days (else no model call). Output validated with zod; `safety.ts` rejects restrictive advice (skipping meals, fasting, detox, supplements…) → one retry, then unsafe items are dropped. Stored in `ai_insights`, one set per user per day. Cost cap 6 calls/day.             | `ANTHROPIC_API_KEY`; optional `INSIGHTS_MODEL`                              |
 
 Set secrets and deploy:
 
@@ -61,6 +62,7 @@ npx supabase functions deploy export-data
 npx supabase functions deploy delete-account
 npx supabase functions deploy generate-meal-plan
 npx supabase functions deploy analyze-food-photo
+npx supabase functions deploy generate-insights
 ```
 
 Supabase checks the caller's JWT before a function runs (the default `verify_jwt`). Locally, `npx supabase functions serve` runs them with secrets from `supabase/functions/.env` (not committed).
@@ -74,7 +76,7 @@ Until `USDA_API_KEY` is set, food search answers `not_configured` and the app po
 | Profile details, goals, preferences, body metrics, food/water logs, check-ins, devices, consents, progress photos | Read and write own rows                   | Full                                           |
 | Plans                                                                                                             | Read own; insert new versions (immutable) | Full                                           |
 | `is_premium`, `xp`, `streak_days`                                                                                 | Read only                                 | Written by the RevenueCat webhook and triggers |
-| Meal plans, coach messages, achievements unlocked, ad unlocks                                                     | Read only                                 | Written by Edge Functions                      |
+| Meal plans, coach messages, AI insights, achievements unlocked, ad unlocks                                        | Read only                                 | Written by Edge Functions                      |
 | Coach conversations, notifications                                                                                | Read, delete; mark notifications read     | Full                                           |
 | Consent history (`consent_events`)                                                                                | Read only (written by trigger)            | Full                                           |
 | `app_config`, achievements catalogue                                                                              | Read only                                 | Full                                           |

@@ -27,6 +27,7 @@ const NOW = [
   'featureCoach',
   'featureMealPlans',
   'featurePhotos',
+  'featureInsights',
   'featureFoodPhotos',
   'featureSupport',
 ] as const;

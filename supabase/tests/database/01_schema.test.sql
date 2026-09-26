@@ -6,7 +6,7 @@ select tables_are('public', array[
   'profiles', 'goals', 'preferences', 'body_metrics', 'plans', 'meal_plans', 'food_logs',
   'water_logs', 'checkins', 'progress_photos', 'coach_conversations', 'coach_messages',
   'achievements', 'user_achievements', 'ad_unlocks', 'notifications', 'device_connections',
-  'consents', 'consent_events', 'app_config', 'ai_usage', 'push_tokens', 'notification_preferences', 'xp_events'
+  'consents', 'consent_events', 'app_config', 'ai_usage', 'push_tokens', 'notification_preferences', 'xp_events', 'ai_insights'
 ]);
 
 select is(

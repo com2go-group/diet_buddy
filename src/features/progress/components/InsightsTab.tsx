@@ -5,6 +5,7 @@ import { t } from '@/i18n';
 import { formatDecimal } from '@/lib/format';
 
 import type { Insight } from '../stats';
+import { AiInsightsCard } from './AiInsightsCard';
 
 const EMOJI: Record<Insight['kind'], string> = {
   proteinGap: '🥩',
@@ -69,42 +70,44 @@ function text(i: Insight): { title: string; body: string } {
   }
 }
 
-/** Patterns found in the last 14 days (rule-based; AI insights arrive in Phase 3). */
+/** AI insights (Premium), then rule-based patterns from the last 14 days. */
 export function InsightsTab({ insights }: { insights: Insight[] }) {
-  if (!insights.length) {
-    return (
-      <EmptyState
-        emoji="📊"
-        title={t('progress.insightsEmpty')}
-        message={t('progress.insightsEmptyDesc')}
-      />
-    );
-  }
   return (
     <View className="mb-4 gap-3">
-      <Text tone="muted" className="text-[13px]">
-        {t('progress.insightsIntro')}
-      </Text>
-      {insights.map((i) => {
-        const { title, body } = text(i);
-        return (
-          <View
-            key={i.kind}
-            accessible
-            className="flex-row items-start gap-3 rounded-2xl border border-border bg-card p-4"
-          >
-            <Text className="text-2xl leading-8">{EMOJI[i.kind]}</Text>
-            <View className="flex-1">
-              <Text variant="label" className="mb-1 font-bold text-[15px]">
-                {title}
-              </Text>
-              <Text className="text-[14px] leading-5" tone="muted">
-                {body}
-              </Text>
-            </View>
-          </View>
-        );
-      })}
+      <AiInsightsCard />
+      {insights.length ? (
+        <>
+          <Text tone="muted" className="text-[13px]">
+            {t('progress.insightsIntro')}
+          </Text>
+          {insights.map((i) => {
+            const { title, body } = text(i);
+            return (
+              <View
+                key={i.kind}
+                accessible
+                className="flex-row items-start gap-3 rounded-2xl border border-border bg-card p-4"
+              >
+                <Text className="text-2xl leading-8">{EMOJI[i.kind]}</Text>
+                <View className="flex-1">
+                  <Text variant="label" className="mb-1 font-bold text-[15px]">
+                    {title}
+                  </Text>
+                  <Text className="text-[14px] leading-5" tone="muted">
+                    {body}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+        </>
+      ) : (
+        <EmptyState
+          emoji="📊"
+          title={t('progress.insightsEmpty')}
+          message={t('progress.insightsEmptyDesc')}
+        />
+      )}
     </View>
   );
 }

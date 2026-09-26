@@ -23,6 +23,7 @@ export const EXPORT_TABLES = [
   'push_tokens',
   'notification_preferences',
   'xp_events',
+  'ai_insights',
   'ai_usage',
 ] as const;
 
