@@ -52,6 +52,7 @@ export function PrivacyScreen() {
           aria-checked={granted}
           value={granted}
           disabled={update.isPending}
+          aria-disabled={update.isPending}
           onValueChange={(v) => update.mutate({ type, granted: v })}
           trackColor={{ true: colors.primary, false: colors.mutedForeground }}
           thumbColor="#FFFFFF"

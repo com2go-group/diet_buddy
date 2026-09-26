@@ -20,6 +20,8 @@ export const EXPORT_TABLES = [
   'ad_unlocks',
   'notifications',
   'device_connections',
+  'push_tokens',
+  'notification_preferences',
   'ai_usage',
 ] as const;
 

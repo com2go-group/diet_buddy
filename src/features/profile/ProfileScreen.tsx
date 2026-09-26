@@ -97,7 +97,7 @@ export function ProfileScreen() {
             icon="bell"
             label={t('profile.notifications')}
             value={t('profile.notificationsDesc')}
-            onPress={() => setInfo('notifications')}
+            onPress={() => router.push('/notification-settings')}
           />
           <SettingsRow
             icon="moon"

@@ -1,3 +1,4 @@
+import { pushToken, scheduleReminders } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 
 import { AuthFailure, toAuthFailure } from './errors';
@@ -109,6 +110,15 @@ export async function updatePassword(password: string): Promise<void> {
 }
 
 export async function signOut(): Promise<void> {
+  // This device should stop receiving the account's pushes and reminders.
+  const token = pushToken();
+  if (token)
+    await supabase
+      .from('push_tokens')
+      .delete()
+      .eq('token', token)
+      .then(undefined, () => undefined);
+  await scheduleReminders([], () => ({ title: '', body: '' })).catch(() => undefined);
   const { error } = await supabase.auth.signOut();
   if (error) throw toAuthFailure(error);
 }

@@ -3,14 +3,13 @@ import { View } from 'react-native';
 import { Button, Sheet, Text } from '@/components';
 import { t } from '@/i18n';
 
-export type ProfileInfo = 'notifications' | 'rate' | 'faq' | 'weightGoal' | null;
+export type ProfileInfo = 'rate' | 'faq' | 'weightGoal' | null;
 
 const FAQ = [1, 2, 3, 4, 5] as const;
 
 /** Help & FAQ, and short explanations for settings that arrive later. */
 export function ProfileInfoSheet({ info, onClose }: { info: ProfileInfo; onClose: () => void }) {
   const text: Record<Exclude<ProfileInfo, null | 'faq'>, [string, string]> = {
-    notifications: [t('profile.notifications'), t('profile.notificationsSoon')],
     rate: [t('profile.rate'), t('profile.rateSoon')],
     weightGoal: [t('profile.weightGoal'), t('profile.weightGoalNote')],
   };

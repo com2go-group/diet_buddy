@@ -27,6 +27,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { Button, ErrorState } from '@/components';
 import { ONBOARDING_ROUTES, useAppRoute } from '@/features/account';
 import { useAdsSetup } from '@/features/ads';
+import { usePushSetup } from '@/features/notifications/usePush';
 import { usePurchasesSetup } from '@/features/subscriptions';
 import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
 import { t } from '@/i18n';
@@ -146,5 +147,6 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
 function SignedInServices() {
   usePurchasesSetup();
   useAdsSetup();
+  usePushSetup();
   return null;
 }

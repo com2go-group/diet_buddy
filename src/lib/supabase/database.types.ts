@@ -520,11 +520,78 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          achievements: boolean
+          checkin_reminder: boolean
+          created_at: string
+          id: string
+          meal_reminders: boolean
+          promotions: boolean
+          streaks: boolean
+          updated_at: string
+          user_id: string
+          weekly_report: boolean
+        }
+        Insert: {
+          achievements?: boolean
+          checkin_reminder?: boolean
+          created_at?: string
+          id?: string
+          meal_reminders?: boolean
+          promotions?: boolean
+          streaks?: boolean
+          updated_at?: string
+          user_id?: string
+          weekly_report?: boolean
+        }
+        Update: {
+          achievements?: boolean
+          checkin_reminder?: boolean
+          created_at?: string
+          id?: string
+          meal_reminders?: boolean
+          promotions?: boolean
+          streaks?: boolean
+          updated_at?: string
+          user_id?: string
+          weekly_report?: boolean
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
           created_at: string
           id: string
+          pushed_at: string | null
           read_at: string | null
           title: string
           type: string
@@ -535,6 +602,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           id?: string
+          pushed_at?: string | null
           read_at?: string | null
           title: string
           type: string
@@ -545,6 +613,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           id?: string
+          pushed_at?: string | null
           read_at?: string | null
           title?: string
           type?: string
@@ -813,6 +882,10 @@ export type Database = {
         Args: { weight_kg: number; height_cm: number }
         Returns: number
       }
+      create_weekly_reports: {
+        Args: never
+        Returns: number
+      }
       evaluate_achievements: {
         Args: { target_user: string }
         Returns: undefined
@@ -824,6 +897,10 @@ export type Database = {
       my_achievement_progress: {
         Args: never
         Returns: { code: string; current: number; target: number }[]
+      }
+      register_push_token: {
+        Args: { p_token: string; p_platform: string }
+        Returns: undefined
       }
       refresh_streak: {
         Args: { target_user: string }
