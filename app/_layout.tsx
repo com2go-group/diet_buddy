@@ -19,6 +19,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -135,6 +136,9 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
         </Stack.Protected>
         <Stack.Protected guard={route === 'home'}>
           <Stack.Screen name="(app)" />
+        </Stack.Protected>
+        <Stack.Protected guard={signedIn && Platform.OS === 'web'}>
+          <Stack.Screen name="admin" />
         </Stack.Protected>
         <Stack.Protected guard={__DEV__}>
           <Stack.Screen name="design-system" />

@@ -27,6 +27,11 @@ jest.mock('../api', () => ({
   deleteAccount: jest.fn(),
 }));
 jest.mock('../saveExport', () => ({ saveExport: jest.fn() }));
+jest.mock('@/lib/purchases', () => ({
+  ...jest.requireActual('@/lib/purchases'),
+  purchasesAvailable: jest.fn(() => false),
+  restore: jest.fn(async () => false),
+}));
 jest.mock('../../notifications/api', () => ({
   loadNotifications: jest.fn().mockResolvedValue([]),
   markAllRead: jest.fn(),
@@ -88,6 +93,25 @@ describe('ProfileScreen', () => {
     expect(screen.getByLabelText('Daily Calorie Target, 1,800 kcal')).toBeOnTheScreen();
     expect(screen.getByLabelText('Hydration Goal, 2.5 L per day')).toBeOnTheScreen();
     expect(screen.getByText('Free plan')).toBeOnTheScreen();
+  });
+
+  it('links to health apps and restores purchases', async () => {
+    const { router } = jest.requireMock('expo-router') as { router: { push: jest.Mock } };
+    const purchases = jest.requireMock('@/lib/purchases') as { purchasesAvailable: jest.Mock };
+    await renderScreen(<ProfileScreen />);
+    await fireEvent.press(await screen.findByLabelText('Health apps, Not connected'));
+    expect(router.push).toHaveBeenCalledWith('/health');
+    expect(screen.queryByLabelText(/Restore purchases/)).toBeNull(); // no store on this build
+
+    purchases.purchasesAvailable.mockReturnValue(true);
+    await renderScreen(<ProfileScreen />);
+    await fireEvent.press(await screen.findByLabelText('Restore purchases'));
+    expect(
+      await screen.findByLabelText(
+        'Restore purchases, No previous purchases were found for this account.',
+      ),
+    ).toBeOnTheScreen();
+    purchases.purchasesAvailable.mockReturnValue(false);
   });
 
   it('changes units', async () => {

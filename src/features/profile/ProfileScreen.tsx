@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Linking, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, ErrorState, Sheet, SkeletonCard, Text } from '@/components';
+import { Button, ErrorState, SkeletonCard, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatDecimal, formatLongDate, formatNumber, formatWeight } from '@/lib/format';
 import { parseDayKey } from '@/lib/dates';
@@ -114,6 +114,37 @@ export function ProfileScreen() {
             value={t(`profile.units_${profile.units}`)}
             onPress={() => setSheet('units')}
           />
+          <SettingsRow
+            icon="activity"
+            label={t('profile.healthApps')}
+            value={healthConnected ? t('profile.healthConnected') : t('profile.healthNotConnected')}
+            onPress={() => router.push('/health')}
+          />
+          {adPrivacy.required ? (
+            <SettingsRow
+              icon="eye-off"
+              label={t('profile.adPrivacy')}
+              onPress={() => adPrivacy.open().catch(() => undefined)}
+            />
+          ) : null}
+          {purchasesOn ? (
+            <SettingsRow
+              icon="refresh-cw"
+              label={t('profile.restore')}
+              value={
+                restore.isPending
+                  ? '…'
+                  : restore.isError
+                    ? t('paywall.restoreFailed')
+                    : restore.isSuccess
+                      ? restore.data
+                        ? t('paywall.restored')
+                        : t('paywall.nothingToRestore')
+                      : undefined
+              }
+              onPress={() => !restore.isPending && restore.mutate()}
+            />
+          ) : null}
           <SettingsRow
             icon="shield"
             label={t('profile.privacy')}

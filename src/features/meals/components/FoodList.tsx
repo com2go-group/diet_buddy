@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native';
 import { Text } from '@/components';
 import { t } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
+import { MIN_TOUCH_TARGET } from '@/theme';
 
 import type { PortionFood } from '../types';
 
@@ -23,7 +23,6 @@ export function FoodList({
   foods: PortionFood[];
   onPick: (f: PortionFood) => void;
 }) {
-  const { colors } = useTheme();
   return (
     <View className="gap-2">
       {foods.map((food, i) => (
