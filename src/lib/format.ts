@@ -33,6 +33,11 @@ export function formatMonthYear(date: Date): string {
   return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
+/** "Mar 27" (short month and year), for tight labels. */
+export function formatShortMonth(date: Date): string {
+  return date.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+}
+
 /** Food amounts: "450 g" / "1.2 kg", or "9.5 oz" / "2.6 lb". */
 export function formatFoodAmount(grams: number, units: UnitSystem): string {
   if (units === 'imperial') {

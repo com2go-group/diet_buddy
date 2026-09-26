@@ -882,6 +882,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar: Json | null
           birth_date: string | null
           created_at: string
           gender: Database["public"]["Enums"]["gender"] | null
@@ -900,6 +901,7 @@ export type Database = {
         }
         Insert: {
           birth_date?: string | null
+          avatar?: Json | null
           created_at?: string
           gender?: Database["public"]["Enums"]["gender"] | null
           height_cm?: number | null
@@ -918,6 +920,7 @@ export type Database = {
         Update: {
           birth_date?: string | null
           created_at?: string
+          avatar?: Json | null
           gender?: Database["public"]["Enums"]["gender"] | null
           height_cm?: number | null
           id?: string

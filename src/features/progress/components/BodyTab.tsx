@@ -8,6 +8,7 @@ import { formatDecimal, formatWeight } from '@/lib/format';
 import { cmToIn, type UnitSystem } from '@/lib/nutrition';
 import { accentColor, useTheme } from '@/theme';
 
+import { TwinCard } from '../../twin/components/TwinCard';
 import { PhotosSection } from '../photos/PhotosSection';
 import { metricChanges, type MetricKey, type MetricRow } from '../stats';
 
@@ -31,6 +32,7 @@ export function BodyTab({ metrics, units }: { metrics: MetricRow[]; units: UnitS
   const keys = Object.keys(labels) as MetricKey[];
   return (
     <>
+      <TwinCard />
       <View className="mb-4 flex-row flex-wrap gap-3">
         {keys.map((key) => {
           const m = changes[key];
