@@ -6,6 +6,9 @@ the contents of this folder to any web server or static host.
 ```
 landing/
   index.html        the page
+  privacy.html      Privacy Policy   ┐ generated from the app's texts
+  terms.html        Terms of Service │ (src/features/legal) by
+  delete-account.html  deletion steps┘ `npm run landing:legal`
   styles.css        styles (light and dark mode, responsive)
   config.js         settings you edit: store links, legal links, contact, company
   main.js           applies config.js to the page
@@ -14,13 +17,14 @@ landing/
 
 ## 1. Edit `config.js`
 
-| Setting                                      | What to put                                                                                                                                                                                                                                            |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `appStoreUrl`                                | The App Store link, e.g. `https://apps.apple.com/app/id1234567890`                                                                                                                                                                                     |
-| `playStoreUrl`                               | `https://play.google.com/store/apps/details?id=com.com2go.dietbuddy` once published                                                                                                                                                                    |
-| `privacyUrl`, `termsUrl`, `deleteAccountUrl` | Where the app's web build serves `/legal/privacy`, `/legal/terms` and `/legal/delete-account` (see `docs/legal.md`). Keep the defaults if the web build is on the same domain; otherwise use full URLs such as `https://app.example.com/legal/privacy` |
-| `supportEmail`                               | Contact address for the footer (the Contact link is hidden while empty)                                                                                                                                                                                |
-| `company`                                    | Company name for the copyright line                                                                                                                                                                                                                    |
+| Setting                                                      | What to put                                                                                                                                                  |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `appStoreUrl`                                                | The App Store link, e.g. `https://apps.apple.com/app/id1234567890`                                                                                           |
+| `playStoreUrl`                                               | `https://play.google.com/store/apps/details?id=com.com2go.dietbuddy` once published                                                                          |
+| `privacyUrl`, `termsUrl`, `deleteAccountUrl`                 | Default to this folder's `privacy.html`, `terms.html` and `delete-account.html`. Change only if you host the legal pages elsewhere                           |
+| `legalCompany`, `legalAddress`, `legalEmail`, `legalCountry` | Company name, registered address, privacy contact email and governing-law country used in the Privacy Policy and Terms (shown as `[placeholders]` until set) |
+| `supportEmail`                                               | Contact address for the footer (the Contact link is hidden while empty)                                                                                      |
+| `company`                                                    | Company name for the copyright line                                                                                                                          |
 
 While a store link is empty, its buttons say "Coming soon to App Store / Google Play" and don't
 navigate, so you can publish the page before launch.
@@ -38,7 +42,13 @@ navigate, so you can publish the page before launch.
   final device screenshots are taken, keeping the file names.
 - **App icon:** the favicon uses the DietBuddy bolt mark. The app's own icon (`assets/icon.png`
   in the app) is still Expo's placeholder and needs a real design before store submission.
-- **Legal:** the Privacy Policy and Terms must be live at the linked URLs (see `docs/legal.md`).
+- **Legal pages:** `privacy.html`, `terms.html` and `delete-account.html` are the live URLs for
+  the stores (App Store privacy policy URL, Google Play privacy policy and account deletion
+  URLs), e.g. `https://dietbuddy.example/privacy.html`. They are drafts for legal review (see
+  `docs/legal.md`). Whenever the texts in `src/features/legal/` change, run
+  `npm run landing:legal` and upload the three files again. To write the company details into
+  the HTML itself instead of filling them from `config.js`, set `EXPO_PUBLIC_LEGAL_COMPANY`,
+  `_ADDRESS`, `_EMAIL` and `_COUNTRY` before running it.
 
 ## 3. Upload
 

@@ -7,10 +7,16 @@ window.DIETBUDDY = {
   appStoreUrl: '',
   // e.g. 'https://play.google.com/store/apps/details?id=com.com2go.dietbuddy'
   playStoreUrl: '',
-  // Where the app's web build serves its legal pages (docs/legal.md).
-  privacyUrl: '/legal/privacy',
-  termsUrl: '/legal/terms',
-  deleteAccountUrl: '/legal/delete-account',
+  // Legal pages. By default the ones in this folder (privacy.html, terms.html,
+  // delete-account.html, built from the app's texts with `npm run landing:legal`).
+  privacyUrl: 'privacy.html',
+  termsUrl: 'terms.html',
+  deleteAccountUrl: 'delete-account.html',
+  // Shown in the Privacy Policy and Terms. Unset values show as [placeholders].
+  legalCompany: '',
+  legalAddress: '',
+  legalEmail: '',
+  legalCountry: '',
   // Contact address shown in the footer.
   supportEmail: '',
   // Company name for the copyright line.

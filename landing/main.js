@@ -32,6 +32,18 @@
     else if (a.getAttribute('data-link') === 'contact') a.parentElement.remove();
   });
 
+  // Legal entity details in the Privacy Policy and Terms (unless baked in when generated).
+  const legal = {
+    company: c.legalCompany,
+    address: c.legalAddress,
+    email: c.legalEmail,
+    country: c.legalCountry,
+  };
+  document.querySelectorAll('[data-legal]').forEach(function (el) {
+    const value = legal[el.getAttribute('data-legal')];
+    if (value) el.textContent = value;
+  });
+
   document.querySelectorAll('[data-year]').forEach(function (el) {
     el.textContent = String(new Date().getFullYear());
   });
