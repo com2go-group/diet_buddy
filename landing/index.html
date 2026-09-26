@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DietBuddy: your personal nutrition coach</title>
+    <meta
+      name="description"
+      content="DietBuddy builds a personal calorie and macro plan from your body, goals and food preferences, then helps you stick to it with easy logging, an AI coach and progress you can see."
+    />
+    <meta name="theme-color" content="#F59E0B" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="DietBuddy: your personal nutrition coach" />
+    <meta
+      property="og:description"
+      content="A personal nutrition plan, easy food logging, an AI coach and progress you can see. Free to start."
+    />
+    <!-- Set to the absolute URL of og-image.png once the page is hosted (see README.md). -->
+    <meta property="og:image" content="assets/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link
+      rel="preload"
+      href="assets/fonts/inter-800.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js" defer></script>
+    <script src="main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="header-row container">
+        <a class="brand" href="#top" aria-label="DietBuddy home">
+          <span class="brand-tile" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+          </span>
+          <span class="brand-word">Diet<span>Buddy</span></span>
+        </a>
+        <nav aria-label="Main">
+          <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#premium">Premium</a></li>
+            <li><a href="#privacy">Safety &amp; privacy</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </nav>
+        <a class="btn btn-primary btn-small" href="#download">Get the app</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero" id="top">
+        <div class="hero-grid container">
+          <div class="hero-copy">
+            <p class="eyebrow">Nutrition &amp; fitness coach</p>
+            <h1>Eat smarter. Reach your goal. <span class="accent">Enjoy the way there.</span></h1>
+            <p class="lead">
+              DietBuddy builds a personal calorie and macro plan from your body, goals and food
+              preferences, then helps you stick to it with easy logging, an AI coach and progress
+              you can see.
+            </p>
+            <div class="store-buttons">
+              <a class="store-btn" data-store="ios" href="#download">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="6" y="2" width="12" height="20" rx="3" />
+                  <circle cx="12" cy="18" r="1" />
+                </svg>
+                <span><small>Download on the</small>App Store</span>
+              </a>
+              <a class="store-btn" data-store="android" href="#download">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 9-14 9z" /></svg>
+                <span><small>Get it on</small>Google Play</span>
+              </a>
+            </div>
+            <p class="fine">Free to start · No credit card required · For adults 18+</p>
+          </div>
+          <div class="hero-visual">
+            <figure class="phone">
+              <img
+                src="assets/screens/01-home.webp"
+                width="645"
+                height="1398"
+                alt="DietBuddy home screen showing today's score, a 12 day streak, calories, protein, carbs, fat and hydration"
+              />
+            </figure>
+            <span class="chip chip-a" aria-hidden="true">🔥 12 day streak</span>
+            <span class="chip chip-b" aria-hidden="true">💧 1.5 L today</span>
+            <span class="chip chip-c" aria-hidden="true">⚡ Level 4</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Highlights -->
+      <section class="highlights" aria-label="Highlights">
+        <div class="highlight-row container">
+          <p><strong>Personal targets</strong><span>from proven formulas</span></p>
+          <p><strong>Food numbers</strong><span>from USDA &amp; Open Food Facts</span></p>
+          <p><strong>3 AI coaches</strong><span>for food, fitness &amp; mindset</span></p>
+          <p><strong>Your data</strong><span>stored in the EU, never sold</span></p>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="section" id="features">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">What DietBuddy does</p>
+            <h2>Everything you need to eat well, in one app</h2>
+            <p class="lead">
+              Simple enough for every day, smart enough to keep you moving forward.
+            </p>
+          </header>
+          <ul class="feature-grid">
+            <li class="card">
+              <span class="icon" aria-hidden="true">🎯</span>
+              <h3>A plan built for you</h3>
+              <p>
+                Answer a few questions and get daily calories, protein, carbs, fat, fibre and water
+                targets based on the Mifflin-St Jeor formula and your activity. Safe minimums are
+                built in.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">🍽️</span>
+              <h3>Log food in seconds</h3>
+              <p>
+                Search a trusted food database, scan a barcode or snap a photo of your plate.
+                Calories and macros come from USDA FoodData Central and Open Food Facts, never
+                guessed.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">💬</span>
+              <h3>An AI coach, three ways</h3>
+              <p>
+                Ask Aria about food, Max about training and Luna about sleep, stress and mindset.
+                They know your targets and today’s log, so the advice fits your day.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">✨</span>
+              <h3>Meal plans that respect your diet</h3>
+              <p>
+                Daily AI meal plans fit your targets and diet style. Every item is checked against
+                your allergies and restrictions before you see it.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">📈</span>
+              <h3>Progress you can see</h3>
+              <p>
+                Weight trend, weekly calories, goal projection, body measurements, private progress
+                photos, daily check-ins, streaks, levels and achievements.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">⌚</span>
+              <h3>Works with your health apps</h3>
+              <p>
+                Connect Apple Health or Health Connect to sync weigh-ins, steps and water. Smart
+                scales and watches such as Apple Watch, Garmin, Fitbit and Withings join through
+                them.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">🧍</span>
+              <h3>Meet your Digital Twin</h3>
+              <p>
+                A friendly cartoon you whose shape follows your weigh-ins, with a timeline from your
+                start to your goal.
+              </p>
+            </li>
+            <li class="card">
+              <span class="icon" aria-hidden="true">📸</span>
+              <h3>Share your week</h3>
+              <p>
+                Turn your week into a story image: streak, days on target, water and new badges.
+                Your weight stays private unless you choose to add it.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Screens -->
+      <section class="section section-tint" id="screens" aria-labelledby="screens-title">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">Take a look</p>
+            <h2 id="screens-title">Designed to make healthy habits easy</h2>
+          </header>
+        </div>
+        <ul class="screens" tabindex="0" aria-label="App screenshots, scroll sideways for more">
+          <li>
+            <img
+              src="assets/screens/01-home.webp"
+              width="645"
+              height="1398"
+              loading="lazy"
+              alt="Home: today’s score, streak, level and nutrition"
+            />
+            <p>Your day at a glance</p>
+          </li>
+          <li>
+            <img
+              src="assets/screens/02-meals.webp"
+              width="645"
+              height="1398"
+              loading="lazy"
+              alt="Meals: calories today, macros and logged lunch"
+            />
+            <p>Meals and macros</p>
+          </li>
+          <li>
+            <img
+              src="assets/screens/03-coach.webp"
+              width="645"
+              height="1398"
+              loading="lazy"
+              alt="AI coach conversation with Aria the nutritionist"
+            />
+            <p>Chat with your coach</p>
+          </li>
+          <li>
+            <img
+              src="assets/screens/04-progress.webp"
+              width="645"
+              height="1398"
+              loading="lazy"
+              alt="Progress: total lost, streak, weight trend and weekly calories"
+            />
+            <p>See your progress</p>
+          </li>
+          <li>
+            <img
+              src="assets/screens/05-digital-twin.webp"
+              width="645"
+              height="1398"
+              loading="lazy"
+              alt="Digital Twin cartoon at the goal weight with a timeline"
+            />
+            <p>Your Digital Twin</p>
+          </li>
+          <li>
+            <img
+              src="assets/screens/06-weekly-story.webp"
+              width="645"
+              height="1398"
+              loading="lazy"
+              alt="Weekly Progress Story with streak, days logged and water goal days"
+            />
+            <p>Share your week</p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- How it works -->
+      <section class="section" id="how">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">How it works</p>
+            <h2>Up and running in a few minutes</h2>
+          </header>
+          <ol class="steps">
+            <li>
+              <span class="step-num" aria-hidden="true">1</span>
+              <h3>Tell us about you</h3>
+              <p>Your goal, measurements, activity, diet style, allergies and foods you avoid.</p>
+            </li>
+            <li>
+              <span class="step-num" aria-hidden="true">2</span>
+              <h3>Get your plan</h3>
+              <p>
+                Daily targets, a hydration goal, an exercise suggestion and a realistic timeline to
+                your goal.
+              </p>
+            </li>
+            <li>
+              <span class="step-num" aria-hidden="true">3</span>
+              <h3>Log, learn and level up</h3>
+              <p>
+                Track meals and water, check in daily, ask your coach and watch your progress grow.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Free vs Premium -->
+      <section class="section section-tint" id="premium">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">Plans</p>
+            <h2>Free to start. Premium when you want more.</h2>
+          </header>
+          <div class="plans">
+            <article class="plan">
+              <h3>Free</h3>
+              <p class="plan-sub">Everything you need to get going</p>
+              <ul class="checks">
+                <li>Personal plan and daily targets</li>
+                <li>Food search, barcode scan and manual logging</li>
+                <li>AI food photo scan (3 a day)</li>
+                <li>Water tracking and daily check-ins</li>
+                <li>Progress charts, streaks, levels and achievements</li>
+                <li>AI coach (5 messages a day)</li>
+                <li>
+                  Daily AI meal plan: first item of each meal, unlock the rest with a short video
+                </li>
+                <li>Includes ads</li>
+              </ul>
+            </article>
+            <article class="plan plan-premium">
+              <p class="badge">Premium</p>
+              <h3>Premium</h3>
+              <p class="plan-sub">Everything in Free, plus</p>
+              <ul class="checks">
+                <li>No ads</li>
+                <li>Unlimited AI coach</li>
+                <li>Full AI meal plans, planned up to a week ahead</li>
+                <li>Grocery AI: one weekly shopping list, sorted by aisle</li>
+                <li>Restaurant mode: scan a menu, see which dishes fit</li>
+                <li>AI body scan from two photos</li>
+                <li>AI insights and wellness insights</li>
+                <li>Before/after photo comparison</li>
+                <li>Digital Twin timeline and goal projection</li>
+                <li>Share your Weekly Progress Story</li>
+                <li>30 AI food photo scans a day and priority support</li>
+              </ul>
+              <p class="plan-note">
+                Monthly or yearly subscription through the App Store or Google Play, with a free
+                trial on the monthly plan. Prices are shown in the app and depend on your country.
+                Cancel anytime in your store account.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Safety & privacy -->
+      <section class="section" id="privacy">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">Safety &amp; privacy</p>
+            <h2>Healthy habits, not extremes</h2>
+          </header>
+          <ul class="trust-grid">
+            <li>
+              <h3>🛡️ Safe by design</h3>
+              <p>
+                Targets never go below 1,200 kcal (women) or 1,500 kcal (men) a day, or your resting
+                energy needs, and weekly loss is capped at 1% of your body weight.
+              </p>
+            </li>
+            <li>
+              <h3>🔒 Your data stays yours</h3>
+              <p>
+                Stored in the EU and visible only to you. Never sold, never used for advertising.
+                Export or delete everything at any time.
+              </p>
+            </li>
+            <li>
+              <h3>🤝 Support when it matters</h3>
+              <p>
+                The coach won’t encourage extreme restriction and points you to professional help if
+                you’re struggling.
+              </p>
+            </li>
+            <li>
+              <h3>✅ You’re in control</h3>
+              <p>
+                Optional features like AI body scans and wellness insights only run with your
+                separate permission, and you can switch them off anytime.
+              </p>
+            </li>
+          </ul>
+          <p class="disclaimer">
+            DietBuddy gives general nutrition and fitness information and is not medical advice.
+            Talk to a doctor before starting a new diet, especially if you have a medical condition
+            or are pregnant. DietBuddy is for adults aged 18 and over.
+          </p>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="section section-tint" id="faq">
+        <div class="narrow container">
+          <header class="section-head">
+            <p class="eyebrow">FAQ</p>
+            <h2>Questions and answers</h2>
+          </header>
+          <div class="faq">
+            <details>
+              <summary>Is DietBuddy free?</summary>
+              <p>
+                Yes. Your plan, food logging, water, check-ins, progress and a daily allowance of
+                coach messages are free, with ads. Premium removes ads and adds unlimited coaching,
+                full meal plans and more.
+              </p>
+            </details>
+            <details>
+              <summary>Where do the calorie and macro numbers come from?</summary>
+              <p>
+                From USDA FoodData Central and Open Food Facts. The AI helps recognise foods and
+                plan meals, but the numbers always come from a food database.
+              </p>
+            </details>
+            <details>
+              <summary>Does it work with my smart scale or watch?</summary>
+              <p>
+                Yes, through Apple Health on iPhone or Health Connect on Android. Most scales and
+                wearables, including Withings, Garmin, Fitbit, Apple Watch, Oura and Samsung Health,
+                share their data there.
+              </p>
+            </details>
+            <details>
+              <summary>Is my health data safe?</summary>
+              <p>
+                Your data is stored in the EU, is visible only to you and is never sold or used for
+                ads. AI features receive only what each feature needs. You can export or delete
+                everything in Profile → Privacy &amp; Data.
+              </p>
+            </details>
+            <details>
+              <summary>How do I cancel Premium?</summary>
+              <p>
+                Premium is managed by the App Store or Google Play. Cancel anytime in your store
+                account settings, at least 24 hours before the next renewal.
+              </p>
+            </details>
+            <details>
+              <summary>Is DietBuddy medical advice?</summary>
+              <p>
+                No. It gives general guidance and estimates. Please talk to a doctor or dietitian
+                about medical conditions, pregnancy or eating concerns.
+              </p>
+            </details>
+            <details>
+              <summary>Who can use DietBuddy?</summary>
+              <p>Adults aged 18 and over. The app is currently available in English.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- Download -->
+      <section class="download" id="download">
+        <div class="download-inner container">
+          <h2>Start your plan today</h2>
+          <p>Download DietBuddy and get your personal plan in a few minutes.</p>
+          <div class="store-buttons centered">
+            <a class="store-btn store-btn-light" data-store="ios" href="#download">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="6" y="2" width="12" height="20" rx="3" />
+                <circle cx="12" cy="18" r="1" />
+              </svg>
+              <span><small>Download on the</small>App Store</span>
+            </a>
+            <a class="store-btn store-btn-light" data-store="android" href="#download">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 9-14 9z" /></svg>
+              <span><small>Get it on</small>Google Play</span>
+            </a>
+          </div>
+          <p class="fine">Free to start · No credit card required</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-row container">
+        <a class="brand" href="#top" aria-label="DietBuddy home">
+          <span class="brand-tile" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+          </span>
+          <span class="brand-word">Diet<span>Buddy</span></span>
+        </a>
+        <nav aria-label="Legal">
+          <ul class="footer-links">
+            <li><a data-link="privacy" href="/legal/privacy">Privacy Policy</a></li>
+            <li><a data-link="terms" href="/legal/terms">Terms of Service</a></li>
+            <li>
+              <a data-link="deleteAccount" href="/legal/delete-account">Delete your account</a>
+            </li>
+            <li><a data-link="contact" href="#top">Contact</a></li>
+          </ul>
+        </nav>
+        <p class="copyright">© <span data-year>2026</span> <span data-company>DietBuddy</span></p>
+      </div>
+    </footer>
+  </body>
+</html>
