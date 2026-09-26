@@ -10,6 +10,7 @@ import { parseDayKey } from '@/lib/dates';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { ManualForm } from './components/ManualForm';
+import { useFeature } from '../config';
 import { PhotoPanel } from './components/PhotoPanel';
 import { PortionPanel } from './components/PortionPanel';
 import { SearchPanel } from './components/SearchPanel';
@@ -35,6 +36,7 @@ export function LogFoodScreen() {
   const [picked, setPicked] = useState<PortionFood | null>(null);
   const save = useLogFood();
   const saveMany = useLogFoods();
+  const photoOn = useFeature('food_photo');
   const slotLabel = t(`homeScreen.${slot}`);
 
   const submit = (entry: Omit<NewFoodLog, 'slot' | 'loggedAt'>) =>
@@ -91,7 +93,7 @@ export function LogFoodScreen() {
                 accessibilityLabel={t('logFood.title')}
                 options={[
                   { value: 'search', label: t('logFood.search') },
-                  { value: 'photo', label: t('logFood.photo') },
+                  ...(photoOn ? [{ value: 'photo' as const, label: t('logFood.photo') }] : []),
                   { value: 'manual', label: t('logFood.manual') },
                 ]}
                 value={mode}

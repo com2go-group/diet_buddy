@@ -9,6 +9,7 @@ import { useTheme } from '@/theme';
 import { FoodSearchError } from '../api';
 import type { FoodResult, PortionFood } from '../types';
 import { useFoodSearch, useRecentFoods } from '../useMeals';
+import { useFeature } from '../../config';
 import { BarcodeScanner } from './BarcodeScanner';
 import { FoodList } from './FoodList';
 
@@ -31,6 +32,7 @@ export function SearchPanel({ onPick }: { onPick: (food: PortionFood) => void })
   const { colors } = useTheme();
   const [text, setText] = useState('');
   const [scanning, setScanning] = useState(false);
+  const barcodeOn = useFeature('barcode');
   const search = useFoodSearch(text);
   const recent = useRecentFoods();
 
@@ -100,12 +102,14 @@ export function SearchPanel({ onPick }: { onPick: (food: PortionFood) => void })
           />
         }
       />
-      <Button
-        label={`▦ ${t('logFood.scanBarcode')}`}
-        variant="outline"
-        size="md"
-        onPress={() => setScanning(true)}
-      />
+      {barcodeOn ? (
+        <Button
+          label={`▦ ${t('logFood.scanBarcode')}`}
+          variant="outline"
+          size="md"
+          onPress={() => setScanning(true)}
+        />
+      ) : null}
       {scanning ? (
         <BarcodeScanner
           visible

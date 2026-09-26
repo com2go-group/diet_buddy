@@ -194,7 +194,7 @@ export function ProfileScreen() {
           <SettingsRow
             icon="help-circle"
             label={t('profile.help')}
-            onPress={() => setInfo('faq')}
+            onPress={() => router.push('/help')}
           />
           <SettingsRow icon="star" label={t('profile.rate')} onPress={() => setInfo('rate')} />
           {authConfig.termsUrl ? (

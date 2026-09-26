@@ -5,6 +5,8 @@ import { Text } from '@/components';
 import { t } from '@/i18n';
 import { accentColor, useTheme, type Accent } from '@/theme';
 
+import { useFeature } from '../../config';
+
 const SHORTCUTS = [
   { key: 'grocery', emoji: '🛒', accent: 'green', route: '/grocery' },
   { key: 'restaurant', emoji: '🍽️', accent: 'blue', route: '/restaurant' },
@@ -14,9 +16,14 @@ const SHORTCUTS = [
 /** Grocery AI, Restaurant mode and Subscribe shortcuts (the first two explain Premium to free users). */
 export function Shortcuts() {
   const { scheme } = useTheme();
+  const on = {
+    grocery: useFeature('grocery'),
+    restaurant: useFeature('restaurant'),
+    subscribe: true,
+  };
   return (
     <View className="mb-4 flex-row gap-2.5">
-      {SHORTCUTS.map((s) => {
+      {SHORTCUTS.filter((s) => on[s.key]).map((s) => {
         const color = accentColor(s.accent, scheme);
         return (
           <Pressable

@@ -128,3 +128,5 @@ select id, 'owner' from auth.users where email = 'you@example.com';
 ```
 
 Enable MFA in Supabase: **Authentication → Multi-Factor → TOTP** on.
+
+What the app reads from the dashboard settings: `feature_barcode`, `feature_food_photo`, `feature_restaurant` and `feature_grocery` hide those entry points when set to false (anything missing counts as on); `min_app_version` shows a blocking "Time to update" screen on older native builds (store links from `EXPO_PUBLIC_APP_STORE_URL` / `EXPO_PUBLIC_PLAY_STORE_URL`); the FAQ in Profile → Help comes from `faq_entries` (built-in text until entries exist); support requests from Help land in the Support page, and replies reach the user in the app and by push.

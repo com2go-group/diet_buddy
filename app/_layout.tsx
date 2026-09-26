@@ -27,6 +27,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 
 import { Button, ErrorState } from '@/components';
 import { ONBOARDING_ROUTES, useAppRoute } from '@/features/account';
+import { UpdateRequired, useUpdateRequired } from '@/features/config';
 import { useAdsSetup } from '@/features/ads';
 import { useHealthSync } from '@/features/health';
 import { usePushSetup } from '@/features/notifications/usePush';
@@ -100,6 +101,7 @@ export default function RootLayout() {
  */
 function RootNavigator({ signedIn }: { signedIn: boolean }) {
   const { route, retry } = useAppRoute();
+  const updateRequired = useUpdateRequired();
 
   // Never show one user's cached data to the next.
   useEffect(() => {
@@ -107,6 +109,7 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
   }, [signedIn]);
 
   if (route === 'loading') return null;
+  if (updateRequired) return <UpdateRequired />;
   if (route === 'error') {
     return (
       <SafeAreaView className="flex-1 justify-center gap-2 bg-background px-5">

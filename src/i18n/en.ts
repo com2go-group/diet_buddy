@@ -892,6 +892,32 @@ export const en = {
     campaignSent: 'Sent to {{count}} users.',
     auditEmpty: 'No admin actions yet.',
   },
+  config: {
+    updateTitle: 'Time to update',
+    updateBody:
+      'This version of DietBuddy is no longer supported. Update to the latest version to keep going; your data is safe.',
+    updateButton: 'Update DietBuddy',
+  },
+  help: {
+    title: 'Help & support',
+    back: 'Back',
+    faq: 'Frequently asked questions',
+    contactTitle: 'Contact support',
+    contactIntro:
+      'Tell us what’s wrong or what you need. We reply in the app, usually within two working days.',
+    subject: 'Subject',
+    message: 'Message',
+    send: 'Send',
+    sent: 'Thanks! We’ve got your message and will reply here.',
+    sendFailed: 'We couldn’t send that. Check your connection and try again.',
+    tooShort: 'Add a subject (at least 3 characters) and a message.',
+    myTickets: 'Your requests',
+    status_open: 'Waiting for a reply',
+    status_answered: 'Answered',
+    status_closed: 'Closed',
+    reply: 'Our reply: {{reply}}',
+    loadFailed: 'We couldn’t load this.',
+  },
   foodPhoto: {
     introTitle: 'Snap your plate',
     intro:
