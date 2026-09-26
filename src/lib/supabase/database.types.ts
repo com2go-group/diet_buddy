@@ -794,6 +794,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      achievement_progress: {
+        Args: { target_user: string }
+        Returns: { code: string; current: number; target: number }[]
+      }
       award_xp: {
         Args: { target_user: string; amount: number }
         Returns: undefined
@@ -802,9 +806,17 @@ export type Database = {
         Args: { weight_kg: number; height_cm: number }
         Returns: number
       }
+      evaluate_achievements: {
+        Args: { target_user: string }
+        Returns: undefined
+      }
       has_activity_on: {
         Args: { target_user: string; day: string }
         Returns: boolean
+      }
+      my_achievement_progress: {
+        Args: never
+        Returns: { code: string; current: number; target: number }[]
       }
       refresh_streak: {
         Args: { target_user: string }

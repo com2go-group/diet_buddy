@@ -1,5 +1,3 @@
-import { ComingNext } from '@/features/tabs';
+import { ProgressScreen } from '@/features/progress';
 
-export default function ProgressTab() {
-  return <ComingNext title="tabs.progress" description="tabs.progressSoon" emoji="📈" />;
-}
+export default ProgressScreen;

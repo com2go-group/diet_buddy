@@ -22,7 +22,7 @@ export const mealsQueryKey = (userId: string | undefined, day: Date) =>
 /** Anything showing food totals (Meals, Home, Progress) refreshes after a change. */
 function invalidateFood(queryClient: ReturnType<typeof useQueryClient>) {
   return Promise.all(
-    ['meals', 'home', 'recentFoods', 'progress'].map((key) =>
+    ['meals', 'home', 'recentFoods', 'progress', 'notifications'].map((key) =>
       queryClient.invalidateQueries({ queryKey: [key] }),
     ),
   );

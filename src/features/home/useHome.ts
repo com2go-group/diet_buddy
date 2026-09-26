@@ -28,7 +28,12 @@ export function useHome() {
   const rollback = (_e: unknown, _v: unknown, ctx: { previous?: HomeData } | undefined) => {
     if (ctx?.previous) queryClient.setQueryData(key, ctx.previous);
   };
-  const settle = () => queryClient.invalidateQueries({ queryKey: key });
+  const settle = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: key }),
+      queryClient.invalidateQueries({ queryKey: ['progress'] }),
+      queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+    ]);
 
   const add = useMutation({
     mutationFn: () => addGlass(userId!),

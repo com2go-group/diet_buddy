@@ -76,6 +76,8 @@ Server-side rules (database triggers):
 - A check-in awards +20 XP (one per day) and refreshes the streak.
 - A check-in's `date` is the device's local date and must be within one day of the server date (covers every time zone), so check-ins can't be back- or future-dated to collect XP.
 - Check-in weight feeds the weight trend.
+- Achievements: `achievement_progress()` computes each achievement's progress from the user's data; after every food, water, check-in or weight insert, `evaluate_achievements()` unlocks the completed ones once, awards their XP and adds a notification. The app reads its own progress with the `my_achievement_progress()` RPC and cannot unlock anything itself. Rules: 12/14-day streaks; Clean Eater = 5 days within ±10% of the calorie target; Hydration Hero = 7 consecutive days at the water goal; Protein Pro = 10 days at the protein target; Scale Master = 2 kg below the active weight-loss goal's starting weight.
+- Streaks and achievement days use the server's UTC date. For users far from UTC, a late-evening log can count toward the next day; moving these rules to the user's time zone is a follow-up.
 - Ad unlocks award XP: +50 for a meal plan, +100 for the AI plan.
 - Every consent change is written to `consent_events`.
 

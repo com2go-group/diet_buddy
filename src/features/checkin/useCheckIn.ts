@@ -20,7 +20,12 @@ export function useCheckIn() {
     onSuccess: () => haptics.success(),
     // Home shows the new XP, streak and check-in; refresh it either way (a duplicate means the
     // home screen was stale).
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['home'] }),
+    onSettled: () =>
+      Promise.all(
+        ['home', 'progress', 'notifications'].map((key) =>
+          queryClient.invalidateQueries({ queryKey: [key] }),
+        ),
+      ),
   });
   return {
     context,
