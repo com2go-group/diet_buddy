@@ -1,5 +1,9 @@
 # Store submission
 
+**Step-by-step guides:** `submit-ios.md` (App Store, do this first) and `submit-android.md`
+(Google Play). Listing texts and review notes: `listing.md`. Store graphics: `graphics/` (App
+Store icon 1024, Play icon 512, Play feature graphic 1024 × 500). Screenshots: `screenshots/`.
+
 What CLAUDE.md §16 lists before store submission, and where each part stands.
 
 | Item                                                 | Where                                                           | Status                         | Still to do                                                                             |

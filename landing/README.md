@@ -45,8 +45,8 @@ navigate, so you can publish the page before launch.
   `robots.txt`, `.htaccess` and `SITE_URL` in `scripts/landing/build-legal-pages.mjs`.
 - **Screenshots** come from `docs/store/screenshots/` (resized to WebP). Replace them when the
   final device screenshots are taken, keeping the file names.
-- **App icon:** the favicon uses the DietBuddy bolt mark. The app's own icon (`assets/icon.png`
-  in the app) is still Expo's placeholder and needs a real design before store submission.
+- **App icon:** the favicon and the app icon (`assets/icon.png`) both use the DietBuddy bolt
+  mark on the amber gradient.
 - **Legal pages:** `privacy.html`, `terms.html` and `delete-account.html` are the live URLs for
   the stores (App Store privacy policy URL, Google Play privacy policy and account deletion
   URLs): `https://dietbuddy.me/privacy.html`, `https://dietbuddy.me/terms.html` and
