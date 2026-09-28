@@ -300,13 +300,15 @@ export const en = {
     optional: 'Optional — you can connect later in Profile → Health apps.',
   },
   devices: {
-    title: 'Connect your devices',
-    subtitle: 'Smart scales and wearables auto-log your weight and activity',
+    title: 'Your scales and wearables',
+    subtitle: 'No pairing in DietBuddy: they sync through {{platform}}',
     howItWorks:
       'DietBuddy works with these through {{platform}}: pair the device in its own app and let it share with {{platform}}. Once DietBuddy is connected to {{platform}}, your weight and activity flow in automatically.',
     scales: 'Smart Scales',
     wearables: 'Wearables',
     open: 'Open {{platform}}',
+    via: 'Via {{platform}}',
+    syncing: '✓ Via {{platform}}',
   },
   aiPlan: {
     title: 'Your AI Plan',

@@ -4,6 +4,7 @@ import { readWeights, requestHealthAccess } from '@/lib/health';
 import { supabase } from '@/lib/supabase';
 import { renderScreen } from '@/test/render';
 
+import { DevicesStep } from '../../onboarding/steps/HealthStep';
 import { HealthScreen } from '../HealthScreen';
 import { useHealthStore } from '../useHealth';
 
@@ -85,5 +86,24 @@ describe('HealthScreen', () => {
     await fireEvent.press(await screen.findByRole('button', { name: 'Connect Apple Health' }));
     await waitFor(() => expect(screen.getByText(/Access wasn’t granted/)).toBeOnTheScreen());
     expect(upserted).toEqual([]);
+  });
+});
+
+describe('DevicesStep', () => {
+  it('explains that scales and wearables sync through Apple Health, with no pairing action', async () => {
+    await renderScreen(<DevicesStep />);
+    expect(await screen.findByText('Your scales and wearables')).toBeOnTheScreen();
+    expect(
+      screen.getByText('No pairing in DietBuddy: they sync through Apple Health'),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText('Via Apple Health').length).toBeGreaterThan(5);
+    expect(screen.queryByRole('button', { name: /Apple Watch/ })).toBeNull();
+  });
+
+  it('marks every device as syncing once Apple Health is connected', async () => {
+    connections = [{ id: 'c1' }];
+    await renderScreen(<DevicesStep />);
+    expect((await screen.findAllByText('✓ Via Apple Health')).length).toBeGreaterThan(5);
+    expect(screen.queryByText('Via Apple Health')).toBeNull();
   });
 });

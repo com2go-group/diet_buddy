@@ -94,9 +94,15 @@ function openHealthApp() {
  * (CLAUDE.md §7.12), so this step explains that rather than offering per-device pairing.
  */
 export function DevicesStep() {
+  const { query } = useHealthConnection();
+  const connected = Boolean(query.data?.connected);
   return (
     <>
-      <StepHeader emoji="📡" title={t('devices.title')} subtitle={t('devices.subtitle')} />
+      <StepHeader
+        emoji="📡"
+        title={t('devices.title')}
+        subtitle={t('devices.subtitle', { platform: platformName })}
+      />
       <Callout emoji="🔗" tone="info" className="mb-5">
         {t('devices.howItWorks', { platform: platformName })}
       </Callout>
@@ -109,7 +115,7 @@ export function DevicesStep() {
       </Text>
       <View className="mb-5 gap-2">
         {SMART_SCALES.map((d) => (
-          <DeviceRow key={d.id} id={d.id} emoji={d.emoji} />
+          <DeviceRow key={d.id} id={d.id} emoji={d.emoji} connected={connected} />
         ))}
       </View>
       <Text
@@ -121,7 +127,7 @@ export function DevicesStep() {
       </Text>
       <View className="gap-2">
         {WEARABLES.map((d) => (
-          <DeviceRow key={d.id} id={d.id} emoji={d.emoji} />
+          <DeviceRow key={d.id} id={d.id} emoji={d.emoji} connected={connected} />
         ))}
       </View>
       {Platform.OS !== 'web' ? (
@@ -137,7 +143,9 @@ export function DevicesStep() {
   );
 }
 
-function DeviceRow({ id, emoji }: { id: string; emoji: string }) {
+/** Information only: devices sync through the health app, so the row states that instead of
+ * offering a pairing action. */
+function DeviceRow({ id, emoji, connected }: { id: string; emoji: string; connected: boolean }) {
   const key = id as 'withings';
   return (
     <View
@@ -155,6 +163,13 @@ function DeviceRow({ id, emoji }: { id: string; emoji: string }) {
           {t(`onboardingDevices.${key}Desc`)}
         </Text>
       </View>
+      <Text
+        variant="caption"
+        tone={connected ? 'success' : 'muted'}
+        className="max-w-[96px] text-right font-bold"
+      >
+        {t(connected ? 'devices.syncing' : 'devices.via', { platform: platformName })}
+      </Text>
     </View>
   );
 }
