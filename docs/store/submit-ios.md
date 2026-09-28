@@ -129,6 +129,18 @@ environments; the `production` environment must have the real `appl_...` key
 
 ## Part 6. Test with TestFlight
 
+For test rounds before the store build, `eas.json` has a **`testflight`** profile: an App Store
+build with the `preview` settings that always shows Google's **test ads**, so testers can't tap
+your live ads:
+
+```bash
+eas build --platform ios --profile testflight --auto-submit
+```
+
+It uploads to TestFlight when the build finishes. The RevenueCat `test_` key is ignored in these
+builds; add the real `appl_...` key to the `preview` environment to test purchases (Apple's
+sandbox, free).
+
 1. App Store Connect → TestFlight → **Internal Testing** → + → add yourself (and your team) as
    testers. Install the **TestFlight** app on your iPhone and accept the invitation.
 2. Go through this list on the phone:

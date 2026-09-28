@@ -13,6 +13,17 @@
       "distribution": "internal",
       "environment": "preview"
     },
+    "testflight": {
+      "distribution": "store",
+      "autoIncrement": true,
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_ADMOB_TEST_ADS": "true"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "environment": "production"
@@ -20,6 +31,12 @@
   },
   "submit": {
     "production": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
+      }
+    },
+    "testflight": {
       "android": {
         "track": "internal",
         "releaseStatus": "draft"

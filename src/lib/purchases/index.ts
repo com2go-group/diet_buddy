@@ -12,13 +12,24 @@ export type { PlanKind, PlanOption } from './plans';
 /** The single RevenueCat entitlement (CLAUDE.md §12). */
 export const PREMIUM_ENTITLEMENT = 'premium';
 
-/** Public SDK keys (safe to ship). Set per platform; see docs/setup/revenuecat.md. */
+/**
+ * Public SDK keys (safe to ship). Set per platform; see docs/setup/revenuecat.md. RevenueCat Test
+ * Store keys (`test_…`) only work in development builds; release builds (TestFlight, the stores)
+ * ignore them, so a test key can never reach real customers.
+ */
+export function usableKey(key: string | undefined, dev = __DEV__): string | undefined {
+  if (!key) return undefined;
+  return key.startsWith('test_') && !dev ? undefined : key;
+}
+
 function apiKey(): string | undefined {
-  return Platform.select({
-    ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
-    android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
-    default: undefined,
-  });
+  return usableKey(
+    Platform.select({
+      ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY,
+      android: process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY,
+      default: undefined,
+    }),
+  );
 }
 
 export const purchasesAvailable = (): boolean => Boolean(apiKey());

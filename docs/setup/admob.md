@@ -29,7 +29,7 @@ EXPO_PUBLIC_ADMOB_IOS_INTERSTITIAL=ca-app-pub-XXXX/...
 EXPO_PUBLIC_ADMOB_IOS_REWARDED=ca-app-pub-XXXX/...
 ```
 
-Development builds (`__DEV__`) always use test units, whatever is set here. Rebuild the app after changing the app IDs (they're compiled into the native project).
+Development builds (`__DEV__`) and TestFlight test builds (the `testflight` profile in `eas.json`, which sets `EXPO_PUBLIC_ADMOB_TEST_ADS=true`) always use test units, whatever is set here. Rebuild the app after changing the app IDs (they're compiled into the native project).
 
 ## 2. Consent messages (GDPR, required in the EU/UK)
 

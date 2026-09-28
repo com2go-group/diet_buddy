@@ -2,8 +2,9 @@ import { Platform } from 'react-native';
 
 /**
  * Ad placements (CLAUDE.md §12). Unit IDs come from EXPO_PUBLIC_ADMOB_* per platform; in
- * development, or when a unit isn't configured, Google's test units are used so live ads are never
- * requested (or tapped) while testing.
+ * development, in test builds (EXPO_PUBLIC_ADMOB_TEST_ADS=true, e.g. TestFlight), or when a unit
+ * isn't configured, Google's test units are used so live ads are never requested (or tapped)
+ * while testing.
  */
 export type Placement = 'banner' | 'interstitial' | 'rewarded';
 
@@ -34,7 +35,13 @@ const CONFIGURED: Record<'ios' | 'android', Record<Placement, string | undefined
   },
 };
 
-export function unitId(placement: Placement, os = Platform.OS, dev = __DEV__): string | null {
+const TEST_BUILD = process.env.EXPO_PUBLIC_ADMOB_TEST_ADS === 'true';
+
+export function unitId(
+  placement: Placement,
+  os = Platform.OS,
+  dev = __DEV__ || TEST_BUILD,
+): string | null {
   if (os !== 'ios' && os !== 'android') return null;
   const live = CONFIGURED[os][placement];
   return dev || !live ? TEST_UNITS[os][placement] : live;

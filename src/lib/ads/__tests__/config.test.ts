@@ -6,6 +6,10 @@ describe('ad config', () => {
     expect(unitId('banner', 'android', true)).toBe(TEST_UNITS.android.banner);
   });
 
+  it('uses test units whenever the dev flag is set (development and TestFlight test builds)', () => {
+    expect(unitId('interstitial', 'ios', true)).toBe(TEST_UNITS.ios.interstitial);
+  });
+
   it('falls back to test units when a live unit is not configured, and has none on web', () => {
     expect(unitId('interstitial', 'android', false)).toBe(TEST_UNITS.android.interstitial);
     expect(unitId('banner', 'web', false)).toBeNull();

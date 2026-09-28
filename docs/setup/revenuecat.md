@@ -81,7 +81,9 @@ EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=test_...
    `$rc_annual` (step 3.4–3.5), so the paywall has plans to show.
 2. Use the key in `.env` and in the EAS **development** and **preview** environments only. It
    must never reach a store build: set the **production** environment to the `appl_...` and
-   `goog_...` keys from step 3.6.
+   `goog_...` keys from step 3.6. As a safeguard, release builds (TestFlight, the stores) ignore
+   `test_` keys, so TestFlight purchases need the real `appl_...` key (Apple's sandbox makes them
+   free).
 3. Test Store purchases still need a development build (not the web build). The webhook works
    the same way (step 4) if you want to see `is_premium` change on the server.
 
