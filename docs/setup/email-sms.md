@@ -5,10 +5,10 @@ Owner decisions 2026-09-28: verification and password-reset emails go through **
 ## 1. Brevo (email)
 
 1. Create an account at [brevo.com](https://www.brevo.com) (EU company; data in the EU).
-2. **Senders, Domains & Dedicated IPs → Domains**: add your domain and publish the DKIM and DMARC DNS records Brevo shows, then verify. Without this, codes land in spam.
-3. **Senders**: add `no-reply@yourdomain.com` (or similar).
+2. **Senders, Domains & Dedicated IPs → Domains**: add `dietbuddy.me` and publish the DKIM and DMARC DNS records Brevo shows, then verify. Without this, codes land in spam.
+3. **Senders**: add `no-reply@dietbuddy.me`, name `DietBuddy`.
 4. **SMTP & API → SMTP**: note the **login** and create an **SMTP key**.
-5. Supabase **Project Settings → Authentication → SMTP Settings**: enable custom SMTP.
+5. Supabase **Authentication → Emails → SMTP Settings** (older dashboards: Project Settings → Authentication): enable custom SMTP.
    - Host `smtp-relay.brevo.com`, port `587`.
    - Username: the Brevo SMTP login. Password: the SMTP key.
    - Sender email: the address from step 3. Sender name: `DietBuddy`.
