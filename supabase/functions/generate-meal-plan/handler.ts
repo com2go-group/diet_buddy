@@ -133,17 +133,34 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
 
     const messages: LlmMessage[] = [{ role: 'user', content: `Plan meals for ${date}.` }];
     const cache = new Map<string, FoodResult | null>();
+    // Why attempts failed, so the app and the logs can say which service is at fault.
+    let aiError: unknown = null;
+    let aiFailures = 0;
+    let searchError: unknown = null;
+    let lastProblemCount = 0;
     const lookup = async (query: string) => {
       const key = query.toLowerCase();
-      if (!cache.has(key)) cache.set(key, pickFood(await deps.searchFoods(key).catch(() => [])));
+      if (!cache.has(key)) {
+        const found = await deps.searchFoods(key).catch((e: unknown) => {
+          searchError = e;
+          return [];
+        });
+        cache.set(key, pickFood(found));
+      }
       return cache.get(key)!;
     };
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const result = await deps.llm
         .complete({ system, messages, maxTokens: 1200 })
-        .catch(() => null);
-      if (!result) continue;
+        .catch((e: unknown) => {
+          aiError = e;
+          return null;
+        });
+      if (!result) {
+        aiFailures++;
+        continue;
+      }
       await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
       messages.push({ role: 'assistant', content: result.text });
 
@@ -177,6 +194,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       );
       problems.push(...violations.map((v) => `"${v.name}" breaks ${v.reason.replace(':', ' ')}`));
       if (problems.length) {
+        lastProblemCount = problems.length;
         messages.push({ role: 'user', content: retryFeedback(problems) });
         continue;
       }
@@ -197,6 +215,18 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       await store.save(userId, date, plan, existing ? existing.regenerations + 1 : 0);
       return json({ plan });
     }
+    // No food names or diet details in the logs: they can reveal health or religious data.
+    if (aiFailures === MAX_ATTEMPTS) {
+      console.error('generate-meal-plan: the AI provider failed on every attempt', aiError);
+      return fail('ai_unavailable', 502);
+    }
+    if (searchError) {
+      console.error('generate-meal-plan: the food database failed', searchError);
+      return fail('food_data_unavailable', 502);
+    }
+    console.warn(
+      `generate-meal-plan: no plan passed the checks in ${MAX_ATTEMPTS} attempts (${lastProblemCount} problems in the last one)`,
+    );
     return fail('generation_failed', 502);
   } catch (e) {
     console.error('generate-meal-plan failed', e);
