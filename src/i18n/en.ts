@@ -1518,7 +1518,6 @@ export const en = {
     regenerate: 'New plan',
     regenerated: 'Here’s a fresh plan.',
     item: '{{grams}} g · {{kcal}} kcal',
-    logged: 'Logged ✓',
     hidden: '{{count}} more items hidden',
     watch: 'Watch a short video to reveal this meal · +15 XP',
     watching: 'Loading video…',
@@ -1542,16 +1541,29 @@ export const en = {
     doneTitle: '{{slot}} logged ✓',
     ateThis: 'I ate this',
     ateItem: 'I ate {{name}}',
-    nextHint: 'Tap “I ate this” once you’ve had it to see your {{next}} suggestion.',
-    lastHint: 'Tap “I ate this” once you’ve had it.',
+    nextHint:
+      'Had it? Tap “I ate this” to see your {{next}} suggestion. Not for you? Get another idea, log what you ate instead, or skip it.',
+    lastHint:
+      'Had it? Tap “I ate this”. Not for you? Get another idea, log what you ate instead, or skip it.',
+    mealTotal: '{{kcal}} kcal',
+    anotherIdea: 'Another idea',
+    anotherLoading: 'Finding one…',
+    ateOther: 'I ate something else',
+    skip: 'Skip this meal',
+    undoSkip: 'Undo',
+    skippedTitle: '{{slot}} skipped',
+    outcome_ate_plan: 'You had “{{dish}}”.',
+    outcome_ate_own: 'You logged your own meal (see below).',
+    outcome_skipped: 'You skipped this meal. The rest of today’s meals were adjusted.',
+    error_alternative_limit:
+      'You’ve used today’s other ideas. Log what you’d like to eat instead, or get more with Premium.',
+    error_no_plan: 'Today’s plan isn’t ready yet. Pull down to refresh and try again.',
     adjusted: 'Portions adjusted to what you’ve eaten today.',
     lockedTitle: 'Your {{slot}} suggestion comes next',
     lockedDesc:
       'Log your {{current}} from the plan first (“I ate this”). Your {{slot}} will be adjusted to what you’ve eaten.',
     goTo: 'Go to {{slot}}',
     allDone: 'All of today’s planned meals are logged 🎉',
-    otherFood:
-      'Ate something else? Add it with + below: it counts towards your day and the next meal adapts, but only “I ate this” moves the plan on.',
     lockedTab: '{{slot}}, locked until you log your {{current}}',
   },
   tabs: {

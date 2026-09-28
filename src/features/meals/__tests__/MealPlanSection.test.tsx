@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 import { showRewarded } from '@/lib/ads';
 import { dayKey } from '@/lib/dates';
@@ -7,13 +8,20 @@ import { renderScreen } from '@/test/render';
 import { useStorePremium } from '../../subscriptions/usePremium';
 import { logFood } from '../api';
 import { MealPlanSection } from '../components/MealPlanSection';
-import { generateMealPlan, loadMealPlan, MealPlanError, type MealPlan } from '../mealPlanApi';
+import {
+  generateMealPlan,
+  loadMealPlan,
+  mealPlanAction,
+  MealPlanError,
+  type MealPlan,
+} from '../mealPlanApi';
 import type { FoodLog } from '../types';
 
 jest.mock('../mealPlanApi', () => ({
   ...jest.requireActual('../mealPlanApi'),
   loadMealPlan: jest.fn(),
   generateMealPlan: jest.fn(),
+  mealPlanAction: jest.fn(),
 }));
 jest.mock('../api', () => ({
   ...jest.requireActual('../api'),
@@ -55,9 +63,18 @@ const plan: MealPlan = {
     dinner: [item('Lentils', 290)],
   },
   totals: { kcal: 998, proteinG: 60, carbsG: 120, fatG: 30 },
+  dishes: {
+    breakfast: { title: 'Overnight oats with berries', description: 'Soak the oats overnight.' },
+    lunch: { title: 'Roast chicken plate', description: '' },
+  },
 };
 const today = new Date();
-const planLog = (slot: FoodLog['meal_slot'], foodRef: string, calories: number): FoodLog => ({
+const planLog = (
+  slot: FoodLog['meal_slot'],
+  foodRef: string,
+  calories: number,
+  source: FoodLog['source'] = 'plan',
+): FoodLog => ({
   id: `${slot}-${foodRef}`,
   logged_at: today.toISOString(),
   meal_slot: slot,
@@ -69,7 +86,7 @@ const planLog = (slot: FoodLog['meal_slot'], foodRef: string, calories: number):
   protein_g: 10,
   carbs_g: 20,
   fat_g: 5,
-  source: 'plan',
+  source,
 });
 
 describe('MealPlanSection', () => {
@@ -125,11 +142,13 @@ describe('MealPlanSection', () => {
     expect(
       await screen.findByText('Portions adjusted to what you’ve eaten today.'),
     ).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'I ate Roast chicken' }));
+    expect(screen.getByText('Roast chicken')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'I ate Roast chicken plate' }));
     await waitFor(() => expect(logFood).toHaveBeenCalled());
     expect((logFood as jest.Mock).mock.calls[0][1]).toMatchObject({
-      name: 'Roast chicken',
-      quantity: 60,
+      name: 'Roast chicken plate',
+      quantity: 1,
+      unit: 'meal',
       macros: { kcal: 149, proteinG: 6, carbsG: 12, fatG: 3 },
       source: 'plan',
     });
@@ -174,20 +193,72 @@ describe('MealPlanSection', () => {
     expect(await screen.findByText('Greek yogurt')).toBeOnTheScreen();
   });
 
-  it('logs a planned item with its USDA numbers', async () => {
+  it('shows the whole dish and logs it as one meal with its USDA numbers', async () => {
+    useStorePremium.setState({ premium: true });
     (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
-    const logs = [planLog('breakfast', 'usda:Rolled oats', 228)];
-    await renderScreen(<MealPlanSection day={today} slot="lunch" isToday logs={logs} />);
-    await fireEvent.press(await screen.findByRole('button', { name: 'I ate Roast chicken' }));
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    expect(await screen.findByText('Overnight oats with berries')).toBeOnTheScreen();
+    expect(screen.getByText('Soak the oats overnight.')).toBeOnTheScreen();
+    expect(screen.getByText('Greek yogurt')).toBeOnTheScreen();
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'I ate Overnight oats with berries' }),
+    );
     await waitFor(() => expect(logFood).toHaveBeenCalled());
     expect((logFood as jest.Mock).mock.calls[0][1]).toMatchObject({
-      slot: 'lunch',
-      name: 'Roast chicken',
-      foodRef: 'usda:Roast chicken',
-      quantity: 100,
-      unit: 'g',
-      macros: { kcal: 248, proteinG: 10, carbsG: 20, fatG: 5 },
+      slot: 'breakfast',
+      name: 'Overnight oats with berries',
+      foodRef: `plan:${dayKey(today)}:breakfast`,
+      quantity: 1,
+      unit: 'meal',
+      macros: { kcal: 382, proteinG: 30, carbsG: 60, fatG: 15 },
       source: 'plan',
     });
+  });
+
+  it('swaps the dish for another idea', async () => {
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
+    (mealPlanAction as jest.Mock).mockResolvedValue({
+      ...plan,
+      slots: { ...plan.slots, breakfast: [item('Eggs', 150)] },
+      dishes: { ...plan.dishes, breakfast: { title: 'Scrambled eggs', description: '' } },
+    });
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Another idea' }));
+    expect(await screen.findByText('Scrambled eggs')).toBeOnTheScreen();
+    expect(mealPlanAction).toHaveBeenCalledWith(dayKey(today), 'alternative', 'breakfast');
+  });
+
+  it('explains when today’s other ideas are used up', async () => {
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
+    (mealPlanAction as jest.Mock).mockRejectedValue(new MealPlanError('alternative_limit'));
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Another idea' }));
+    expect(await screen.findByText(/You’ve used today’s other ideas/)).toBeOnTheScreen();
+  });
+
+  it('skips a meal and can undo it', async () => {
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
+    (mealPlanAction as jest.Mock).mockResolvedValueOnce({ ...plan, skipped: ['breakfast'] });
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Skip this meal' }));
+    expect(await screen.findByText('Breakfast skipped')).toBeOnTheScreen();
+    expect(mealPlanAction).toHaveBeenCalledWith(dayKey(today), 'skip', 'breakfast');
+    (mealPlanAction as jest.Mock).mockResolvedValueOnce(plan);
+    await fireEvent.press(screen.getByRole('button', { name: 'Undo' }));
+    expect(await screen.findByText('✨ Your breakfast suggestion')).toBeOnTheScreen();
+    expect(mealPlanAction).toHaveBeenLastCalledWith(dayKey(today), 'unskip', 'breakfast');
+  });
+
+  it('lets the user log their own meal instead, which moves the plan on', async () => {
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'I ate something else' }));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/log-food',
+      params: { slot: 'breakfast', date: dayKey(today) },
+    });
+    const logs = [planLog('breakfast', 'usda:Toast', 300, 'search')];
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={logs} />);
+    expect(await screen.findByText('You logged your own meal (see below).')).toBeOnTheScreen();
   });
 });

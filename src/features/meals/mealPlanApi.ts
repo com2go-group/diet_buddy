@@ -16,10 +16,30 @@ export interface PlannedItem {
   fatG: number;
 }
 
+export interface Dish {
+  title: string;
+  description: string;
+}
+
 export interface MealPlan {
   date: string;
+  /** Each meal's ingredients. */
   slots: Record<MealSlot, PlannedItem[]>;
+  /** Each meal as a dish; older plans only have ingredients (see dishOf). */
+  dishes?: Partial<Record<MealSlot, Dish>>;
+  /** Meals the user skipped today. */
+  skipped?: MealSlot[];
   totals: { kcal: number; proteinG: number; carbsG: number; fatG: number };
+}
+
+/** A meal as a dish; for older plans the ingredients stand in for the title. */
+export function dishOf(plan: MealPlan, slot: MealSlot): Dish {
+  return (
+    plan.dishes?.[slot] ?? {
+      title: (plan.slots[slot] ?? []).map((i) => i.name).join(', '),
+      description: '',
+    }
+  );
 }
 
 export interface MealPlanDay {
@@ -63,6 +83,8 @@ export type MealPlanErrorCode =
   | 'rate_limited'
   | 'ai_unavailable'
   | 'food_data_unavailable'
+  | 'alternative_limit'
+  | 'no_plan'
   | 'failed';
 
 export class MealPlanError extends Error {
@@ -73,10 +95,21 @@ export class MealPlanError extends Error {
   }
 }
 
-export async function generateMealPlan(date: string, regenerate: boolean): Promise<MealPlan> {
-  const { data, error } = await supabase.functions.invoke('generate-meal-plan', {
-    body: { date, regenerate },
-  });
+export function generateMealPlan(date: string, regenerate: boolean): Promise<MealPlan> {
+  return callMealPlan({ date, regenerate });
+}
+
+/** "Another idea" for one meal, or skipping / un-skipping it (today's plan only). */
+export function mealPlanAction(
+  date: string,
+  action: 'alternative' | 'skip' | 'unskip',
+  slot: MealSlot,
+): Promise<MealPlan> {
+  return callMealPlan({ date, action, slot });
+}
+
+async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
+  const { data, error } = await supabase.functions.invoke('generate-meal-plan', { body });
   if (error) {
     let code: MealPlanErrorCode = 'failed';
     if (error instanceof FunctionsHttpError) {
@@ -90,6 +123,8 @@ export async function generateMealPlan(date: string, regenerate: boolean): Promi
         'rate_limited',
         'ai_unavailable',
         'food_data_unavailable',
+        'alternative_limit',
+        'no_plan',
       ];
       if (known.includes(body?.error as MealPlanErrorCode)) code = body!.error as MealPlanErrorCode;
     }

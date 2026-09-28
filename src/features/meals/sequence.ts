@@ -3,21 +3,37 @@ import { MEAL_SLOTS } from './portion';
 import type { FoodLog, MealSlot } from './types';
 
 /**
- * Today's plan is followed meal by meal (owner decision 2026-09-28): a meal's suggestion appears
- * only once the one before it has been logged from the plan ("I ate this"). Food logged another
- * way still counts towards the day, and the next meal's portions adapt to it.
+ * Today's plan is followed meal by meal (owner decisions 2026-09-28): a meal's suggestion appears
+ * once the one before it is dealt with, meaning eaten from the plan ("I ate this"), replaced by
+ * the user's own meal (anything logged for it), or skipped. Everything eaten counts towards the
+ * day, and the next meal's portions adapt to it.
  */
 export type SlotState = 'done' | 'current' | 'locked';
 
 type Log = Pick<FoodLog, 'meal_slot' | 'source' | 'calories'>;
 
 /**
- * A meal is done once something from the plan was logged for it ("I ate this"). Any plan log
- * counts, so a Premium "New plan" later in the day doesn't undo meals already eaten.
+ * A meal is done once anything is logged for it (the planned dish or the user's own meal) or it
+ * was skipped. Logs, not the plan's contents, decide, so a Premium "New plan" or "Another idea"
+ * later in the day doesn't undo meals already eaten.
  */
 export function slotDone(plan: MealPlan, logs: Log[], slot: MealSlot): boolean {
   if (!(plan.slots[slot] ?? []).length) return true;
-  return logs.some((l) => l.source === 'plan' && l.meal_slot === slot);
+  if (plan.skipped?.includes(slot)) return true;
+  return logs.some((l) => l.meal_slot === slot);
+}
+
+/** How a finished meal was dealt with, for its summary line. */
+export function slotOutcome(
+  plan: MealPlan,
+  logs: Log[],
+  slot: MealSlot,
+): 'ate_plan' | 'ate_own' | 'skipped' | null {
+  const slotLogs = logs.filter((l) => l.meal_slot === slot);
+  if (slotLogs.some((l) => l.source === 'plan')) return 'ate_plan';
+  if (slotLogs.length) return 'ate_own';
+  if (plan.skipped?.includes(slot)) return 'skipped';
+  return null;
 }
 
 /** The first meal that hasn't been logged yet, or null when the whole day is done. */
@@ -80,6 +96,17 @@ export function adaptItem(item: PlannedItem, factor: number): PlannedItem {
     proteinG: round1(item.proteinG * ratio),
     carbsG: round1(item.carbsG * ratio),
     fatG: round1(item.fatG * ratio),
+  };
+}
+
+/** A meal's numbers: the sum of its ingredients (logged as one entry by "I ate this"). */
+export function mealTotals(items: PlannedItem[]) {
+  const sum = (pick: (i: PlannedItem) => number) => items.reduce((t, i) => t + pick(i), 0);
+  return {
+    kcal: Math.round(sum((i) => i.kcal)),
+    proteinG: round1(sum((i) => i.proteinG)),
+    carbsG: round1(sum((i) => i.carbsG)),
+    fatG: round1(sum((i) => i.fatG)),
   };
 }
 

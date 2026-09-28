@@ -6,7 +6,14 @@ import { dayKey } from '@/lib/dates';
 import { useSessionStore } from '../auth/sessionStore';
 import { useRewardedUnlock } from '../ads/useAds';
 import { usePremium } from '../subscriptions/usePremium';
-import { generateMealPlan, loadMealPlan, unlockTarget, type MealPlanDay } from './mealPlanApi';
+import {
+  generateMealPlan,
+  loadMealPlan,
+  mealPlanAction,
+  unlockTarget,
+  type MealPlan,
+  type MealPlanDay,
+} from './mealPlanApi';
 import type { MealSlot } from './types';
 
 /** The day's plan and this day's per-meal video unlocks (shared cache for the whole screen). */
@@ -31,13 +38,19 @@ export function useMealPlan(day: Date, slot: MealSlot) {
   const [localUnlocks, setLocalUnlocks] = useState<string[]>([]);
 
   const query = useMealPlanDay(day);
+  const store = (plan: MealPlan) =>
+    queryClient.setQueryData<MealPlanDay>(key, (old) => ({
+      plan,
+      unlockedSlots: old?.unlockedSlots ?? [],
+    }));
   const generate = useMutation({
     mutationFn: (regenerate: boolean) => generateMealPlan(date, regenerate),
-    onSuccess: (plan) =>
-      queryClient.setQueryData<MealPlanDay>(key, (old) => ({
-        plan,
-        unlockedSlots: old?.unlockedSlots ?? [],
-      })),
+    onSuccess: store,
+  });
+  /** "Another idea", "Skip" and "Undo" for this meal. */
+  const act = useMutation({
+    mutationFn: (action: 'alternative' | 'skip' | 'unskip') => mealPlanAction(date, action, slot),
+    onSuccess: store,
   });
 
   const target = unlockTarget(date, slot);
@@ -56,5 +69,5 @@ export function useMealPlan(day: Date, slot: MealSlot) {
 
   const locked =
     !premium && !query.data?.unlockedSlots.includes(slot) && !localUnlocks.includes(target);
-  return { date, query, generate, premium, locked, watching, watchToUnlock };
+  return { date, query, generate, act, premium, locked, watching, watchToUnlock };
 }

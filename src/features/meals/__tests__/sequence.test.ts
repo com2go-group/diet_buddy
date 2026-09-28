@@ -4,8 +4,10 @@ import {
   adaptItem,
   currentSlot,
   isAdjusted,
+  mealTotals,
   previousSlot,
   slotDone,
+  slotOutcome,
   slotStates,
 } from '../sequence';
 import type { FoodLog } from '../types';
@@ -54,10 +56,16 @@ describe('meal sequence', () => {
     expect(slotStates(plan, logs)).toMatchObject({ breakfast: 'done', lunch: 'current' });
   });
 
-  it('does not unlock the next meal for food logged another way', () => {
-    const logs = [log('breakfast', 400, 'search', 'usda:Croissant')];
-    expect(currentSlot(plan, logs)).toBe('breakfast');
-    // A plan log in another meal doesn't count for breakfast either.
+  it('also moves on when the user logs their own meal, or skips it', () => {
+    const own = [log('breakfast', 400, 'search', 'usda:Croissant')];
+    expect(currentSlot(plan, own)).toBe('lunch');
+    expect(slotOutcome(plan, own, 'breakfast')).toBe('ate_own');
+    const skipped = { ...plan, skipped: ['breakfast' as const] };
+    expect(currentSlot(skipped, [])).toBe('lunch');
+    expect(slotOutcome(skipped, [], 'breakfast')).toBe('skipped');
+    expect(slotOutcome(plan, [log('breakfast', 400)], 'breakfast')).toBe('ate_plan');
+    expect(slotOutcome(plan, [], 'breakfast')).toBeNull();
+    // A log in another meal doesn't count for breakfast.
     expect(currentSlot(plan, [log('lunch', 600, 'plan', 'usda:Chicken')])).toBe('breakfast');
   });
 
@@ -95,10 +103,22 @@ describe('adapting the next meal', () => {
     expect(adaptFactor(plan, logs, 5000)).toBe(1.6);
   });
 
-  it('counts extras logged in the current meal', () => {
-    const logs = [log('breakfast', 400, 'plan', 'usda:Oats'), log('lunch', 300, 'manual')];
-    // 700 eaten, 1300 left for lunch+snack+dinner (1500 planned).
-    expect(adaptFactor(plan, logs, 2000)).toBe(0.87);
+  it('counts the user’s own meals, and gives a skipped meal’s share to the rest', () => {
+    // Lunch was the user's own 300 kcal meal: 700 eaten, 1300 left for snack+dinner (900 planned).
+    const own = [log('breakfast', 400, 'plan', 'usda:Oats'), log('lunch', 300, 'manual')];
+    expect(adaptFactor(plan, own, 2000)).toBe(1.44);
+    // Lunch skipped: 400 eaten, 1600 left for 900 planned → capped at the maximum.
+    const skipped = { ...plan, skipped: ['lunch' as const] };
+    expect(adaptFactor(skipped, [log('breakfast', 400, 'plan', 'usda:Oats')], 2000)).toBe(1.6);
+  });
+
+  it('adds up a meal for logging it in one go', () => {
+    expect(mealTotals([item('Oats', 400), item('Berries', 100)])).toEqual({
+      kcal: 500,
+      proteinG: 40,
+      carbsG: 60,
+      fatG: 20,
+    });
   });
 
   it('does nothing without a target', () => {

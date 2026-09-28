@@ -7,7 +7,7 @@ import { t } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
-import type { MealPlan } from '../../meals/mealPlanApi';
+import { dishOf, type MealPlan } from '../../meals/mealPlanApi';
 import { MEAL_SLOTS } from '../../meals/portion';
 
 export function dayName(date: string): string {
@@ -66,7 +66,7 @@ export function WeekPlan({ dates, plans }: { dates: string[]; plans: MealPlan[] 
                   plan.slots[slot].length ? (
                     <Text key={slot} className="text-[13px]">
                       <Text className="font-semibold text-[13px]">{t(`homeScreen.${slot}`)}: </Text>
-                      {plan.slots[slot].map((i) => i.name).join(', ')}
+                      {dishOf(plan, slot).title}
                     </Text>
                   ) : null,
                 )}
