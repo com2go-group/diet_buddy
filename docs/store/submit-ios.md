@@ -49,7 +49,7 @@ Tools on your Windows PC (once):
    Tick **HealthKit**, **Sign In with Apple** and **Push Notifications**, then Register.
    (EAS can also do this during the first build, but doing it here avoids surprises.)
 2. **appstoreconnect.apple.com** → Apps → **+** → New App:
-   - Platform **iOS**, Name **DietBuddy: Nutrition Coach**, Primary language **English (U.S.)**
+   - Platform **iOS**, Name **DietBuddy.me** (the plain name "DietBuddy" is taken), Primary language **English (U.S.)**
      (or English (U.K.)), Bundle ID `com.com2go.dietbuddy`, SKU `dietbuddy`, User access Full.
 3. Open the new app → **App Information** and note the **Apple ID** (a number such as
    `6741234567`). Add it to `eas.json` so submitting doesn't ask every time:

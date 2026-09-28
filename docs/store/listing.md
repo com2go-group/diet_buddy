@@ -10,7 +10,7 @@ Graphics are in `graphics/`, screenshots in `screenshots/`.
 
 | Field                               | Value                                                                                             |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Name (30)                           | DietBuddy: Nutrition Coach                                                                        |
+| Name (30)                           | DietBuddy.me ("DietBuddy" is taken on the App Store)                                              |
 | Subtitle (30)                       | Calorie & macro plan, AI coach                                                                    |
 | Primary category                    | Health & Fitness                                                                                  |
 | Secondary category                  | Food & Drink                                                                                      |
