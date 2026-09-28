@@ -166,6 +166,30 @@ describe('generate-meal-plan', () => {
     expect(saved).toEqual([]);
   });
 
+  it('says when the AI provider is failing, rather than blaming the diet rules', async () => {
+    const { deps, saved } = setup({ replies: [] });
+    deps.llm = {
+      complete: jest.fn(async () => Promise.reject(new Error('401 invalid x-api-key'))),
+    };
+    const error = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const res = await handleGenerateMealPlan(post(), deps);
+    expect(res.status).toBe(502);
+    expect(await res.json()).toEqual({ error: 'ai_unavailable' });
+    expect(error.mock.calls[0]![0]).toContain('AI provider failed');
+    expect(saved).toEqual([]);
+    error.mockRestore();
+  });
+
+  it('says when the food database is failing', async () => {
+    const { deps } = setup({ replies: Array(3).fill(planJson(item('Apple', 'apple', 150))) });
+    deps.searchFoods = async () => Promise.reject(new Error('USDA 403'));
+    const error = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const res = await handleGenerateMealPlan(post(), deps);
+    expect(await res.json()).toEqual({ error: 'food_data_unavailable' });
+    expect(error.mock.calls[0]![0]).toContain('food database failed');
+    error.mockRestore();
+  });
+
   it('asks again when a food has no USDA data', async () => {
     const { deps, requests } = setup({
       replies: [
