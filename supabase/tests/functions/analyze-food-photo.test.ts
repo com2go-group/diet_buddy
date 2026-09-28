@@ -279,4 +279,38 @@ describe('anthropic provider', () => {
       { role: 'assistant', content: 'plain' },
     ]);
   });
+
+  it('names the workspace when one is configured, and not otherwise', async () => {
+    const fetchFn = jest.fn(async () => new Response(JSON.stringify({ content: [], usage: {} })));
+    const request = {
+      system: 's',
+      maxTokens: 10,
+      messages: [{ role: 'user' as const, content: 'hi' }],
+    };
+    const headers = (i: number) =>
+      (fetchFn.mock.calls[i] as unknown as [string, RequestInit])[1].headers as Record<
+        string,
+        string
+      >;
+    await anthropicProvider('key', 'm', fetchFn as unknown as typeof fetch, 'wrkspc_1').complete(
+      request,
+    );
+    await anthropicProvider('key', 'm', fetchFn as unknown as typeof fetch).complete(request);
+    expect(headers(0)['anthropic-workspace-id']).toBe('wrkspc_1');
+    expect(headers(1)['anthropic-workspace-id']).toBeUndefined();
+  });
+
+  it('keeps Anthropic’s error message for the logs', async () => {
+    const fetchFn = jest.fn(
+      async () =>
+        new Response('{"error":{"message":"Your credit balance is too low"}}', { status: 400 }),
+    );
+    await expect(
+      anthropicProvider('key', 'm', fetchFn as unknown as typeof fetch).complete({
+        system: 's',
+        maxTokens: 10,
+        messages: [{ role: 'user', content: 'hi' }],
+      }),
+    ).rejects.toThrow('anthropic 400: {"error":{"message":"Your credit balance is too low"}}');
+  });
 });

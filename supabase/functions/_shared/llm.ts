@@ -51,11 +51,22 @@ export class LlmError extends Error {
   }
 }
 
+/**
+ * Optional secret ANTHROPIC_WORKSPACE_ID: organisations that require a workspace on every
+ * request reject keys that aren't scoped to one unless the request names the workspace.
+ * Read through globalThis so this module also loads in Jest, where Deno doesn't exist.
+ */
+function workspaceFromEnv(): string | undefined {
+  const deno = (globalThis as { Deno?: { env: { get(key: string): string | undefined } } }).Deno;
+  return deno?.env.get('ANTHROPIC_WORKSPACE_ID') || undefined;
+}
+
 /** Anthropic Messages API. */
 export function anthropicProvider(
   apiKey: string,
   model: string,
   fetchFn: typeof fetch = fetch,
+  workspaceId: string | undefined = workspaceFromEnv(),
 ): LlmProvider {
   return {
     async complete({ system, messages, maxTokens }) {
@@ -65,6 +76,7 @@ export function anthropicProvider(
           'content-type': 'application/json',
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
+          ...(workspaceId ? { 'anthropic-workspace-id': workspaceId } : {}),
         },
         body: JSON.stringify({
           model,
@@ -75,7 +87,12 @@ export function anthropicProvider(
       }).catch((e: unknown) => {
         throw new LlmError(`network: ${String(e)}`);
       });
-      if (!res.ok) throw new LlmError(`anthropic ${res.status}`, res.status);
+      if (!res.ok) {
+        // Anthropic's error message (never the prompt) makes key and billing problems visible
+        // in the function logs.
+        const detail = (await res.text().catch(() => '')).slice(0, 300);
+        throw new LlmError(`anthropic ${res.status}: ${detail}`, res.status);
+      }
       const data = (await res.json()) as {
         model?: string;
         content?: { type: string; text?: string }[];
