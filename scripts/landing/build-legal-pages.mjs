@@ -13,6 +13,9 @@ import { DELETE_ACCOUNT } from '../../src/features/legal/deleteAccount.en.ts';
 import { PRIVACY_POLICY } from '../../src/features/legal/privacy.en.ts';
 import { TERMS_OF_SERVICE } from '../../src/features/legal/terms.en.ts';
 
+/** The landing page's public address (canonical links in the generated pages). */
+const SITE_URL = 'https://dietbuddy.me';
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const out = join(root, 'landing');
 
@@ -76,6 +79,7 @@ function page(doc, file, description) {
     <title>${escape(doc.title)} · DietBuddy</title>
     <meta name="description" content="${escape(description)}" />
     <meta name="theme-color" content="#F59E0B" />
+    <link rel="canonical" href="${SITE_URL}/${file}" />
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
     <script src="config.js" defer></script>

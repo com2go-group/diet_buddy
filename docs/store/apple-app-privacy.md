@@ -6,7 +6,7 @@ and before each submission check Google's current disclosure for the Google Mobi
 (developers.google.com/admob/ios/privacy/data-disclosure), because rows marked **AdMob** depend
 on it.
 
-- **Privacy Policy URL:** `https://<your-domain>/legal/privacy` (see `docs/legal.md`).
+- **Privacy Policy URL:** `https://dietbuddy.me/privacy.html` (the landing site; see `docs/legal.md`).
 - **Do you or your third-party partners collect data from this app?** Yes.
 - **Tracking:** No. The app never shows Apple's tracking prompt, never reads the IDFA and
   always requests **non-personalised** ads on iOS (`src/lib/ads/config.ts`). No data is linked

@@ -14,8 +14,8 @@ submission.
 | Does your app collect or share any of the required user data types?   | Yes                                                                        |
 | Is all of the user data collected by your app encrypted in transit?   | Yes                                                                        |
 | Do you provide a way for users to request that their data is deleted? | Yes: in the app (Profile → Privacy & Data → Delete account) and on the web |
-| Account deletion URL                                                  | `https://<your-domain>/legal/delete-account`                               |
-| Privacy policy URL                                                    | `https://<your-domain>/legal/privacy`                                      |
+| Account deletion URL                                                  | `https://dietbuddy.me/delete-account.html`                                 |
+| Privacy policy URL                                                    | `https://dietbuddy.me/privacy.html`                                        |
 | Independent security review                                           | No (optional)                                                              |
 
 ## Data types

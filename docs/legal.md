@@ -36,12 +36,13 @@ launch.** Whenever data collection changes, update the data inventory and the po
    - Retention (immediate deletion, backups within 30 days).
    - Consumer-law wording in the Terms (subscriptions, liability, governing law) for each launch
      country.
-4. **Host the web build** (for example with EAS Hosting: `npx expo export --platform web`, then
-   `npx eas deploy --prod`, or any static host that serves the SPA with a fallback to
-   `index.html`). The URLs are then `https://<your-domain>/legal/privacy` and
-   `https://<your-domain>/legal/terms`.
+4. **Host the pages.** The landing site at dietbuddy.me carries the same texts
+   (`landing/README.md`): `https://dietbuddy.me/privacy.html`, `https://dietbuddy.me/terms.html`
+   and `https://dietbuddy.me/delete-account.html`. These are the URLs for the stores. The web
+   build of the app also serves them at `/legal/privacy`, `/legal/terms` and
+   `/legal/delete-account` if you host it.
 5. **Point the app at the hosted pages** (optional): set `EXPO_PUBLIC_PRIVACY_URL` and
-   `EXPO_PUBLIC_TERMS_URL`. When they are set, the links open the hosted page in the browser;
+   `EXPO_PUBLIC_TERMS_URL` (`https://dietbuddy.me/privacy.html`, `https://dietbuddy.me/terms.html`). When they are set, the links open the hosted page in the browser;
    when they are not, the same text opens inside the app. Either way the links are always shown
    at sign-up, in the onboarding consent step and in Profile.
 6. **Enter the URLs in the stores**: App Store Connect (App Privacy → Privacy Policy URL, and
