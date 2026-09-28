@@ -1,37 +1,56 @@
-import { router } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View } from 'react-native';
 
 import { Button, SkeletonCard, Text } from '@/components';
 import { t } from '@/i18n';
-import { adsSupported } from '@/lib/ads';
 import { formatNumber } from '@/lib/format';
-import { accentColor, MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../../auth/components/FormMessage';
 import { MealPlanError, type PlannedItem } from '../mealPlanApi';
-import { logTimeFor } from '../portion';
+import { logTimeFor, MEAL_SLOTS } from '../portion';
+import { adaptFactor, adaptItem, currentSlot, isAdjusted, slotStates } from '../sequence';
 import type { FoodLog, MealSlot } from '../types';
 import { useLogFood } from '../useMeals';
 import { useMealPlan } from '../useMealPlan';
+import { HiddenPlanItems } from './HiddenPlanItems';
+import { LockedMealCard } from './LockedMealCard';
+import { PlanItemRow } from './PlanItemRow';
+
+const lower = (slot: MealSlot) => t(`homeScreen.${slot}`).toLowerCase();
 
 /**
- * The day's AI plan for one meal (CLAUDE.md §7.6). Free users see the first item of each meal;
- * the rest of a meal unlocks with an opt-in rewarded video for that meal (+15 XP) or Premium.
+ * The day's AI meal plan for one meal (CLAUDE.md §7.6). Today's plan is made automatically and
+ * followed meal by meal: a meal's suggestion appears once the previous one is logged from the
+ * plan, and its portions adapt to everything eaten so far (`sequence.ts`). Free users see the
+ * first item of a meal; the rest unlocks with an opt-in rewarded video for that meal or Premium.
  */
 export function MealPlanSection({
   day,
   slot,
   isToday,
   logs,
+  targetKcal = null,
+  onSelectSlot,
 }: {
   day: Date;
   slot: MealSlot;
   isToday: boolean;
   logs: FoodLog[];
+  targetKcal?: number | null;
+  onSelectSlot?: (slot: MealSlot) => void;
 }) {
-  const { scheme } = useTheme();
   const { query, generate, premium, locked, watching, watchToUnlock } = useMealPlan(day, slot);
   const log = useLogFood();
+  const plan = query.data?.plan ?? null;
+
+  // Today's plan is created without a button, once; a failure offers a retry instead of looping.
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (!isToday || autoTried.current || !query.isSuccess || plan) return;
+    autoTried.current = true;
+    generate.mutate(false);
+  }, [isToday, query.isSuccess, plan, generate]);
+
   const errorCode =
     generate.error instanceof MealPlanError
       ? generate.error.code
@@ -41,37 +60,64 @@ export function MealPlanSection({
   const error = errorCode ? <FormMessage message={t(`mealPlan.error_${errorCode}`)} /> : null;
 
   if (query.isPending) return <SkeletonCard lines={2} />;
-  const plan = query.data?.plan ?? null;
 
   if (!plan) {
     if (!isToday) return null;
     return (
       <View className="mb-4 gap-2 rounded-2xl border border-primary/25 bg-primary/10 p-4">
         <Text variant="heading" accessibilityRole="header" className="text-base">
-          ✨ {t('mealPlan.createTitle')}
+          ✨ {generate.isError ? t('mealPlan.createTitle') : t('mealPlan.planning')}
         </Text>
-        <Text className="text-[14px]">{t('mealPlan.createDesc')}</Text>
+        <Text className="text-[14px]">{t('mealPlan.planningDesc')}</Text>
         {error}
-        <Button
-          label={generate.isPending ? t('mealPlan.creating') : t('mealPlan.create')}
-          loading={generate.isPending}
-          onPress={() => generate.mutate(false)}
-        />
+        {generate.isError ? (
+          <Button label={t('mealPlan.retry')} onPress={() => generate.mutate(false)} />
+        ) : (
+          <SkeletonCard lines={2} />
+        )}
       </View>
     );
   }
 
-  const items = plan.slots[slot] ?? [];
+  const states = isToday ? slotStates(plan, logs) : null;
+  const current = isToday ? currentSlot(plan, logs) : null;
+  const state = states?.[slot] ?? 'done';
+  if (states && state === 'locked' && current) {
+    return (
+      <LockedMealCard slot={slot} current={current} onGoToCurrent={() => onSelectSlot?.(current)} />
+    );
+  }
+
+  const factor = isToday && state === 'current' ? adaptFactor(plan, logs, targetKcal) : 1;
+  const items = (plan.slots[slot] ?? []).map((i) => adaptItem(i, factor));
   const visible = locked ? items.slice(0, 1) : items;
   const hidden = items.length - visible.length;
   const isLogged = (i: PlannedItem) =>
     logs.some((l) => l.source === 'plan' && l.food_ref === i.foodRef && l.meal_slot === slot);
+  const next = MEAL_SLOTS[MEAL_SLOTS.indexOf(slot) + 1];
+  const title = !isToday
+    ? `✨ ${t('mealPlan.title')}`
+    : state === 'done'
+      ? t('mealPlan.doneTitle', { slot: t(`homeScreen.${slot}`) })
+      : `✨ ${t('mealPlan.suggestionTitle', { slot: lower(slot) })}`;
+
+  const logItem = (item: PlannedItem) =>
+    log.mutate({
+      slot,
+      loggedAt: logTimeFor(day, slot, new Date()),
+      name: item.name,
+      foodRef: item.foodRef,
+      quantity: item.grams,
+      unit: 'g',
+      macros: { kcal: item.kcal, proteinG: item.proteinG, carbsG: item.carbsG, fatG: item.fatG },
+      source: 'plan',
+    });
 
   return (
     <View className="mb-4 gap-2">
       <View className="flex-row items-center justify-between">
-        <Text variant="label" accessibilityRole="header" className="font-bold">
-          ✨ {t('mealPlan.title')}
+        <Text variant="label" accessibilityRole="header" className="flex-1 font-bold">
+          {title}
         </Text>
         {premium && isToday ? (
           <Button
@@ -85,94 +131,33 @@ export function MealPlanSection({
         ) : null}
       </View>
       {error}
-      {visible.map((item) => {
-        const logged = isLogged(item);
-        return (
-          <View
-            key={`${item.foodRef}-${item.name}`}
-            className="flex-row items-center gap-2 rounded-2xl border border-border bg-card py-2 pl-3 pr-2"
-          >
-            <View className="flex-1">
-              <Text variant="label" className="font-semibold text-[15px]">
-                {item.name}
-              </Text>
-              <Text variant="caption" tone="muted">
-                {t('mealPlan.item', { grams: item.grams, kcal: formatNumber(item.kcal) })} ·{' '}
-                <Text variant="caption" style={{ color: accentColor('green', scheme) }}>
-                  P {formatNumber(item.proteinG)}g
-                </Text>
-              </Text>
-            </View>
-            {logged ? (
-              <Text variant="caption" tone="success" className="font-bold">
-                {t('mealPlan.logged')}
-              </Text>
-            ) : (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t('mealPlan.logItem', { name: item.name })}
-                disabled={log.isPending}
-                onPress={() =>
-                  log.mutate({
-                    slot,
-                    loggedAt: logTimeFor(day, slot, new Date()),
-                    name: item.name,
-                    foodRef: item.foodRef,
-                    quantity: item.grams,
-                    unit: 'g',
-                    macros: {
-                      kcal: item.kcal,
-                      proteinG: item.proteinG,
-                      carbsG: item.carbsG,
-                      fatG: item.fatG,
-                    },
-                    source: 'plan',
-                  })
-                }
-                style={{ minHeight: MIN_TOUCH_TARGET, minWidth: MIN_TOUCH_TARGET }}
-                className="items-center justify-center rounded-xl bg-primary/10 px-3 active:opacity-70"
-              >
-                <Text variant="label" tone="primary" className="font-bold">
-                  {t('mealPlan.log')}
-                </Text>
-              </Pressable>
-            )}
-          </View>
-        );
-      })}
+      {state === 'current' && isAdjusted(factor) ? (
+        <Text variant="caption" tone="muted">
+          {t('mealPlan.adjusted')}
+        </Text>
+      ) : null}
+      {visible.map((item) => (
+        <PlanItemRow
+          key={`${item.foodRef}-${item.name}`}
+          item={item}
+          logged={isLogged(item)}
+          busy={log.isPending}
+          onLog={() => logItem(item)}
+        />
+      ))}
       {hidden > 0 ? (
-        <View className="gap-2">
-          {Array.from({ length: hidden }, (_, i) => (
-            <View
-              key={i}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-              className="flex-row items-center gap-3 rounded-2xl border border-border bg-muted p-3 opacity-70"
-            >
-              <Text>🔒</Text>
-              <View className="h-3 flex-1 rounded-full bg-border" />
-            </View>
-          ))}
-          <View className="gap-2 rounded-2xl border-[1.5px] border-primary/35 bg-primary/10 p-3.5">
-            <Text variant="label" className="font-bold" accessibilityLiveRegion="polite">
-              {t('mealPlan.hidden', { count: hidden })}
-            </Text>
-            {adsSupported ? (
-              <Button
-                label={watching ? t('mealPlan.watching') : t('mealPlan.watch')}
-                loading={watching}
-                size="md"
-                onPress={watchToUnlock}
-              />
-            ) : null}
-            <Button
-              label={t('mealPlan.unlockPremium')}
-              variant={adsSupported ? 'ghost' : 'primary'}
-              size="md"
-              onPress={() => router.push('/paywall')}
-            />
-          </View>
-        </View>
+        <HiddenPlanItems count={hidden} watching={watching} onWatch={watchToUnlock} />
+      ) : null}
+      {isToday && state === 'current' ? (
+        <Text variant="caption" className="text-[13px]">
+          {next ? t('mealPlan.nextHint', { next: lower(next) }) : t('mealPlan.lastHint')}{' '}
+          {t('mealPlan.otherFood')}
+        </Text>
+      ) : null}
+      {isToday && current === null ? (
+        <Text variant="label" tone="success" className="font-bold">
+          {t('mealPlan.allDone')}
+        </Text>
       ) : null}
       <Text variant="caption" tone="muted">
         {t('mealPlan.totals', {

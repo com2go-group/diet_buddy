@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,7 +17,9 @@ import { MealPlanSection } from './components/MealPlanSection';
 import { MealsSummary } from './components/MealsSummary';
 import { SlotTabs } from './components/SlotTabs';
 import { MEAL_SLOTS, SLOT_EMOJI, slotTarget, totals } from './portion';
+import { currentSlot, slotStates } from './sequence';
 import type { MealSlot } from './types';
+import { useMealPlanDay } from './useMealPlan';
 import { useMealsDay } from './useMeals';
 
 /** Default tab: the meal for the current time of day. */
@@ -35,6 +37,21 @@ export function MealsScreen() {
   const [day, setDay] = useState(() => startOfDay(now));
   const [slot, setSlot] = useState<MealSlot>(() => slotForHour(now.getHours()));
   const { query, remove } = useMealsDay(day);
+  const isToday = dayKey(day) === dayKey(now);
+  const plan = useMealPlanDay(day).data?.plan ?? null;
+  const logs = query.data?.logs;
+  // Today's plan is followed meal by meal (sequence.ts).
+  const todayCurrent = isToday && plan && logs ? currentSlot(plan, logs) : undefined;
+  const states = isToday && plan && logs ? slotStates(plan, logs) : null;
+
+  // Open on the meal that's next, and move on to the following one right after "I ate this".
+  const lastCurrent = useRef<MealSlot | null | undefined>(undefined);
+  useEffect(() => {
+    if (todayCurrent === undefined) return;
+    const previous = lastCurrent.current;
+    lastCurrent.current = todayCurrent;
+    if (todayCurrent && (previous === undefined || previous === slot)) setSlot(todayCurrent);
+  }, [todayCurrent, slot]);
 
   const openLog = (forSlot: MealSlot) =>
     router.push({ pathname: '/log-food', params: { slot: forSlot, date: dayKey(day) } });
@@ -59,7 +76,6 @@ export function MealsScreen() {
     const counts = Object.fromEntries(
       MEAL_SLOTS.map((s) => [s, logs.filter((l) => l.meal_slot === s).length]),
     ) as Record<MealSlot, number>;
-    const isToday = dayKey(day) === dayKey(now);
     return (
       <>
         <MealsSummary
@@ -69,8 +85,27 @@ export function MealsScreen() {
             isToday ? t('meals.caloriesToday') : t('meals.caloriesOn', { date: dayLabel(day, now) })
           }
         />
-        <SlotTabs value={slot} onChange={setSlot} counts={counts} />
-        <MealPlanSection day={day} slot={slot} isToday={isToday} logs={logs} />
+        <SlotTabs
+          value={slot}
+          onChange={setSlot}
+          counts={counts}
+          lockedLabel={(s) =>
+            states?.[s] === 'locked' && todayCurrent
+              ? t('mealPlan.lockedTab', {
+                  slot: t(`homeScreen.${s}`),
+                  current: t(`homeScreen.${todayCurrent}`).toLowerCase(),
+                })
+              : null
+          }
+        />
+        <MealPlanSection
+          day={day}
+          slot={slot}
+          isToday={isToday}
+          logs={logs}
+          targetKcal={targets?.calories ?? null}
+          onSelectSlot={setSlot}
+        />
         <View className="mb-3 flex-row items-center justify-between">
           <View className="flex-1">
             <Text variant="heading" accessibilityRole="header" className="text-base">

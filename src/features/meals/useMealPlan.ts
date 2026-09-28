@@ -9,6 +9,17 @@ import { usePremium } from '../subscriptions/usePremium';
 import { generateMealPlan, loadMealPlan, unlockTarget, type MealPlanDay } from './mealPlanApi';
 import type { MealSlot } from './types';
 
+/** The day's plan and this day's per-meal video unlocks (shared cache for the whole screen). */
+export function useMealPlanDay(day: Date) {
+  const userId = useSessionStore((s) => s.session?.user.id);
+  const date = dayKey(day);
+  return useQuery({
+    queryKey: ['mealPlan', userId, date],
+    enabled: Boolean(userId),
+    queryFn: () => loadMealPlan(userId!, date),
+  });
+}
+
 export function useMealPlan(day: Date, slot: MealSlot) {
   const userId = useSessionStore((s) => s.session?.user.id);
   const date = dayKey(day);
@@ -19,11 +30,7 @@ export function useMealPlan(day: Date, slot: MealSlot) {
   const [watching, setWatching] = useState(false);
   const [localUnlocks, setLocalUnlocks] = useState<string[]>([]);
 
-  const query = useQuery({
-    queryKey: key,
-    enabled: Boolean(userId),
-    queryFn: () => loadMealPlan(userId!, date),
-  });
+  const query = useMealPlanDay(day);
   const generate = useMutation({
     mutationFn: (regenerate: boolean) => generateMealPlan(date, regenerate),
     onSuccess: (plan) =>
