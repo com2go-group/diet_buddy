@@ -18,15 +18,25 @@ const aiItem = z.object({
   usda_query: z.string().trim().min(2).max(80),
   grams: z.number().positive().max(1000),
 });
+/** One complete meal: a named dish, how to put it together, and its ingredients. */
+const aiMeal = (maxIngredients: number) =>
+  z.object({
+    title: z.string().trim().min(3).max(80),
+    description: z.string().trim().max(200).default(''),
+    ingredients: z.array(aiItem).min(1).max(maxIngredients),
+  });
 export const aiPlanSchema = z.object({
   meals: z.object({
-    breakfast: z.array(aiItem).min(1).max(5),
-    lunch: z.array(aiItem).min(1).max(5),
-    snack: z.array(aiItem).min(1).max(4),
-    dinner: z.array(aiItem).min(1).max(5),
+    breakfast: aiMeal(6),
+    lunch: aiMeal(6),
+    snack: aiMeal(4),
+    dinner: aiMeal(6),
   }),
 });
 export type AiPlan = z.infer<typeof aiPlanSchema>;
+/** "Another idea" for one meal. */
+export const aiMealSchema = z.object({ meal: aiMeal(6) });
+export type AiMeal = z.infer<typeof aiMealSchema>['meal'];
 
 export interface PlannedItem {
   name: string;
@@ -40,10 +50,24 @@ export interface PlannedItem {
   fatG: number;
 }
 
+export interface Dish {
+  title: string;
+  description: string;
+}
+
 export interface MealPlan {
-  version: 1;
+  version: 1 | 2;
   date: string;
+  /** Each meal's ingredients, with USDA numbers. */
   slots: Record<Slot, PlannedItem[]>;
+  /** Each meal as a dish (version 2; version 1 plans only have ingredients). */
+  dishes?: Record<Slot, Dish>;
+  /** Meals the user chose to skip today. */
+  skipped?: Slot[];
+  /** Dish titles replaced with "Another idea", so they aren't suggested again that day. */
+  rejected?: Partial<Record<Slot, string[]>>;
+  /** How many "Another idea" meals were made for this day. */
+  alternatives?: number;
   totals: { kcal: number; proteinG: number; carbsG: number; fatG: number };
   targets: { kcal: number; proteinG: number };
   promptVersion: string;

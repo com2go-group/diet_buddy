@@ -42,16 +42,30 @@ const usda: Record<string, FoodResult> = Object.fromEntries(
 );
 
 const item = (name: string, q: string, grams: number) => ({ name, usda_query: q, grams });
-const planJson = (snack: ReturnType<typeof item>) =>
+const meal = (title: string, ...ingredients: ReturnType<typeof item>[]) => ({
+  title,
+  description: 'Put it together on a plate.',
+  ingredients,
+});
+const planJson = (snack: ReturnType<typeof item>, snackTitle = snack.name) =>
   JSON.stringify({
     meals: {
-      breakfast: [item('Rolled oats', 'oats', 60), item('Blueberries', 'blueberries raw', 100)],
-      lunch: [
+      breakfast: meal(
+        'Oats with blueberries',
+        item('Rolled oats', 'oats', 60),
+        item('Blueberries', 'blueberries raw', 100),
+      ),
+      lunch: meal(
+        'Chicken and rice',
         item('Roast chicken', 'chicken breast roasted', 150),
         item('Rice', 'rice cooked', 200),
-      ],
-      snack: [snack],
-      dinner: [item('Lentils', 'lentils cooked', 250), item('Broccoli', 'broccoli', 150)],
+      ),
+      snack: meal(snackTitle, snack),
+      dinner: meal(
+        'Lentils with broccoli',
+        item('Lentils', 'lentils cooked', 250),
+        item('Broccoli', 'broccoli', 150),
+      ),
     },
   });
 
@@ -118,7 +132,27 @@ describe('generate-meal-plan', () => {
       }
     }
     expect(Math.abs(plan.totals.kcal - 1800)).toBeLessThan(250);
+    expect(plan.dishes.lunch).toEqual({
+      title: 'Chicken and rice',
+      description: 'Put it together on a plate.',
+    });
+    expect(plan.version).toBe(2);
     expect(saved).toHaveLength(1);
+  });
+
+  it('checks the dish name too, not only the ingredients', async () => {
+    const { deps, requests } = setup({
+      prefs: { allergies: ['peanuts'] },
+      replies: [
+        planJson(item('Apple', 'apple', 150), 'Peanut apple slices'),
+        planJson(item('Apple', 'apple', 150)),
+      ],
+    });
+    const { plan } = await (await handleGenerateMealPlan(post(), deps)).json();
+    expect(requests[1]!.messages.at(-1)!.content).toContain(
+      '"Peanut apple slices" breaks allergy peanuts',
+    );
+    expect(plan.dishes.snack.title).toBe('Apple');
   });
 
   it('rejects a plan with an allergen and regenerates with feedback', async () => {
@@ -233,6 +267,120 @@ describe('generate-meal-plan', () => {
         await handleGenerateMealPlan(post({ date: DATE, regenerate: true }), capped.deps)
       ).json(),
     ).toEqual({ error: 'regenerate_limit' });
+  });
+
+  describe('one meal', () => {
+    /** A stored version 2 plan, made the normal way. */
+    async function storedPlan(): Promise<StoredPlan> {
+      const first = setup({ replies: [planJson(item('Apple', 'apple', 150))] });
+      await handleGenerateMealPlan(post(), first.deps);
+      return first.saved[0] as unknown as StoredPlan;
+    }
+    const lentilSoup = JSON.stringify({
+      meal: meal(
+        'Lentil soup',
+        item('Lentils', 'lentils cooked', 300),
+        item('Broccoli', 'broccoli', 100),
+      ),
+    });
+
+    it('gives another idea for one meal, different from earlier ones, and keeps the rest', async () => {
+      const existing = await storedPlan();
+      const { deps, saved, requests } = setup({ existing, replies: [lentilSoup] });
+      const res = await handleGenerateMealPlan(
+        post({ date: DATE, action: 'alternative', slot: 'lunch' }),
+        deps,
+      );
+      expect(res.status).toBe(200);
+      const { plan } = await res.json();
+      expect(plan.dishes.lunch.title).toBe('Lentil soup');
+      expect(plan.slots.lunch.map((i: { name: string }) => i.name)).toEqual([
+        'Lentils',
+        'Broccoli',
+      ]);
+      expect(plan.dishes.breakfast.title).toBe('Oats with blueberries');
+      expect(plan.rejected.lunch).toEqual(['Chicken and rice']);
+      expect(plan.alternatives).toBe(1);
+      expect(requests[0]!.system).toContain('Chicken and rice');
+      expect(saved[0]!.regenerations).toBe(existing.regenerations);
+    });
+
+    it('asks again when the same dish comes back', async () => {
+      const existing = await storedPlan();
+      const again = JSON.stringify({
+        meal: meal('Chicken and rice', item('Roast chicken', 'chicken breast roasted', 150)),
+      });
+      const { deps, requests } = setup({ existing, replies: [again, lentilSoup] });
+      const { plan } = await (
+        await handleGenerateMealPlan(
+          post({ date: DATE, action: 'alternative', slot: 'lunch' }),
+          deps,
+        )
+      ).json();
+      expect(requests[1]!.messages.at(-1)!.content).toContain('was already suggested');
+      expect(plan.dishes.lunch.title).toBe('Lentil soup');
+    });
+
+    it('limits alternatives per day (more with Premium)', async () => {
+      const existing = await storedPlan();
+      const used = { ...existing, plan: { ...existing.plan, alternatives: 3 } };
+      const free = setup({ existing: used, replies: [lentilSoup] });
+      expect(
+        await (
+          await handleGenerateMealPlan(
+            post({ date: DATE, action: 'alternative', slot: 'lunch' }),
+            free.deps,
+          )
+        ).json(),
+      ).toEqual({ error: 'alternative_limit' });
+      const premium = setup({ existing: used, premium: true, replies: [lentilSoup] });
+      expect(
+        (
+          await handleGenerateMealPlan(
+            post({ date: DATE, action: 'alternative', slot: 'lunch' }),
+            premium.deps,
+          )
+        ).status,
+      ).toBe(200);
+    });
+
+    it('skips a meal and undoes it, without a model call', async () => {
+      const existing = await storedPlan();
+      const { deps, llm, saved } = setup({ existing, replies: [] });
+      const skipped = await (
+        await handleGenerateMealPlan(post({ date: DATE, action: 'skip', slot: 'breakfast' }), deps)
+      ).json();
+      expect(skipped.plan.skipped).toEqual(['breakfast']);
+      const again = setup({ existing: saved[0] as unknown as StoredPlan, replies: [] });
+      const undone = await (
+        await handleGenerateMealPlan(
+          post({ date: DATE, action: 'unskip', slot: 'breakfast' }),
+          again.deps,
+        )
+      ).json();
+      expect(undone.plan.skipped).toEqual([]);
+      expect(llm.complete).not.toHaveBeenCalled();
+    });
+
+    it('needs a meal, today’s date and an existing plan', async () => {
+      const { deps } = setup({ replies: [] });
+      expect(
+        (await handleGenerateMealPlan(post({ date: DATE, action: 'skip' }), deps)).status,
+      ).toBe(400);
+      expect(
+        (
+          await handleGenerateMealPlan(
+            post({ date: '2026-10-01', action: 'skip', slot: 'lunch' }),
+            deps,
+          )
+        ).status,
+      ).toBe(400);
+      expect(
+        await (
+          await handleGenerateMealPlan(post({ date: DATE, action: 'skip', slot: 'lunch' }), deps)
+        ).json(),
+      ).toEqual({ error: 'no_plan' });
+    });
   });
 
   it('plans today (±1 day for time zones); Premium also the next 7 days', async () => {

@@ -1,5 +1,6 @@
 import type { FoodResult } from '../../functions/_shared/usda';
 import {
+  aiMealSchema,
   aiPlanSchema,
   itemFor,
   pickFood,
@@ -60,15 +61,25 @@ describe('meal plan building', () => {
     });
   });
 
-  it('validates the model output shape', () => {
-    expect(
-      aiPlanSchema.safeParse({ meals: { breakfast: [], lunch: [], snack: [], dinner: [] } })
-        .success,
-    ).toBe(false);
+  it('validates the model output shape: one titled dish with ingredients per meal', () => {
     const ok = { name: 'Oats', usda_query: 'oats', grams: 60 };
+    const dish = (ingredients: object[], title = 'Porridge with berries') => ({
+      title,
+      description: 'Cook the oats.',
+      ingredients,
+    });
+    const plan = (d: object) => ({ meals: { breakfast: d, lunch: d, snack: d, dinner: d } });
+    expect(aiPlanSchema.safeParse(plan(dish([ok]))).success).toBe(true);
+    expect(aiPlanSchema.safeParse(plan(dish([])))).toMatchObject({ success: false });
+    expect(aiPlanSchema.safeParse(plan(dish([ok], '')))).toMatchObject({ success: false });
+    // The old format (a list of foods per meal) is rejected.
     expect(
       aiPlanSchema.safeParse({ meals: { breakfast: [ok], lunch: [ok], snack: [ok], dinner: [ok] } })
         .success,
+    ).toBe(false);
+    // The description is optional.
+    expect(
+      aiMealSchema.safeParse({ meal: { title: 'Apple and cheese', ingredients: [ok] } }).success,
     ).toBe(true);
   });
 });
