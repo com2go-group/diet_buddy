@@ -8,7 +8,7 @@ export const PRIVACY_POLICY: LegalDoc = {
   title: 'Privacy Policy',
   updated: '2026-09-28',
   intro: [
-    'This policy explains what personal data DietBuddy collects, why, who it is shared with and the choices and rights you have. DietBuddy is for adults (18+).',
+    'This policy explains what personal data DietBuddy collects, why, who it is shared with and the choices and rights you have. DietBuddy is for adults (18+). The current version is always at https://dietbuddy.me/privacy.html.',
     {
       list: [
         'Your health data is used only to run DietBuddy for you. It is never sold and never used for advertising.',
@@ -108,7 +108,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     {
       heading: '9. How long we keep data',
       blocks: [
-        'We keep your data while you have an account. When you delete your account in Profile → Privacy & Data, your account, all your data and your photos are deleted straight away; copies in our encrypted backups are gone within 30 days. You can also delete individual entries, progress photos and wellness insights at any time. Photos for the AI body scan, food photo scan and restaurant mode are never stored. Push tokens are removed when you sign out.',
+        'We keep your data while you have an account. When you delete your account in Profile → Privacy & Data, your account, all your data and your photos are deleted straight away; copies in our encrypted backups are gone within 30 days. How to delete your account, including when you can’t sign in, is explained at https://dietbuddy.me/delete-account.html. You can also delete individual entries, progress photos and wellness insights at any time. Photos for the AI body scan, food photo scan and restaurant mode are never stored. Push tokens are removed when you sign out.',
       ],
     },
     {
@@ -149,7 +149,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     {
       heading: '14. Changes to this policy',
       blocks: [
-        'If we change this policy we will update the date above and, for important changes, tell you in the app. When a change needs your consent, we will ask for it again.',
+        'If we change this policy we will publish the new version at https://dietbuddy.me/privacy.html, update the date above and, for important changes, tell you in the app. When a change needs your consent, we will ask for it again.',
       ],
     },
   ],

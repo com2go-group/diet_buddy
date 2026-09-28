@@ -1,5 +1,7 @@
 import { Platform } from 'react-native';
 
+import { siteLinks } from '@/lib/site';
+
 /** Which auth options this build offers. See docs/auth.md for setting them up. */
 export const authConfig = {
   /** Phone sign-up/sign-in with SMS codes. Needs an SMS provider on the Supabase project. */
@@ -8,8 +10,9 @@ export const authConfig = {
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
   },
-  termsUrl: process.env.EXPO_PUBLIC_TERMS_URL,
-  privacyUrl: process.env.EXPO_PUBLIC_PRIVACY_URL,
+  /** Legal pages on the website (dietbuddy.me); cleared, the links open the in-app copy. */
+  termsUrl: siteLinks.terms as string | undefined,
+  privacyUrl: siteLinks.privacy as string | undefined,
 };
 
 /** Native Google Sign-In needs a dev build and the web client ID (plus the iOS one on iOS). */

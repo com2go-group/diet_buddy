@@ -69,6 +69,13 @@ navigate, so you can publish the page before launch.
    `https://dietbuddy.me/`; `https://dietbuddy.me/privacy` and `/privacy.html` both show the
    Privacy Policy; an unknown address shows the "Page not found" page.
 5. Optionally submit `https://dietbuddy.me/sitemap.xml` in Google Search Console.
+6. **app-ads.txt** (for AdMob): once AdMob gives you its line (AdMob → Apps → app-ads.txt),
+   save it as `app-ads.txt` in this folder and upload it, so it is served at
+   `https://dietbuddy.me/app-ads.txt`.
+
+The app opens `https://dietbuddy.me/terms.html` and `https://dietbuddy.me/privacy.html` from its
+Terms and Privacy Policy links, and Profile → Website opens the home page, so keep those file
+names. All store URL fields are listed in `docs/store/README.md`.
 
 ### Apache (most shared hosting)
 

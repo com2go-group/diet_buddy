@@ -5,7 +5,7 @@ export const TERMS_OF_SERVICE: LegalDoc = {
   title: 'Terms of Service',
   updated: '2026-09-28',
   intro: [
-    'These terms are an agreement between you and {{company}}, {{address}} ("we", "us") for using the DietBuddy app. By creating an account you accept them. Please also read our Privacy Policy, which explains how we handle your data.',
+    'These terms are an agreement between you and {{company}}, {{address}} ("we", "us") for using the DietBuddy app. By creating an account you accept them. Please also read our Privacy Policy (https://dietbuddy.me/privacy.html), which explains how we handle your data. The current version of these terms is always at https://dietbuddy.me/terms.html.',
   ],
   sections: [
     {
@@ -78,7 +78,7 @@ export const TERMS_OF_SERVICE: LegalDoc = {
     {
       heading: '9. Changes and ending the service',
       blocks: [
-        'We may update DietBuddy and these terms. For important changes we will tell you in the app before they apply. You can stop using DietBuddy and delete your account at any time. We may suspend or close accounts that seriously or repeatedly break these terms, after warning you where possible.',
+        'We may update DietBuddy and these terms. For important changes we will tell you in the app before they apply. You can stop using DietBuddy and delete your account at any time (see https://dietbuddy.me/delete-account.html). We may suspend or close accounts that seriously or repeatedly break these terms, after warning you where possible.',
       ],
     },
     {
@@ -101,7 +101,9 @@ export const TERMS_OF_SERVICE: LegalDoc = {
     },
     {
       heading: '13. Contact',
-      blocks: ['Questions about these terms: {{email}}, or Profile → Help in the app.'],
+      blocks: [
+        'Questions about these terms: {{email}}, or Profile → Help in the app. More about DietBuddy: https://dietbuddy.me.',
+      ],
     },
   ],
 };

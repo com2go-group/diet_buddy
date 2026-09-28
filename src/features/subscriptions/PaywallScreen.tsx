@@ -10,7 +10,7 @@ import type { PlanOption } from '@/lib/purchases';
 import { ACCENTS, MIN_TOUCH_TARGET } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
-import { authConfig } from '../auth/config';
+import { openLegal } from '../legal/legal';
 import { PlanCard } from './components/PlanCard';
 import { usePaywall } from './usePaywall';
 import { usePremium } from './usePremium';
@@ -182,26 +182,22 @@ export function PaywallScreen() {
             </View>
           ) : null}
           <View className="flex-row justify-center gap-6">
-            {authConfig.termsUrl ? (
-              <Text
-                tone="primary"
-                variant="caption"
-                accessibilityRole="link"
-                onPress={() => Linking.openURL(authConfig.termsUrl!)}
-              >
-                {t('paywall.terms')}
-              </Text>
-            ) : null}
-            {authConfig.privacyUrl ? (
-              <Text
-                tone="primary"
-                variant="caption"
-                accessibilityRole="link"
-                onPress={() => Linking.openURL(authConfig.privacyUrl!)}
-              >
-                {t('paywall.privacy')}
-              </Text>
-            ) : null}
+            <Text
+              tone="primary"
+              variant="caption"
+              accessibilityRole="link"
+              onPress={() => openLegal('terms')}
+            >
+              {t('paywall.terms')}
+            </Text>
+            <Text
+              tone="primary"
+              variant="caption"
+              accessibilityRole="link"
+              onPress={() => openLegal('privacy')}
+            >
+              {t('paywall.privacy')}
+            </Text>
           </View>
         </View>
       </ScrollView>

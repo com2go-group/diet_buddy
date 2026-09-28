@@ -46,7 +46,7 @@ Do these once the project exists (see `docs/backend.md`). Items 1–2 are needed
 
 ### 5. Legal links
 
-Set `EXPO_PUBLIC_TERMS_URL` and `EXPO_PUBLIC_PRIVACY_URL`. Until then, "Terms of Service" and "Privacy Policy" on the sign-up screen show as plain text. Both pages must be live before store submission.
+"Terms of Service" and "Privacy Policy" on the sign-up screen (and in onboarding, Profile and the paywall) open https://dietbuddy.me/terms.html and https://dietbuddy.me/privacy.html (`src/lib/site.ts`). `EXPO_PUBLIC_TERMS_URL` and `EXPO_PUBLIC_PRIVACY_URL` override them, e.g. for a staging site. Both pages must be live before store submission: upload `landing/` (see `landing/README.md`).
 
 ## Local development
 

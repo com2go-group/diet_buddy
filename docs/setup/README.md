@@ -16,4 +16,4 @@ The app runs without any of these (features that need them say so). Do them in t
 | 10  | Google Cloud OAuth clients             | Free                        | Sign in with Google                                       | `../auth.md`                     |
 | 11  | **Brevo** (email) and **sms.to** (SMS) | Free tier / pay per SMS     | Email codes for real users; phone sign-up codes           | `email-sms.md`                   |
 
-Before store submission you also need live **Terms** and **Privacy Policy** pages (`EXPO_PUBLIC_TERMS_URL`, `EXPO_PUBLIC_PRIVACY_URL`) that describe health data, AI processing (Anthropic), ads (Google) and purchases (RevenueCat).
+Before store submission the website **https://dietbuddy.me** must be live with the **Terms** (`/terms.html`), **Privacy Policy** (`/privacy.html`) and **account deletion** (`/delete-account.html`) pages: upload the `landing/` folder (`landing/README.md`). The app links to these pages, and the store forms use them (`docs/store/README.md` lists every URL field).

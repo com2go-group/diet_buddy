@@ -29,9 +29,16 @@ const PLACEHOLDERS = {
 const escape = (s) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-/** Escapes text and turns {{company}}-style placeholders into fillable spans. */
+/** Links to the site's own pages (a trailing full stop stays outside the link). */
+const linkSite = (s) =>
+  s.replace(/https:\/\/dietbuddy\.me(?:\/[\w.-]*\w)?/g, (url) => {
+    const href = url.startsWith(`${SITE_URL}/`) ? url.slice(SITE_URL.length + 1) : 'index.html';
+    return `<a href="${href}">${url.replace('https://', '')}</a>`;
+  });
+
+/** Escapes text, links site URLs and turns {{company}}-style placeholders into fillable spans. */
 function text(s) {
-  return escape(s).replace(/\{\{(\w+)\}\}/g, (match, key) => {
+  return linkSite(escape(s)).replace(/\{\{(\w+)\}\}/g, (match, key) => {
     const entry = PLACEHOLDERS[key];
     if (!entry) return match;
     const value = entry[0];

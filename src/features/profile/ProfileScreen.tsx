@@ -1,13 +1,14 @@
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, ErrorState, SkeletonCard, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatDecimal, formatLongDate, formatNumber, formatWeight } from '@/lib/format';
 import { parseDayKey } from '@/lib/dates';
+import { siteLinks } from '@/lib/site';
 import { ACCENTS, useThemeStore, useTheme, type ThemePreference } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
@@ -206,6 +207,12 @@ export function ProfileScreen() {
             icon="lock"
             label={t('profile.privacyPolicy')}
             onPress={() => openLegal('privacy')}
+          />
+          <SettingsRow
+            icon="globe"
+            label={t('profile.website')}
+            value="dietbuddy.me"
+            onPress={() => Linking.openURL(siteLinks.home)}
           />
           <SettingsRow
             icon="log-out"

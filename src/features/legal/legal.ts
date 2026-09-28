@@ -27,7 +27,7 @@ export function fillBlock(block: LegalBlock): LegalBlock {
     : { list: block.list.map((item) => fillPlaceholders(item)) };
 }
 
-/** The hosted page when its URL is configured, else the same text inside the app. */
+/** The page on dietbuddy.me (or the configured URL); the same text inside the app if none is set. */
 export function openLegal(kind: LegalKind): void {
   const url = kind === 'privacy' ? authConfig.privacyUrl : authConfig.termsUrl;
   if (url) Linking.openURL(url);

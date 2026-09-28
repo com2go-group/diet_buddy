@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { Linking } from 'react-native';
 
 import {
   getPlans,
@@ -70,6 +71,16 @@ describe('PaywallScreen', () => {
         /7-day free trial, then \$9.99 per month\. Renews automatically until cancelled/,
       ),
     ).toBeOnTheScreen();
+  });
+
+  it('links the Terms and Privacy Policy on dietbuddy.me', async () => {
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    await renderScreen(<PaywallScreen />);
+    await screen.findByRole('radio', { name: /Monthly/ });
+    await fireEvent.press(screen.getByRole('link', { name: 'Terms' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Privacy' }));
+    expect(open).toHaveBeenCalledWith('https://dietbuddy.me/terms.html');
+    expect(open).toHaveBeenCalledWith('https://dietbuddy.me/privacy.html');
   });
 
   it('buys the selected plan and shows the premium state', async () => {

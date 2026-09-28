@@ -13,7 +13,7 @@ No new accounts are needed beyond the Apple Developer and Google Play accounts f
 
 1. Nothing to configure by hand. The `@kingstinct/react-native-healthkit` config plugin adds the HealthKit entitlement and the permission texts, and EAS Build enables the HealthKit capability on the App ID when it builds.
 2. App Store Connect → **App Privacy**: declare "Health & Fitness → Health" and "Fitness" data, linked to the user, used for App Functionality, **not** for tracking or advertising.
-3. App Review requires your privacy policy to explain the HealthKit use (read weight, body fat, steps, active energy, water; write weight and water; never sold or used for ads). Apple rejects apps that store HealthKit data in iCloud or use it for ads; DietBuddy does neither.
+3. App Review requires your privacy policy (https://dietbuddy.me/privacy.html, section 5) to explain the HealthKit use (read weight, body fat, steps, active energy, water; write weight and water; never sold or used for ads). Apple rejects apps that store HealthKit data in iCloud or use it for ads; DietBuddy does neither.
 4. Test: build with `npx eas build --profile development --platform ios`, open Profile → Health apps → Connect, allow the categories, add a weight in the Health app, and tap **Sync now**. It appears in Progress with source `healthkit`.
 
 ## Android (Health Connect)

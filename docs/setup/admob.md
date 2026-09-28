@@ -35,7 +35,7 @@ Development builds (`__DEV__`) always use test units, whatever is set here. Rebu
 
 AdMob → **Privacy & messaging**:
 
-1. **European regulations** → create a GDPR message for both apps. Choose "Consent or Manage options", add your privacy policy URL, and publish.
+1. **European regulations** → create a GDPR message for both apps. Choose "Consent or Manage options", add the privacy policy URL `https://dietbuddy.me/privacy.html`, and publish.
 2. Optionally **US state regulations** for US users.
 
 The app shows this message (Google UMP) before any ad request, and mirrors the personalisation choice into `consents` (`ads_personalization`). When UMP says so, Profile shows "Ad privacy choices" so users can change their answer.
@@ -58,6 +58,6 @@ The app shows this message (Google UMP) before any ad request, and mirrors the p
 
 - **Google Play Console** → App content: **Ads** = "Yes, my app contains ads"; **Data safety**: Device or other IDs (advertising ID) collected for advertising, shared with Google; **Advertising ID** declaration = used for advertising.
 - **App Store Connect** → App Privacy: "Identifiers → Device ID" and "Usage Data → Advertising Data", used for third-party advertising. The app doesn't show Apple's tracking prompt (ATT), so iOS ads are served without the IDFA.
-- Publish an **app-ads.txt** file on your website (AdMob → Apps → app-ads.txt) once the store listing links to your site.
+- Publish **app-ads.txt** at `https://dietbuddy.me/app-ads.txt`: copy the line from AdMob → Apps → app-ads.txt into a file named `app-ads.txt` in `landing/` and upload it. AdMob finds it through the developer website in the store listings, which must be `https://dietbuddy.me`.
 
 Health data is never sent to ad networks: requests carry only the personalisation flag, with no keywords or content URLs (`src/lib/ads/config.ts`).

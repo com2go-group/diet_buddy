@@ -5,7 +5,7 @@ export const DELETE_ACCOUNT: LegalDoc = {
   title: 'Delete your account',
   updated: '2026-09-28',
   intro: [
-    'You can delete your DietBuddy account and all its data yourself at any time, in the app or on the web.',
+    'You can delete your DietBuddy account and all its data yourself at any time, in the app or on the web. This page is at https://dietbuddy.me/delete-account.html; see also our Privacy Policy at https://dietbuddy.me/privacy.html.',
   ],
   sections: [
     {

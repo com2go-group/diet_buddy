@@ -18,8 +18,11 @@ Store products can only be tested in a development build installed from EAS, not
 - Platform iOS, name "DietBuddy", bundle ID `com.com2go.dietbuddy` (register it first under Certificates, Identifiers & Profiles → Identifiers if it isn't listed), SKU `dietbuddy`.
 - Agreements, Tax, and Banking: accept the **Paid Apps** agreement and add bank/tax details. Subscriptions can't be tested until this is active.
 
+- App Information / version page URLs: Privacy Policy `https://dietbuddy.me/privacy.html`, Support URL and Marketing URL `https://dietbuddy.me` (see `docs/store/README.md`).
+
 **Google Play Console** → Create app → "DietBuddy", app, free (in-app purchases are still allowed), package `com.com2go.dietbuddy`.
 
+- Store settings → Store listing contact details: website `https://dietbuddy.me`; App content → Privacy policy `https://dietbuddy.me/privacy.html`; Data safety → delete account URL `https://dietbuddy.me/delete-account.html`.
 - Google only lets you create subscriptions after an app build with the billing library has been uploaded. Upload the first EAS Android build to the **Internal testing** track (step 5), then continue with step 2.
 
 ## 2. Create the products
@@ -76,5 +79,5 @@ The app logs RevenueCat in with the Supabase user ID, so webhook events map dire
 ## Store review checklist
 
 - The paywall states the price, period, trial length and that it renews automatically (done in code).
-- Terms and Privacy links appear on the paywall when `EXPO_PUBLIC_TERMS_URL` / `EXPO_PUBLIC_PRIVACY_URL` are set; both stores require them.
+- Terms and Privacy links on the paywall open https://dietbuddy.me/terms.html and https://dietbuddy.me/privacy.html; both stores require them. In App Store Connect, also put the Terms URL under App Information → License Agreement (custom EULA) or in the app description, as Apple asks for subscriptions.
 - Features marked "Coming to Premium" must not be described as included in store listings until they ship.

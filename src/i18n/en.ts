@@ -1330,6 +1330,7 @@ export const en = {
     rateSoon: 'Rating opens the App Store or Google Play once DietBuddy is published.',
     terms: 'Terms of Service',
     privacyPolicy: 'Privacy Policy',
+    website: 'Website',
     version: 'Version {{version}}',
     signOut: 'Sign out',
     loadFailed: 'We couldn’t load your profile.',

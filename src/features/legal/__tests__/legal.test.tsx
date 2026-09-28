@@ -63,11 +63,22 @@ describe('legal texts', () => {
 });
 
 describe('openLegal', () => {
+  const defaults = { ...authConfig };
   afterEach(() => {
-    authConfig.privacyUrl = undefined;
+    authConfig.privacyUrl = defaults.privacyUrl;
+    authConfig.termsUrl = defaults.termsUrl;
   });
 
-  it('opens the page inside the app when no URL is configured', () => {
+  it('opens the pages on dietbuddy.me by default', () => {
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    openLegal('terms');
+    openLegal('privacy');
+    expect(open).toHaveBeenCalledWith('https://dietbuddy.me/terms.html');
+    expect(open).toHaveBeenCalledWith('https://dietbuddy.me/privacy.html');
+  });
+
+  it('opens the page inside the app when the URL is cleared', () => {
+    authConfig.termsUrl = undefined;
     openLegal('terms');
     expect(router.push).toHaveBeenCalledWith('/legal/terms');
   });
@@ -87,6 +98,9 @@ describe('LegalScreen', () => {
     expect(screen.getByText('Last updated 28 September 2026')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: '10. Your rights' })).toBeOnTheScreen();
     expect(screen.getByText(/DietBuddy is provided by \[company name\]/)).toBeOnTheScreen();
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    await fireEvent.press(screen.getAllByRole('link', { name: 'dietbuddy.me/privacy.html' })[0]!);
+    expect(open).toHaveBeenCalledWith('https://dietbuddy.me/privacy.html');
     await fireEvent.press(screen.getByRole('button', { name: 'Back' }));
     expect(router.back).toHaveBeenCalled();
   });

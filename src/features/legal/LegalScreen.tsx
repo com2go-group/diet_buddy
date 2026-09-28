@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Text } from '@/components';
@@ -14,17 +14,44 @@ import type { LegalBlock, LegalDoc } from './types';
 
 const back = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
+const SITE_URL = /(https:\/\/dietbuddy\.me(?:\/[\w.-]*\w)?)/;
+
+/** Text with the website's URLs as tappable links. */
+function Linked({ text }: { text: string }) {
+  return text.split(SITE_URL).map((part, i) =>
+    i % 2 === 1 ? (
+      <Text
+        key={i}
+        tone="primary"
+        className="font-semibold text-[15px] leading-6"
+        accessibilityRole="link"
+        onPress={() => Linking.openURL(part)}
+      >
+        {part.replace('https://', '')}
+      </Text>
+    ) : (
+      part
+    ),
+  );
+}
+
 function Block({ block }: { block: LegalBlock }) {
   const filled = fillBlock(block);
   if (typeof filled === 'string') {
-    return <Text className="text-[15px] leading-6">{filled}</Text>;
+    return (
+      <Text className="text-[15px] leading-6">
+        <Linked text={filled} />
+      </Text>
+    );
   }
   return (
     <View className="gap-1.5">
       {filled.list.map((item) => (
         <View key={item} className="flex-row gap-2">
           <Text className="text-[15px] leading-6">•</Text>
-          <Text className="flex-1 text-[15px] leading-6">{item}</Text>
+          <Text className="flex-1 text-[15px] leading-6">
+            <Linked text={item} />
+          </Text>
         </View>
       ))}
     </View>
