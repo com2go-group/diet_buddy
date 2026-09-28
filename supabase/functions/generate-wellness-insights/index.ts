@@ -11,7 +11,7 @@ const admin = createClient(
   { auth: { persistSession: false } },
 );
 const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
-const model = Deno.env.get('WELLNESS_MODEL') ?? Deno.env.get('COACH_MODEL') ?? 'claude-sonnet-5';
+const model = Deno.env.get('WELLNESS_MODEL') || Deno.env.get('COACH_MODEL') || 'claude-sonnet-5';
 const store = supabaseWellnessStore(admin);
 const llm = anthropicKey ? anthropicProvider(anthropicKey, model) : null;
 

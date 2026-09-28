@@ -8,7 +8,7 @@ import { supabaseCoachStore } from './store.ts';
 const url = Deno.env.get('SUPABASE_URL')!;
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
-const model = Deno.env.get('COACH_MODEL') ?? 'claude-sonnet-5';
+const model = Deno.env.get('COACH_MODEL') || 'claude-sonnet-5';
 
 const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
 const store = supabaseCoachStore(admin);

@@ -445,3 +445,7 @@ verify_jwt = false
 # Called by pg_cron with the CRON_SECRET bearer token (docs/setup/push.md).
 [functions.push-dispatch]
 verify_jwt = false
+
+# Supabase Auth's Send SMS hook calls this (Standard Webhooks signature, no user JWT).
+[functions.send-sms]
+verify_jwt = false

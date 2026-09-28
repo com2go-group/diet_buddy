@@ -7,7 +7,8 @@ The schema lives in `supabase/migrations`, reference data in `supabase/seed.sql`
 1. Create an account at [supabase.com](https://supabase.com) (the free plan is enough for development).
 2. **New project**, region **Central EU (Frankfurt)** or another EU region (CLAUDE.md §13). Save the database password in a password manager.
 3. **Project Settings → API**: copy the Project URL and the anon (public) key into `.env` (see `.env.example`). Never put the service-role key in `.env` or in the app.
-4. Link and push the schema from the repo:
+4. Link and push the schema from the repo. Don't run `supabase init`: the repo already has
+   `supabase/config.toml`. `link` asks for the database password (never put it in a file):
    ```bash
    npx supabase login
    npx supabase link --project-ref <project-ref>
@@ -16,6 +17,8 @@ The schema lives in `supabase/migrations`, reference data in `supabase/seed.sql`
 5. Load the reference data (achievements, config) once: open **SQL Editor** in the dashboard and run the contents of `supabase/seed.sql`. It is safe to re-run.
 
 Auth providers (Apple, Google), email templates and redirect URLs are set up with the Auth task (Phase 1, item 5).
+
+**The DietBuddy project:** ref `maxbfivlqauziwhswxbi`, URL `https://maxbfivlqauziwhswxbi.supabase.co`. The app uses its publishable key (`sb_publishable_…`) as `EXPO_PUBLIC_SUPABASE_ANON_KEY`. Keep the legacy API keys enabled (Project Settings → API keys): the Edge Functions read `SUPABASE_SERVICE_ROLE_KEY`, which Supabase provides from them.
 
 ## Local development (Windows)
 
@@ -62,7 +65,13 @@ Server-side code that needs a secret or an outside API lives in `supabase/functi
 Set secrets and deploy:
 
 ```bash
-npx supabase secrets set USDA_API_KEY=<key> ANTHROPIC_API_KEY=<key>
+npx supabase secrets set --env-file supabase/functions/.env   # or: secrets set USDA_API_KEY=<key> ANTHROPIC_API_KEY=<key>
+npx supabase functions deploy                                  # all functions, using config.toml's verify_jwt settings
+```
+
+Or one at a time:
+
+```bash
 npx supabase functions deploy food-search
 npx supabase functions deploy food-barcode
 npx supabase functions deploy coach-chat

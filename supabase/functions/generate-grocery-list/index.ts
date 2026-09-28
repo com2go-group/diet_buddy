@@ -13,7 +13,7 @@ const admin = createClient(
   },
 );
 const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
-const model = Deno.env.get('GROCERY_MODEL') ?? Deno.env.get('COACH_MODEL') ?? 'claude-sonnet-5';
+const model = Deno.env.get('GROCERY_MODEL') || Deno.env.get('COACH_MODEL') || 'claude-sonnet-5';
 const store = supabaseGroceryStore(admin);
 const llm = anthropicKey ? anthropicProvider(anthropicKey, model) : null;
 
@@ -21,7 +21,7 @@ Deno.serve((req) =>
   handleGenerateGroceryList(req, {
     store,
     llm,
-    currency: Deno.env.get('GROCERY_CURRENCY') ?? 'EUR',
+    currency: Deno.env.get('GROCERY_CURRENCY') || 'EUR',
     getUserId: (r) => userIdFromRequest(admin, r),
   }),
 );

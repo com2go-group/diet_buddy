@@ -15,7 +15,7 @@ const admin = createClient(
 );
 const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
 const usdaKey = Deno.env.get('USDA_API_KEY');
-const model = Deno.env.get('MEAL_PLAN_MODEL') ?? Deno.env.get('COACH_MODEL') ?? 'claude-sonnet-5';
+const model = Deno.env.get('MEAL_PLAN_MODEL') || Deno.env.get('COACH_MODEL') || 'claude-sonnet-5';
 const store = supabaseMealPlanStore(admin);
 const llm = anthropicKey && usdaKey ? anthropicProvider(anthropicKey, model) : null;
 

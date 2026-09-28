@@ -13,7 +13,7 @@ const admin = createClient(
   },
 );
 const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
-const model = Deno.env.get('INSIGHTS_MODEL') ?? Deno.env.get('COACH_MODEL') ?? 'claude-sonnet-5';
+const model = Deno.env.get('INSIGHTS_MODEL') || Deno.env.get('COACH_MODEL') || 'claude-sonnet-5';
 const store = supabaseInsightsStore(admin);
 const llm = anthropicKey ? anthropicProvider(anthropicKey, model) : null;
 

@@ -13,7 +13,7 @@ const admin = createClient(
   },
 );
 const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY');
-const model = Deno.env.get('VISION_MODEL') ?? Deno.env.get('COACH_MODEL') ?? 'claude-sonnet-5';
+const model = Deno.env.get('VISION_MODEL') || Deno.env.get('COACH_MODEL') || 'claude-sonnet-5';
 const store = supabaseBodyScanStore(admin);
 // A licensed body-scan SDK would be another BodyScanEstimator chosen here (BODY_SCAN_PROVIDER).
 const estimator = anthropicKey ? aiEstimator(anthropicProvider(anthropicKey, model)) : null;
