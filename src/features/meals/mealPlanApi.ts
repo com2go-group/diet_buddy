@@ -61,6 +61,8 @@ export type MealPlanErrorCode =
   | 'premium_required'
   | 'regenerate_limit'
   | 'rate_limited'
+  | 'ai_unavailable'
+  | 'food_data_unavailable'
   | 'failed';
 
 export class MealPlanError extends Error {
@@ -86,6 +88,8 @@ export async function generateMealPlan(date: string, regenerate: boolean): Promi
         'premium_required',
         'regenerate_limit',
         'rate_limited',
+        'ai_unavailable',
+        'food_data_unavailable',
       ];
       if (known.includes(body?.error as MealPlanErrorCode)) code = body!.error as MealPlanErrorCode;
     }
