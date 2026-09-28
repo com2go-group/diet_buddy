@@ -89,6 +89,14 @@ export async function verifySignature(
   );
 }
 
+const parseJson = (s: string | null): unknown => {
+  try {
+    return JSON.parse(s ?? 'null');
+  } catch {
+    return null;
+  }
+};
+
 const dayKeyUtc = (d: Date) => d.toISOString().slice(0, 10);
 
 /**
@@ -112,10 +120,15 @@ export async function handleAdmobSsv(req: Request, deps: SsvDeps): Promise<Respo
     if (!(await verifySignature(query, deps))) return fail('invalid_signature', 401);
     const params = new URLSearchParams(query);
     const userId = params.get('user_id') ?? '';
-    const custom = customDataSchema.safeParse(JSON.parse(params.get('custom_data') ?? 'null'));
-    if (!UUID.test(userId) || !custom.success) return fail('invalid_reward', 400);
+    const custom = customDataSchema.safeParse(parseJson(params.get('custom_data')));
+    // A genuine Google callback that carries no usable reward (the console's "Verify URL" test,
+    // or an expired meal target) is acknowledged with 200 so Google doesn't retry it, but
+    // records nothing.
+    if (!UUID.test(userId) || !custom.success) return json({ ok: true, ignored: 'no_reward' });
     const { type, target } = custom.data;
-    if (!validTarget(type, target, deps.now?.() ?? new Date())) return fail('invalid_target', 400);
+    if (!validTarget(type, target, deps.now?.() ?? new Date())) {
+      return json({ ok: true, ignored: 'invalid_target' });
+    }
     await deps.recordUnlock(userId, type, target);
     return json({ ok: true });
   } catch (e) {

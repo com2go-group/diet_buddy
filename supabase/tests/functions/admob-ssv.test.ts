@@ -83,7 +83,9 @@ describe('admob-ssv', () => {
       get(await sign(params({ type: 'meal_plan', target: '2026-09-01:lunch' }))),
       deps,
     );
-    expect(res.status).toBe(400);
+    // Signed by Google but not usable: acknowledged so Google doesn't retry, nothing recorded.
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, ignored: 'invalid_target' });
     expect(unlocks).toEqual([]);
     expect(validTarget('meal_plan', '2026-09-26:dinner', NOW)).toBe(true);
     expect(validTarget('meal_plan', '2026-09-26', NOW)).toBe(false);
@@ -95,6 +97,19 @@ describe('admob-ssv', () => {
   it('answers Google’s unsigned verification ping', async () => {
     const { deps } = await setup();
     expect((await handleAdmobSsv(get(''), deps)).status).toBe(200);
+  });
+
+  it('acknowledges the console’s signed test callback without recording anything', async () => {
+    const { sign, deps, unlocks } = await setup();
+    const bare =
+      'ad_network=5450213213286189855&ad_unit=1234&reward_amount=1&reward_item=Reward&timestamp=1790000000000&transaction_id=abc';
+    const typed = `${bare}&custom_data=EXAMPLE_CUSTOM_DATA_STRING&user_id=userid_1234567`;
+    for (const query of [bare, typed]) {
+      const res = await handleAdmobSsv(get(await sign(query)), deps);
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ ok: true, ignored: 'no_reward' });
+    }
+    expect(unlocks).toEqual([]);
   });
 
   it('converts DER signatures with leading zeros', () => {
