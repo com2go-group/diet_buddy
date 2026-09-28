@@ -1530,8 +1530,7 @@ export const en = {
     error_premium_required: 'New plans for the same day come with Premium.',
     error_regenerate_limit: 'You’ve made the maximum number of plans for today.',
     error_rate_limited: 'Too many requests. Try again later.',
-    error_ai_unavailable:
-      'The meal planner isn’t available right now. Try again in a few minutes.',
+    error_ai_unavailable: 'The meal planner isn’t available right now. Try again in a few minutes.',
     error_food_data_unavailable:
       'The food database isn’t available right now. Try again in a few minutes.',
     error_failed: 'Something went wrong. Check your connection and try again.',
