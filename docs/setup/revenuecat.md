@@ -9,7 +9,7 @@ You need:
 - **RevenueCat** account (free until $2.5k monthly revenue): https://app.revenuecat.com/signup
 - An **Expo** account for EAS builds (free): https://expo.dev/signup
 
-Store products can only be tested in a development build installed from EAS, not in Expo Go or the web build.
+Store products can only be tested in a development build installed from EAS, not in Expo Go or the web build. Before the store accounts exist, RevenueCat's Test Store key lets you try the paywall (see "Before the stores" below).
 
 ## 1. Create the apps in the stores
 
@@ -64,6 +64,26 @@ There is no Lifetime plan (decision log 2026-09-28); the app ignores one if it i
    - Send a **test event**; the function answers `{ "ok": true }`.
 
 The app logs RevenueCat in with the Supabase user ID, so webhook events map directly to `profiles.user_id`. Out-of-order events are ignored (`profiles.premium_event_at`).
+
+## Before the stores: RevenueCat Test Store
+
+RevenueCat's **Test Store** key (starts with `test_`, RevenueCat → Project → API keys) lets you
+try the paywall without App Store or Play accounts: purchases are simulated by RevenueCat. The
+app takes one key per platform, so put the same `test_` key in both:
+
+```
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=test_...
+EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=test_...
+```
+
+1. In RevenueCat, open the **Test Store** app and add two products (monthly and annual), attach
+   them to the `premium` entitlement and put them in the default offering as `$rc_monthly` and
+   `$rc_annual` (step 3.4–3.5), so the paywall has plans to show.
+2. Use the key in `.env` and in the EAS **development** and **preview** environments only. It
+   must never reach a store build: set the **production** environment to the `appl_...` and
+   `goog_...` keys from step 3.6.
+3. Test Store purchases still need a development build (not the web build). The webhook works
+   the same way (step 4) if you want to see `is_premium` change on the server.
 
 ## 5. Test with sandbox purchases
 

@@ -99,6 +99,10 @@ Add the Google Sign-In values (`EXPO_PUBLIC_GOOGLE_*`) and `EXPO_PUBLIC_AUTH_PHO
 if you use them. You can also add them in the browser: expo.dev → your project →
 **Environment variables**. `.env.example` lists every setting.
 
+The RevenueCat **Test Store** key (`test_...`) belongs only in the `development` and `preview`
+environments; the `production` environment must have the real `appl_...` key
+(`docs/setup/revenuecat.md`).
+
 ## Part 5. Build and upload
 
 1. Make sure `version` in `app.json` is the version you want to show (1.0.0 for the first
