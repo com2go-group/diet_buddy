@@ -17,6 +17,7 @@ import { FoodLogRow } from './components/FoodLogRow';
 import { MealPlanSection } from './components/MealPlanSection';
 import { MealsSummary } from './components/MealsSummary';
 import { SlotTabs } from './components/SlotTabs';
+import { TOMORROW_FROM_HOUR, TomorrowPlan } from './components/TomorrowPlan';
 import { MEAL_SLOTS, SLOT_EMOJI, slotTarget, totals } from './portion';
 import { currentSlot, slotStates } from './sequence';
 import type { MealSlot } from './types';
@@ -158,6 +159,9 @@ export function MealsScreen() {
           </View>
         )}
         <FormMessage message={remove.isError ? t('meals.deleteFailed') : undefined} />
+        {isToday && (now.getHours() >= TOMORROW_FROM_HOUR || (plan && todayCurrent === null)) ? (
+          <TomorrowPlan today={day} />
+        ) : null}
       </>
     );
   };

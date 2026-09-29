@@ -1539,6 +1539,10 @@ export const en = {
     privacy: 'Health data is never sold or used for ads.',
   },
   mealPlan: {
+    tomorrowTitle: 'Tomorrow’s plan',
+    tomorrowDesc: 'See tomorrow’s meals tonight, so you can shop or prep ahead.',
+    tomorrowCta: 'Plan tomorrow',
+    tomorrowNote: 'Portions adjust tomorrow to what you eat, meal by meal.',
     howTo: 'How to make it ({{count}} steps)',
     prepTime: '{{minutes}} min',
     title: 'AI meal plan',

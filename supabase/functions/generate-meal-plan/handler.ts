@@ -81,6 +81,12 @@ export function validDate(date: string, now: Date): boolean {
   return offset >= -1 && offset <= 1;
 }
 
+/** Free: today or tomorrow in any time zone, so tomorrow's plan can be seen the evening before. */
+export function validFreeDate(date: string, now: Date): boolean {
+  const offset = dayOffset(date, now);
+  return offset >= -1 && offset <= 2;
+}
+
 /** Premium: today in any time zone up to 7 days ahead. */
 function validPremiumDate(date: string, now: Date): boolean {
   const offset = dayOffset(date, now);
@@ -229,7 +235,7 @@ function promptInput(ctx: MealPlanContext): MealPlanPromptInput {
 
 /**
  * POST { date, regenerate?, action?, slot? } → { plan }.
- * - plan (default): the day's plan. Dates: today in any time zone; Premium also the next 7 days
+ * - plan (default): the day's plan. Dates: today or tomorrow in any time zone; Premium up to 7 days
  *   (for the weekly grocery list). Returns the stored plan when there is one; otherwise generates:
  *   model picks a dish per meal → USDA numbers → allergy/restriction check in code (dish names
  *   too) → retry with feedback on any problem (up to 3 attempts) → portions scaled → stored.
@@ -274,7 +280,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
     if (existing && !regenerate) return json({ plan: existing.plan });
 
     const ctx = await store.context(userId);
-    if (!validDate(date, now) && !ctx.premium) return fail('premium_required', 403);
+    if (!validFreeDate(date, now) && !ctx.premium) return fail('premium_required', 403);
     if (existing && (!ctx.premium || existing.regenerations >= PREMIUM_REGENERATIONS)) {
       return fail(ctx.premium ? 'regenerate_limit' : 'premium_required', 403);
     }

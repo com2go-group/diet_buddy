@@ -405,6 +405,13 @@ describe('generate-meal-plan', () => {
     });
   });
 
+  it('lets free users plan tomorrow the evening before', async () => {
+    const { deps } = setup({ replies: [planJson(item('Apple', 'apple', 150))] });
+    const res = await handleGenerateMealPlan(post({ date: '2026-09-28' }), deps);
+    expect(res.status).toBe(200);
+    expect((await res.json()).plan.date).toBe('2026-09-28');
+  });
+
   it('plans today (±1 day for time zones); Premium also the next 7 days', async () => {
     const { deps } = setup({ replies: [] });
     expect((await handleGenerateMealPlan(post({ date: '2026-09-25' }), deps)).status).toBe(400);
