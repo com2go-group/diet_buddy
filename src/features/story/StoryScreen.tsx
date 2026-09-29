@@ -6,20 +6,14 @@ import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import type Svg from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-  Button,
-  Callout,
-  EmptyState,
-  ErrorState,
-  SkeletonCard,
-  SwitchRow,
-  Text,
-} from '@/components';
+import { Button, EmptyState, ErrorState, SkeletonCard, SwitchRow, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatShortDate } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
+import { useSessionStore } from '../auth/sessionStore';
+import { askForReview } from '../review/reviewPrompt';
 import { usePremium } from '../subscriptions/usePremium';
 import { fullness, twinFrames } from '../twin/twin';
 import { StoryCard, storyBadgeText, storyWeightText } from './components/StoryCard';
@@ -39,8 +33,17 @@ export function StoryScreen() {
   const query = useStory(now);
   const [showTwin, setShowTwin] = useState(true);
   const [showWeight, setShowWeight] = useState(false);
+  // Free users share with the DietBuddy mark; Premium can turn it off.
+  const [showMark, setShowMark] = useState(true);
+  const watermark = !premium || showMark;
   const svg = useRef<Svg>(null);
-  const share = useMutation({ mutationFn: () => shareStoryImage(svg.current!, now) });
+  const userId = useSessionStore((s) => s.session?.user.id);
+  const share = useMutation({
+    mutationFn: () => shareStoryImage(svg.current!, now),
+    onSuccess: () => {
+      if (userId) void askForReview(userId, 'story');
+    },
+  });
 
   const view = useMemo(() => {
     const data = query.data;
@@ -108,6 +111,7 @@ export function StoryScreen() {
               showWeight={showWeight}
               units={twin.units}
               width={cardWidth}
+              watermark={watermark}
             />
           </View>
         </View>
@@ -118,30 +122,34 @@ export function StoryScreen() {
           setShowWeight,
           noWeight ? t('story.noWeight') : t('story.showWeightDesc'),
         )}
-        {premium ? (
-          <View className="gap-2">
-            <FormMessage
-              tone={share.data === 'downloaded' ? 'info' : 'error'}
-              message={
-                share.isError
-                  ? t('story.shareFailed')
-                  : share.data === 'downloaded'
-                    ? t('story.downloaded')
-                    : undefined
-              }
-            />
+        {premium
+          ? toggle(t('story.showMark'), showMark, setShowMark, t('story.showMarkDesc'))
+          : null}
+        <View className="gap-2">
+          <FormMessage
+            tone={share.data === 'downloaded' ? 'info' : 'error'}
+            message={
+              share.isError
+                ? t('story.shareFailed')
+                : share.data === 'downloaded'
+                  ? t('story.downloaded')
+                  : undefined
+            }
+          />
+          <Button
+            label={t('story.share')}
+            loading={share.isPending}
+            onPress={() => share.mutate()}
+          />
+          {!premium ? (
             <Button
-              label={t('story.share')}
-              loading={share.isPending}
-              onPress={() => share.mutate()}
+              label={t('story.removeMark')}
+              variant="ghost"
+              size="md"
+              onPress={() => openPaywall('story')}
             />
-          </View>
-        ) : (
-          <View className="gap-3">
-            <Callout emoji="⭐">{t('story.locked')}</Callout>
-            <Button label={t('story.upgrade')} onPress={() => openPaywall('story')} />
-          </View>
-        )}
+          ) : null}
+        </View>
         <Text variant="caption" tone="muted" className="text-center">
           {t('story.privacy')}
         </Text>

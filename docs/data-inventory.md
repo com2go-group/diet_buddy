@@ -90,3 +90,7 @@ Retention: see `docs/backend.md` → Abuse limits and data retention. Coach mess
 Reminders: `notification_preferences.water_reminders` (new switch). Meal-time learning and the water/check-in checks for reminders run on the device from the logs Home already loads; nothing extra is stored or sent.
 
 Goal reached: `goals.reached_at` records when the user switched from weight loss to maintenance (their goal weight is kept as the weight to maintain). Maintenance steps are new `plans` versions with `generated_by = 'maintenance'`.
+
+Referrals: `referral_codes` (user's invite code) and `referrals` (referrer, referred user, status, reward date); each user can read only their own side; exported (without the other person's ID) and deleted with either account. RevenueCat receives only the user ID and the promotional duration.
+
+Store review prompt, watermark and tracking: when the store rating sheet was last requested is kept on the device only. On iOS, Apple's App Tracking Transparency answer is read by the device; personalised ads only when both Google's consent and ATT allow it.

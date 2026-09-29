@@ -140,6 +140,20 @@ Without `ANTHROPIC_API_KEY` and `USDA_API_KEY` the function answers `configured:
 select cron.schedule('purge-old-data', '17 3 * * *', $$ select public.purge_old_data(); $$);
 ```
 
+## Referrals
+
+Every user has an 8-character invite code (`my_referral_code()`, created on first use). A new user can enter a friend's code within `referral_redeem_days` (14) of signing up (`redeem_referral`: one code per person, never your own, at most `referral_max_per_year` (10) invites per referrer). `referral-rewards` (pg_cron every 30 min, `CRON_SECRET`) rewards invites whose new user finished onboarding and logged food on `referral_active_days` (3) different days: both get a **monthly promotional `premium` entitlement** in RevenueCat (`_shared/revenuecat.ts`, needs `REVENUECAT_SECRET_KEY`), applied to `is_premium` at once, and an in-app notification (`type = 'referral'`, pushed like badges). An invite is claimed (`rewarding`) before granting, so parallel runs never reward twice; a failed grant returns it to `pending`. Invites still pending after 60 days expire. Schedule once:
+
+```sql
+select cron.schedule('referral-rewards', '*/30 * * * *', $$
+  select net.http_post(
+    url := 'https://<project-ref>.supabase.co/functions/v1/referral-rewards',
+    headers := '{"Authorization": "Bearer <secret>", "Content-Type": "application/json"}'::jsonb,
+    body := '{}'::jsonb
+  );
+$$);
+```
+
 ## Access model
 
 | Data                                                                                                              | App (signed-in user)                      | Server (Edge Functions, service role)          |

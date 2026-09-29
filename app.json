@@ -45,6 +45,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Allowing tracking lets us show you more relevant ads, which keeps DietBuddy free. Your health data is never used for ads."
+        }
+      ],
       "expo-router",
       "expo-font",
       "expo-apple-authentication",

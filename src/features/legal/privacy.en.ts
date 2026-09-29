@@ -37,6 +37,7 @@ export const PRIVACY_POLICY: LegalDoc = {
         'Purchases: if you subscribe to Premium, Apple or Google processes the payment. We receive your subscription status only, through RevenueCat, never your card details.',
         'Notifications: if you allow them, a push token for your device and your notification settings.',
         'Support requests: what you write to us in Profile → Help, and our replies.',
+        'Invites: your invite code, and if you invite friends or join with a friend’s code, the link between the two accounts and whether the reward was given (neither of you sees the other’s data).',
         'Technical records: how many AI requests you make (to keep costs and limits in check), and, if a coach message shows signs of a crisis or disordered eating, a record of that flag type (not the message) so our staff can review our safety measures.',
       ],
     },
@@ -79,7 +80,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     {
       heading: '6. Advertising (free plan)',
       blocks: [
-        'The free plan shows ads from Google AdMob. Before any ad is requested, we ask for your choice about personalised ads (Google’s consent tool). Google may use your device’s advertising identifier and how you interact with ads; if you don’t agree to personalisation, only non-personalised ads are shown. On iPhone and iPad, ads are always non-personalised and DietBuddy does not track you across other companies’ apps or websites. We never pass health data, logs or anything you enter in the app to advertisers. Google acts as an independent controller for personalised advertising: see policies.google.com/privacy. Premium has no ads.',
+        'The free plan shows ads from Google AdMob. Before any ad is requested, we ask for your choice about personalised ads (Google’s consent tool). Google may use your device’s advertising identifier and how you interact with ads; if you don’t agree to personalisation, only non-personalised ads are shown. On iPhone and iPad, if you agreed to personalised ads, Apple’s “Allow tracking” prompt also asks for your permission; ads are personalised only if you allow it, and you can change this any time in iOS Settings → Privacy & Security → Tracking. We never pass health data, logs or anything you enter in the app to advertisers. Google acts as an independent controller for personalised advertising: see policies.google.com/privacy. Premium has no ads.',
       ],
     },
     {

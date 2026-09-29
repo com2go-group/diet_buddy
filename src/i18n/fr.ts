@@ -105,6 +105,34 @@ export const fr: Translation = {
     regain:
       'Les petites variations sont normales. Si tu veux te recentrer, tu peux fixer un objectif doux pour revenir.',
   },
+  invite: {
+    title: 'Inviter des amis',
+    back: 'Retour au profil',
+    intro:
+      'Partage ton code. Quand un·e ami·e s’inscrit avec et note ses repas sur 3 jours, vous recevez tous les deux un mois de Premium.',
+    yourCode: 'Ton code d’invitation',
+    codeA11y: 'Ton code d’invitation : {{code}}',
+    share: 'Partager mon code',
+    shareText:
+      'J’utilise DietBuddy pour bien manger et suivre mes progrès. Inscris-toi avec mon code {{code}} et on reçoit tous les deux un mois de Premium : {{url}}',
+    stats: '{{joined}} inscrits · {{rewarded}} récompensés',
+    gotCode: 'Un·e ami·e t’a donné un code ?',
+    codeLabel: 'Code de ton ami·e',
+    apply: 'Utiliser le code',
+    failed: 'Nous n’avons pas pu vérifier ce code. Réessaie.',
+    result_ok:
+      'Code ajouté ! Note tes repas sur 3 jours et vous recevrez tous les deux un mois de Premium.',
+    result_invalid: 'Ce code n’existe pas. Vérifie-le et réessaie.',
+    result_own: 'C’est ton propre code. Partage-le plutôt avec tes amis !',
+    result_already: 'Tu as déjà utilisé le code d’un·e ami·e.',
+    result_too_late: 'Les codes s’utilisent dans les 14 jours qui suivent l’inscription.',
+    result_limit: 'Ton ami·e a atteint la limite d’invitations de l’année.',
+    referredWaiting:
+      'Tu as rejoint avec le code d’un·e ami·e. Note tes repas sur 3 jours et vous recevrez tous les deux un mois de Premium.',
+    referredDone: 'Tu as rejoint avec le code d’un·e ami·e et reçu un mois de Premium. Profite !',
+    terms:
+      'Jusqu’à 10 invitations récompensées par an. Le code d’un·e ami·e s’utilise une fois, dans les 14 jours suivant l’inscription. Le Premium offert se termine seul après un mois, ne se renouvelle jamais et ne te coûte rien.',
+  },
   care: {
     title: 'Comment vas-tu ?',
     body: 'Tes derniers jours ont été enregistrés bien en dessous de ton plan. Manger suffisamment nourrit ton énergie, ton humeur et tes progrès ; perdre du poids plus vite que prévu n’est pas l’objectif.',
@@ -1108,6 +1136,10 @@ export const fr: Translation = {
     failed: 'Impossible de créer vos conseils. Veuillez réessayer.',
   },
   story: {
+    removeMark: 'Retirer la mention DietBuddy avec Premium',
+    showMarkDesc: 'Une petite ligne « Créé avec DietBuddy » en bas de l’image.',
+    showMark: 'Afficher la mention DietBuddy',
+    watermark: 'Créé avec DietBuddy · dietbuddy.me',
     title: 'Story de la semaine',
     close: 'Fermer',
     intro: 'Vos 7 derniers jours en une image à partager où vous voulez.',
@@ -1228,6 +1260,7 @@ export const fr: Translation = {
     loadFailed: 'Impossible de charger votre conversation.',
   },
   profile: {
+    invite: 'Invite des amis, gagne Premium',
     title: 'Profil',
     free: 'Offre gratuite',
     premium: 'Premium',
@@ -1371,7 +1404,7 @@ export const fr: Translation = {
     continueFree: 'Continuer gratuitement',
     featureBodyScan: 'Scan corporel IA à partir de deux photos',
     featureTwin: 'Chronologie et projection de votre jumeau numérique',
-    featureStory: 'Story de la semaine à partager',
+    featureStory: 'Récap de la semaine sans la mention DietBuddy',
     ctaTrial: 'Commencer l’essai gratuit de {{days}} jours',
     ctaMonthly: 'Prendre Premium mensuel',
     ctaAnnual: 'Prendre Premium annuel',

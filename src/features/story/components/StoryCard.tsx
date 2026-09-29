@@ -98,6 +98,8 @@ export interface StoryCardProps {
   units: UnitSystem;
   width: number;
   ref?: Ref<Svg>;
+  /** "Made with DietBuddy · dietbuddy.me" along the bottom (always on for free users). */
+  watermark?: boolean;
 }
 
 /** The weekly story as one SVG, so the same drawing is shown and exported as the image. */
@@ -109,6 +111,7 @@ export function StoryCard({
   units,
   width,
   ref,
+  watermark = false,
 }: StoryCardProps) {
   const range = `${formatShortDate(stats.start)} – ${formatShortDate(stats.end)}`;
   const tiles = [
@@ -194,9 +197,14 @@ export function StoryCard({
           {badgeText}
         </Label>
       ) : null}
-      <Label x={180} y={622} size={11} color={C.muted} anchor="middle">
+      <Label x={180} y={watermark ? 610 : 622} size={11} color={C.muted} anchor="middle">
         {t('story.footer', { level: stats.level })}
       </Label>
+      {watermark ? (
+        <Label x={180} y={630} size={11} weight="bold" color={C.brand} anchor="middle">
+          {t('story.watermark')}
+        </Label>
+      ) : null}
     </Svg>
   );
 }

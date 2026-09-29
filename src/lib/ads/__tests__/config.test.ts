@@ -1,4 +1,4 @@
-import { requestOptions, TEST_UNITS, unitId } from '../config';
+import { personalisedAllowed, requestOptions, TEST_UNITS, unitId } from '../config';
 
 describe('ad config', () => {
   it('always uses Google test units in development', () => {
@@ -16,12 +16,16 @@ describe('ad config', () => {
   });
 
   it('never sends targeting data, only the personalisation choice', () => {
-    expect(requestOptions(false, 'android')).toEqual({ requestNonPersonalizedAdsOnly: true });
-    expect(requestOptions(true, 'android')).toEqual({ requestNonPersonalizedAdsOnly: false });
+    expect(requestOptions(false)).toEqual({ requestNonPersonalizedAdsOnly: true });
+    expect(requestOptions(true)).toEqual({ requestNonPersonalizedAdsOnly: false });
   });
 
-  it('never requests personalised ads on iOS (no App Tracking Transparency prompt)', () => {
-    expect(requestOptions(true, 'ios')).toEqual({ requestNonPersonalizedAdsOnly: true });
-    expect(requestOptions(false, 'ios')).toEqual({ requestNonPersonalizedAdsOnly: true });
+  it('personalises only with Google consent and, on iOS, tracking allowed (ATT)', () => {
+    expect(personalisedAllowed(true, 'unavailable', 'android')).toBe(true);
+    expect(personalisedAllowed(false, 'unavailable', 'android')).toBe(false);
+    expect(personalisedAllowed(true, 'granted', 'ios')).toBe(true);
+    expect(personalisedAllowed(true, 'denied', 'ios')).toBe(false);
+    expect(personalisedAllowed(true, 'undetermined', 'ios')).toBe(false);
+    expect(personalisedAllowed(false, 'granted', 'ios')).toBe(false);
   });
 });

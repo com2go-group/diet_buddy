@@ -25,7 +25,8 @@ describe('export-data', () => {
       .map((f) => readFileSync(join(dir, f), 'utf8'))
       .join('\n');
     const tables = [...sql.matchAll(/create table public\.(\w+) \(([\s\S]*?)\n\);/g)]
-      .filter(([, , body]) => /\n\s+user_id uuid/.test(body!))
+      // Referrals link two users (referrer_id / referred_id) instead of one user_id.
+      .filter(([, , body]) => /\n\s+(user_id|referrer_id) uuid/.test(body!))
       .map(([, name]) => name);
     expect([...tables].sort()).toEqual([...EXPORT_TABLES].sort());
   });

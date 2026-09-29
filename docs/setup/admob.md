@@ -57,7 +57,7 @@ The app shows this message (Google UMP) before any ad request, and mirrors the p
 ## 5. Store declarations
 
 - **Google Play Console** → App content: **Ads** = "Yes, my app contains ads"; **Data safety**: Device or other IDs (advertising ID) collected for advertising, shared with Google; **Advertising ID** declaration = used for advertising.
-- **App Store Connect** → App Privacy: "Identifiers → Device ID" and "Usage Data → Advertising Data", used for third-party advertising. The app doesn't show Apple's tracking prompt (ATT), so iOS ads are served without the IDFA.
+- **App Store Connect** → App Privacy: "Identifiers → Device ID" and "Usage Data → Advertising Data", used for third-party advertising. Both marked "Used for tracking": iOS users who agree to personalised ads in Google's form are then asked by Apple's tracking prompt (ATT, `expo-tracking-transparency`); ads are personalised only if they allow it. Optionally add Google's **IDFA explainer** message in AdMob → Privacy & messaging so users see why before Apple's prompt.
 - Publish **app-ads.txt** at `https://dietbuddy.me/app-ads.txt`: copy the line from AdMob → Apps → app-ads.txt into a file named `app-ads.txt` in `landing/` and upload it. AdMob finds it through the developer website in the store listings, which must be `https://dietbuddy.me`.
 
 Health data is never sent to ad networks: requests carry only the personalisation flag, with no keywords or content URLs (`src/lib/ads/config.ts`).

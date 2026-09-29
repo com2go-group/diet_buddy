@@ -20,6 +20,8 @@ interface JourneyState {
   mealsAdShownOn: Record<string, string>;
   /** When the low-intake care card was last closed. */
   careDismissedAt: Record<string, string>;
+  /** When the store rating prompt was last requested. */
+  reviewAskedAt: Record<string, string>;
   onboarded: (userId: string, at?: Date) => void;
   welcomeOfferShown: (userId: string) => void;
   dismissChecklist: (userId: string) => void;
@@ -27,6 +29,7 @@ interface JourneyState {
   dismissMealsHint: (userId: string) => void;
   mealsAdShown: (userId: string, day: string) => void;
   dismissCare: (userId: string, at?: Date) => void;
+  reviewAsked: (userId: string, at?: Date) => void;
 }
 
 export const useJourneyStore = create<JourneyState>()(
@@ -39,6 +42,7 @@ export const useJourneyStore = create<JourneyState>()(
       mealsHintDismissed: {},
       mealsAdShownOn: {},
       careDismissedAt: {},
+      reviewAskedAt: {},
       onboarded: (userId, at = new Date()) =>
         set((s) => ({
           onboardedAt: { ...s.onboardedAt, [userId]: at.toISOString() },
@@ -56,6 +60,8 @@ export const useJourneyStore = create<JourneyState>()(
         set((s) => ({ mealsAdShownOn: { ...s.mealsAdShownOn, [userId]: day } })),
       dismissCare: (userId, at = new Date()) =>
         set((s) => ({ careDismissedAt: { ...s.careDismissedAt, [userId]: at.toISOString() } })),
+      reviewAsked: (userId, at = new Date()) =>
+        set((s) => ({ reviewAskedAt: { ...s.reviewAskedAt, [userId]: at.toISOString() } })),
     }),
     { name: 'journey', storage: createJSONStorage(() => AsyncStorage) },
   ),

@@ -7,10 +7,15 @@ import { useStorePremium } from '../../subscriptions/usePremium';
 import type { TwinData } from '../../twin/api';
 import { loadStory, type StoryData } from '../api';
 import { shareStoryImage } from '../shareImage';
+import { StoryCard } from '../components/StoryCard';
 import { StoryScreen } from '../StoryScreen';
 
 jest.mock('../api', () => ({ loadStory: jest.fn() }));
 jest.mock('../shareImage', () => ({ shareStoryImage: jest.fn() }));
+jest.mock('../components/StoryCard', () => {
+  const actual = jest.requireActual('../components/StoryCard');
+  return { ...actual, StoryCard: jest.fn((props) => actual.StoryCard(props)) };
+});
 jest.mock('@/lib/supabase', () => {
   const chain = {
     select: () => chain,
@@ -91,15 +96,20 @@ describe('StoryScreen', () => {
     ).toBeOnTheScreen();
   });
 
-  it('offers Premium instead of sharing to free users', async () => {
+  it('lets free users share with the DietBuddy mark, Premium removes it', async () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<StoryScreen />);
-    await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
+    expect(await screen.findByRole('button', { name: 'Share image' })).toBeOnTheScreen();
+    // The image carries the mark (drawn in the SVG).
+    expect((StoryCard as unknown as jest.Mock).mock.calls.at(-1)[0].watermark).toBe(true);
+    expect(screen.queryByLabelText('Show the DietBuddy mark')).toBeNull();
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Remove the DietBuddy mark with Premium' }),
+    );
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/paywall',
       params: { feature: 'story' },
     });
-    expect(screen.queryByRole('button', { name: 'Share image' })).toBeNull();
   });
 
   it('asks for a log when the week is empty', async () => {

@@ -1,7 +1,12 @@
 import { z } from 'npm:zod@4';
 
 import { corsHeaders, fail, json } from '../_shared/http.ts';
-import { activeFromSubscriber, PREMIUM_ENTITLEMENT } from '../sync-premium/handler.ts';
+import {
+  GRANT_DURATIONS,
+  promotionalPremium,
+  RevenueCatError,
+  type GrantDuration,
+} from '../_shared/revenuecat.ts';
 
 export type AdminRole = 'support' | 'admin' | 'owner';
 const RANK: Record<AdminRole, number> = { support: 1, admin: 2, owner: 3 };
@@ -29,9 +34,7 @@ export interface AdminUsersDeps {
   now?: () => Date;
 }
 
-/** RevenueCat's promotional durations offered in the dashboard. */
-export const GRANT_DURATIONS = ['weekly', 'monthly', 'three_month', 'yearly', 'lifetime'] as const;
-export type GrantDuration = (typeof GRANT_DURATIONS)[number];
+export { GRANT_DURATIONS, type GrantDuration } from '../_shared/revenuecat.ts';
 
 const bodySchema = z.object({
   action: z.enum(['export', 'delete', 'ban', 'unban', 'grant_premium', 'revoke_premium']),
@@ -41,12 +44,6 @@ const bodySchema = z.object({
   duration: z.enum(GRANT_DURATIONS).optional(),
   /** Why Premium was given or taken back (kept in the audit log). */
   reason: z.string().trim().max(200).optional(),
-});
-
-const subscriberExpiry = z.object({
-  subscriber: z.object({
-    entitlements: z.record(z.string(), z.object({ expires_date: z.string().nullish() })),
-  }),
 });
 
 /**
@@ -61,33 +58,22 @@ async function promotional(
   duration: GrantDuration | null,
 ): Promise<Response | { premium: boolean; expiresAt: string | null }> {
   if (!deps.revenueCatKey || !deps.applyPremium) return fail('not_configured', 503);
-  const base = `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(userId)}/entitlements/${PREMIUM_ENTITLEMENT}`;
-  const res = await (deps.fetch ?? fetch)(
-    duration ? `${base}/promotional` : `${base}/revoke_promotionals`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${deps.revenueCatKey}`,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: duration ? JSON.stringify({ duration }) : undefined,
-    },
-  );
-  if (!res.ok) {
-    console.error('admin-users: RevenueCat answered', res.status);
+  const now = deps.now?.() ?? new Date();
+  try {
+    const result = await promotionalPremium({
+      key: deps.revenueCatKey,
+      userId,
+      duration,
+      now,
+      fetch: deps.fetch,
+    });
+    await deps.applyPremium(userId, result.premium, now);
+    return result;
+  } catch (e) {
+    if (!(e instanceof RevenueCatError)) throw e;
+    console.error('admin-users: RevenueCat answered', e.status);
     return fail('store_unavailable', 502);
   }
-  const body: unknown = await res.json().catch(() => null);
-  const now = deps.now?.() ?? new Date();
-  const premium = activeFromSubscriber(body, now);
-  if (premium === null) return fail('store_unavailable', 502);
-  await deps.applyPremium(userId, premium, now);
-  const parsed = subscriberExpiry.safeParse(body);
-  const expiresAt = parsed.success
-    ? (parsed.data.subscriber.entitlements[PREMIUM_ENTITLEMENT]?.expires_date ?? null)
-    : null;
-  return { premium, expiresAt };
 }
 
 /**

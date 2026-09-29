@@ -105,6 +105,34 @@ export const es: Translation = {
     regain:
       'Los pequeños altibajos son normales. Si quieres volver a centrarte, puedes fijar un objetivo suave para volver.',
   },
+  invite: {
+    title: 'Invitar a amigos',
+    back: 'Volver al perfil',
+    intro:
+      'Comparte tu código. Cuando alguien se registre con él y registre comidas 3 días, los dos conseguís un mes de Premium.',
+    yourCode: 'Tu código de invitación',
+    codeA11y: 'Tu código de invitación: {{code}}',
+    share: 'Compartir mi código',
+    shareText:
+      'Uso DietBuddy para comer bien y seguir mi progreso. Regístrate con mi código {{code}} y los dos conseguimos un mes de Premium: {{url}}',
+    stats: '{{joined}} se unieron · {{rewarded}} con premio',
+    gotCode: '¿Tienes un código de un amigo?',
+    codeLabel: 'Código de tu amigo',
+    apply: 'Usar código',
+    failed: 'No pudimos comprobar el código. Inténtalo de nuevo.',
+    result_ok: '¡Código añadido! Registra comidas 3 días y los dos conseguiréis un mes de Premium.',
+    result_invalid: 'Ese código no existe. Revísalo e inténtalo de nuevo.',
+    result_own: 'Ese es tu propio código. ¡Compártelo con tus amigos!',
+    result_already: 'Ya has usado el código de un amigo.',
+    result_too_late: 'Los códigos se pueden usar en los primeros 14 días tras registrarte.',
+    result_limit: 'Tu amigo ha alcanzado el límite de invitaciones de este año.',
+    referredWaiting:
+      'Te uniste con el código de un amigo. Registra comidas 3 días y los dos conseguiréis un mes de Premium.',
+    referredDone:
+      'Te uniste con el código de un amigo y conseguiste un mes de Premium. ¡Disfrútalo!',
+    terms:
+      'Hasta 10 invitaciones con premio al año. El código de un amigo se usa una vez, en los primeros 14 días tras registrarte. El Premium de invitaciones termina solo tras un mes, nunca se renueva ni te cobra.',
+  },
   care: {
     title: '¿Cómo estás?',
     body: 'Tus últimos días se registraron muy por debajo de tu plan. Comer lo suficiente alimenta tu energía, tu ánimo y tu progreso; perder peso más rápido de lo previsto no es el objetivo.',
@@ -1095,6 +1123,10 @@ export const es: Translation = {
     failed: 'No hemos podido crear tus ideas. Inténtalo de nuevo.',
   },
   story: {
+    removeMark: 'Quitar la marca de DietBuddy con Premium',
+    showMarkDesc: 'Una pequeña línea «Hecho con DietBuddy» al pie de la imagen.',
+    showMark: 'Mostrar la marca de DietBuddy',
+    watermark: 'Hecho con DietBuddy · dietbuddy.me',
     title: 'Resumen semanal',
     close: 'Cerrar',
     intro: 'Tus últimos 7 días en una imagen para compartir donde quieras.',
@@ -1212,6 +1244,7 @@ export const es: Translation = {
     loadFailed: 'No hemos podido cargar tu conversación.',
   },
   profile: {
+    invite: 'Invita a amigos y consigue Premium',
     title: 'Perfil',
     free: 'Plan gratuito',
     premium: 'Premium',
@@ -1355,7 +1388,7 @@ export const es: Translation = {
     continueFree: 'Seguir gratis',
     featureBodyScan: 'Escáner corporal IA con dos fotos',
     featureTwin: 'Cronología y previsión de tu gemelo digital',
-    featureStory: 'Resumen semanal para compartir',
+    featureStory: 'Resumen semanal sin la marca de DietBuddy',
     ctaTrial: 'Empezar prueba gratis de {{days}} días',
     ctaMonthly: 'Obtener Premium mensual',
     ctaAnnual: 'Obtener Premium anual',

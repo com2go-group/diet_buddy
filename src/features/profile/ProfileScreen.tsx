@@ -210,6 +210,11 @@ export function ProfileScreen() {
             onPress={() => router.push('/help')}
           />
           <SettingsRow
+            icon="gift"
+            label={t('profile.invite')}
+            onPress={() => router.push('/invite')}
+          />
+          <SettingsRow
             icon="star"
             label={t('profile.rate')}
             onPress={async () => {

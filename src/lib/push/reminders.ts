@@ -184,6 +184,8 @@ export function routeFor(data: { type?: unknown; route?: unknown } | undefined):
       return '/story';
     case 'streak':
       return '/home';
+    case 'referral':
+      return '/invite';
     default:
       return '/home';
   }

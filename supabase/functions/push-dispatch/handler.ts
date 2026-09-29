@@ -36,6 +36,8 @@ const PREF_FOR_TYPE: Record<string, keyof Preferences> = {
   streak: 'streaks',
   weekly_report: 'weekly_report',
   promotion: 'promotions',
+  // Rewards from invites are news about the user's own account, like a badge.
+  referral: 'achievements',
 };
 
 export interface PushMessage {

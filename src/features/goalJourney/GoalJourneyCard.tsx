@@ -9,6 +9,7 @@ import { formatNumber } from '@/lib/format';
 import { haptics } from '@/lib/haptics';
 
 import { FormMessage } from '../auth/components/FormMessage';
+import { askForReview } from '../review/reviewPrompt';
 import { applyMaintenanceStep, loadGoalJourney, maintenancePlan } from './api';
 import { journeyState } from './state';
 
@@ -38,6 +39,7 @@ export function GoalJourneyCard({ userId, now }: { userId: string; now: Date }) 
     onSuccess: async (kcal) => {
       haptics.success();
       setApplied(kcal);
+      if (state === 'reached') void askForReview(userId, 'goal');
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: goalJourneyKey(userId) }),
         queryClient.invalidateQueries({ queryKey: ['home'] }),

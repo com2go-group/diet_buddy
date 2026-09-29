@@ -30,6 +30,7 @@ import { Shortcuts } from './components/Shortcuts';
 import { TodayMeals } from './components/TodayMeals';
 import { WaterCard } from './components/WaterCard';
 import { WeeklyAdherence } from './components/WeeklyAdherence';
+import { REVIEW_STREAKS, askForReview } from '../review/reviewPrompt';
 import { useJourneyStore } from './journeyStore';
 import { useCoachTipReminder } from './useCoachTipReminder';
 import { homeInsight, summarizeHome } from './summary';
@@ -61,6 +62,11 @@ export function HomeScreen() {
     () => (query.data ? summarizeHome(query.data, now) : null),
     [query.data, now],
   );
+  // A streak milestone is a good moment to ask for a rating (at most every 90 days).
+  const streak = query.data?.profile.streak_days ?? 0;
+  useEffect(() => {
+    if (userId && REVIEW_STREAKS.includes(streak)) void askForReview(userId, 'streak');
+  }, [userId, streak]);
   useSmartReminders(
     summary && query.data
       ? {

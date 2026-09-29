@@ -49,9 +49,22 @@ export function unitId(
 
 /**
  * Request options shared by every ad. No keywords or content URLs are ever passed, so health data
- * can't reach ad networks (CLAUDE.md §12, §13). iOS always gets non-personalised ads: the app
- * has no App Tracking Transparency prompt, and personalised ads would count as tracking.
+ * can't reach ad networks (CLAUDE.md §12, §13). `personalised` is only true after the user said
+ * yes in Google's consent form and, on iOS, allowed tracking in Apple's ATT prompt (initAds).
  */
-export function requestOptions(personalised: boolean, os = Platform.OS) {
-  return { requestNonPersonalizedAdsOnly: os === 'ios' || !personalised };
+export function requestOptions(personalised: boolean) {
+  return { requestNonPersonalizedAdsOnly: !personalised };
+}
+
+/**
+ * Personalised ads need both consents: Google's (UMP) and, on iOS, Apple's tracking permission.
+ * Android has no ATT, so `tracking` is ignored there.
+ */
+export function personalisedAllowed(
+  umpPersonalised: boolean,
+  tracking: 'granted' | 'denied' | 'undetermined' | 'unavailable',
+  os = Platform.OS,
+): boolean {
+  if (!umpPersonalised) return false;
+  return os !== 'ios' || tracking === 'granted';
 }

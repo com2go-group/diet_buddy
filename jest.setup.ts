@@ -89,3 +89,11 @@ jest.mock('@sentry/react-native', () => ({
   captureException: jest.fn(),
   wrap: (component: unknown) => component,
 }));
+
+// expo-store-review: the store rating sheet (native only).
+jest.mock('expo-store-review', () => ({
+  isAvailableAsync: jest.fn(async () => false),
+  hasAction: jest.fn(async () => false),
+  requestReview: jest.fn(async () => undefined),
+  storeUrl: jest.fn(() => null),
+}));

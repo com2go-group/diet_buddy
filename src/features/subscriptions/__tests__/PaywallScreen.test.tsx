@@ -63,7 +63,7 @@ describe('PaywallScreen', () => {
       screen.getByText(/\$71.88 per year, billed to your .* account. Renews automatically/),
     ).toBeOnTheScreen();
     // Only built features are listed, all as included.
-    expect(screen.getByText('Weekly Progress Story to share')).toBeOnTheScreen();
+    expect(screen.getByText('Weekly Progress Story without the DietBuddy mark')).toBeOnTheScreen();
     expect(screen.queryByText('Coming to Premium')).toBeNull();
   });
 

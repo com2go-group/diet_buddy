@@ -14,6 +14,20 @@ export function supabaseExportStore(db: SupabaseClient): ExportStore {
       return { id: u.id, email: u.email ?? null, phone: u.phone ?? null, created_at: u.created_at };
     },
     async rows(table, userId) {
+      if (table === 'referrals') {
+        // The user's side of each invite; the other person's ID is left out (their data).
+        const { data, error } = await db
+          .from('referrals')
+          .select('referrer_id, referred_id, status, rewarded_at, created_at')
+          .or(`referrer_id.eq.${userId},referred_id.eq.${userId}`);
+        if (error) throw new Error(`referrals: ${error.message}`);
+        return (data ?? []).map((r: Record<string, unknown>) => ({
+          role: r.referrer_id === userId ? 'invited_a_friend' : 'joined_with_a_code',
+          status: r.status,
+          rewarded_at: r.rewarded_at,
+          created_at: r.created_at,
+        }));
+      }
       const { data, error } = await db.from(table).select('*').eq('user_id', userId).limit(100_000);
       if (error) throw new Error(`${table}: ${error.message}`);
       return (data ?? []) as Record<string, unknown>[];

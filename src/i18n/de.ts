@@ -104,6 +104,35 @@ export const de: Translation = {
     regain:
       'Kleine Schwankungen sind normal. Wenn du dich neu ausrichten möchtest, kannst du ein sanftes Ziel setzen, um zurückzukommen.',
   },
+  invite: {
+    title: 'Freunde einladen',
+    back: 'Zurück zum Profil',
+    intro:
+      'Teile deinen Code. Wenn sich jemand damit anmeldet und an 3 Tagen Mahlzeiten einträgt, bekommt ihr beide einen Monat Premium.',
+    yourCode: 'Dein Einladungscode',
+    codeA11y: 'Dein Einladungscode: {{code}}',
+    share: 'Meinen Code teilen',
+    shareText:
+      'Ich nutze DietBuddy, um mich gut zu ernähren und meinen Fortschritt zu sehen. Melde dich mit meinem Code {{code}} an, dann bekommen wir beide einen Monat Premium: {{url}}',
+    stats: '{{joined}} angemeldet · {{rewarded}} belohnt',
+    gotCode: 'Hast du einen Code von Freunden?',
+    codeLabel: 'Code von Freunden',
+    apply: 'Code verwenden',
+    failed: 'Wir konnten den Code nicht prüfen. Versuch es erneut.',
+    result_ok:
+      'Code hinzugefügt! Trag an 3 Tagen Mahlzeiten ein, dann bekommt ihr beide einen Monat Premium.',
+    result_invalid: 'Diesen Code gibt es nicht. Prüf ihn und versuch es erneut.',
+    result_own: 'Das ist dein eigener Code. Teile ihn lieber mit Freunden!',
+    result_already: 'Du hast bereits einen Code von Freunden verwendet.',
+    result_too_late: 'Codes können in den ersten 14 Tagen nach der Anmeldung verwendet werden.',
+    result_limit: 'Diese Person hat das Einladungslimit für dieses Jahr erreicht.',
+    referredWaiting:
+      'Du bist mit einem Code von Freunden dabei. Trag an 3 Tagen Mahlzeiten ein, dann bekommt ihr beide einen Monat Premium.',
+    referredDone:
+      'Du bist mit einem Code von Freunden dabei und hast einen Monat Premium bekommen. Viel Spaß!',
+    terms:
+      'Bis zu 10 belohnte Einladungen pro Jahr. Ein Code von Freunden kann einmal verwendet werden, in den ersten 14 Tagen nach der Anmeldung. Premium aus Einladungen endet nach einem Monat von selbst, verlängert sich nie und kostet nichts.',
+  },
   care: {
     title: 'Wie geht es dir?',
     body: 'Deine letzten Tage wurden deutlich unter deinem Plan eingetragen. Genug zu essen gibt dir Energie, gute Laune und Fortschritt – schneller abzunehmen als geplant ist nicht das Ziel.',
@@ -1106,6 +1135,10 @@ export const de: Translation = {
     failed: 'Deine Einblicke konnten nicht erstellt werden. Bitte versuche es erneut.',
   },
   story: {
+    removeMark: 'DietBuddy-Hinweis mit Premium entfernen',
+    showMarkDesc: 'Eine kleine Zeile „Erstellt mit DietBuddy“ unten im Bild.',
+    showMark: 'DietBuddy-Hinweis zeigen',
+    watermark: 'Erstellt mit DietBuddy · dietbuddy.me',
     title: 'Wochen-Story',
     close: 'Schließen',
     intro: 'Deine letzten 7 Tage als Bild zum Teilen, wo du möchtest.',
@@ -1229,6 +1262,7 @@ export const de: Translation = {
     loadFailed: 'Dein Gespräch konnte nicht geladen werden.',
   },
   profile: {
+    invite: 'Freunde einladen, Premium erhalten',
     title: 'Profil',
     free: 'Kostenloser Plan',
     premium: 'Premium',
@@ -1373,7 +1407,7 @@ export const de: Translation = {
     continueFree: 'Kostenlos weiter',
     featureBodyScan: 'KI-Kamera-Körperscan aus zwei Fotos',
     featureTwin: 'Zeitleiste und Zielprognose deines digitalen Zwillings',
-    featureStory: 'Wochen-Story zum Teilen',
+    featureStory: 'Wochenrückblick ohne DietBuddy-Hinweis',
     ctaTrial: '{{days}} Tage kostenlos testen',
     ctaMonthly: 'Premium monatlich holen',
     ctaAnnual: 'Premium jährlich holen',

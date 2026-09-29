@@ -68,7 +68,7 @@ Premium removes ads and adds:
 • Restaurant mode: scan a menu and see the dishes that best fit your plan
 • Grocery AI: a weekly shopping list from your meal plans
 • AI insights and wellness insights
-• Before and after photo comparison, Digital Twin timeline and weekly story sharing
+• Before and after photo comparison, Digital Twin timeline and the weekly story without the DietBuddy mark
 • More food photo scans and priority support
 
 Premium is available as a monthly subscription with a 7-day free trial, or as an annual subscription. Prices are shown in the app before you buy. Payment is charged to your Apple Account at confirmation of purchase or when the free trial ends. The subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel it in your Apple Account settings.
@@ -107,7 +107,7 @@ Where to find things:
 - Account deletion: Profile > Privacy & Data > Delete account (type DELETE). Data export is on the same screen.
 - AI features (coach, meal plans, photo scans) use Anthropic's Claude on our servers. Calorie and nutrient numbers come from USDA FoodData Central and Open Food Facts, not from the AI.
 - Safety: calorie targets never go below 1,200/1,500 kcal or the user's BMR; the coach refuses extreme restriction and points to professional help.
-- Ads (free plan): Google AdMob, always non-personalised on iOS; no App Tracking Transparency prompt because we don't track.
+- Ads (free plan): Google AdMob. Personalised only when the user agrees in Google's consent form and then allows tracking in Apple's App Tracking Transparency prompt; otherwise non-personalised.
 - The app does not provide medical advice; disclaimers are shown in onboarding, the plan and the coach.
 ```
 
