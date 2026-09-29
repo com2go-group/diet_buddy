@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { addDays, dayKey } from '@/lib/dates';
 import { renderScreen } from '@/test/render';
@@ -45,9 +45,10 @@ describe('TomorrowPlan', () => {
     (loadMealPlan as jest.Mock).mockResolvedValue({ plan: null, unlockedSlots: [] });
     (generateMealPlan as jest.Mock).mockResolvedValue(plan);
     await renderScreen(<TomorrowPlan today={today} />);
-    await fireEvent.press(
-      await screen.findByRole('button', { name: 'Plan tomorrow' }, { timeout: 3000 }),
-    );
+    const button = await screen.findByRole('button', { name: 'Plan tomorrow' }, { timeout: 3000 });
+    // The button stays disabled until tomorrow's (empty) plan has loaded.
+    await waitFor(() => expect(button).toBeEnabled(), { timeout: 3000 });
+    await fireEvent.press(button);
     expect(generateMealPlan).toHaveBeenCalledWith(dayKey(addDays(today, 1)), false);
     expect(await screen.findByText(/Lentil curry/, {}, { timeout: 3000 })).toBeOnTheScreen();
     expect(screen.getByText('500 kcal')).toBeOnTheScreen();

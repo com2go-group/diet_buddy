@@ -9,23 +9,26 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 export function dayLabel(day: Date, now: Date): string {
   if (dayKey(day) === dayKey(now)) return t('meals.today');
   if (dayKey(day) === dayKey(addDays(now, -1))) return t('meals.yesterday');
+  if (dayKey(day) === dayKey(addDays(now, 1))) return t('meals.tomorrow');
   return day.toLocaleDateString(getLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
-/** Previous/next day switcher; the future is not reachable. */
+/** Previous/next day switcher; days after `maxDay` (default today) are not reachable. */
 export function DayNav({
   day,
   now,
+  maxDay = now,
   onChange,
 }: {
   day: Date;
   now: Date;
+  maxDay?: Date;
   onChange: (d: Date) => void;
 }) {
   const { colors } = useTheme();
-  const isToday = dayKey(day) === dayKey(now);
+  const atMax = dayKey(day) >= dayKey(maxDay);
   const arrow = (dir: -1 | 1) => {
-    const disabled = dir === 1 && isToday;
+    const disabled = dir === 1 && atMax;
     return (
       <Pressable
         accessibilityRole="button"

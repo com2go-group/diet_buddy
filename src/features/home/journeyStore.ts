@@ -14,10 +14,13 @@ interface JourneyState {
   checklistDismissed: Record<string, boolean>;
   /** When the plan check-in was last answered (updated or "not now"). */
   planReviewedAt: Record<string, string>;
+  /** The Meals tab's "how the plan works" hint was closed. */
+  mealsHintDismissed: Record<string, boolean>;
   onboarded: (userId: string, at?: Date) => void;
   welcomeOfferShown: (userId: string) => void;
   dismissChecklist: (userId: string) => void;
   planReviewed: (userId: string, at?: Date) => void;
+  dismissMealsHint: (userId: string) => void;
 }
 
 export const useJourneyStore = create<JourneyState>()(
@@ -27,6 +30,7 @@ export const useJourneyStore = create<JourneyState>()(
       welcomeOfferPending: {},
       checklistDismissed: {},
       planReviewedAt: {},
+      mealsHintDismissed: {},
       onboarded: (userId, at = new Date()) =>
         set((s) => ({
           onboardedAt: { ...s.onboardedAt, [userId]: at.toISOString() },
@@ -38,6 +42,8 @@ export const useJourneyStore = create<JourneyState>()(
         set((s) => ({ checklistDismissed: { ...s.checklistDismissed, [userId]: true } })),
       planReviewed: (userId, at = new Date()) =>
         set((s) => ({ planReviewedAt: { ...s.planReviewedAt, [userId]: at.toISOString() } })),
+      dismissMealsHint: (userId) =>
+        set((s) => ({ mealsHintDismissed: { ...s.mealsHintDismissed, [userId]: true } })),
     }),
     { name: 'journey', storage: createJSONStorage(() => AsyncStorage) },
   ),

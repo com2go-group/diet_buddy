@@ -18,8 +18,9 @@ appId: com.com2go.dietbuddy
 - inputText: '20'
 - hideKeyboard
 - tapOn: 'Add to Snack'
-# The sheet closes back to the previous screen; check the entry on the Meals tab.
+# The sheet closes back to the previous screen; the entry shows in the Snack card of the day.
 - tapOn:
     id: 'Meals'
-- tapOn: 'Snack'
+- scrollUntilVisible:
+    element: 'Protein bar.*'
 - assertVisible: 'Protein bar.*'

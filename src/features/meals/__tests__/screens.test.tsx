@@ -73,33 +73,41 @@ beforeEach(() => {
 });
 
 describe('MealsScreen', () => {
-  it('shows the day’s totals and the chosen meal’s items', async () => {
+  it('shows the day’s totals and every meal with its food, in one timeline', async () => {
     await renderScreen(<MealsScreen />);
     expect(await screen.findByText('610 / 2,000 kcal')).toBeOnTheScreen();
     expect(screen.getByText('1,390 kcal')).toBeOnTheScreen(); // remaining
-    await fireEvent.press(screen.getByRole('tab', { name: /Breakfast/ }));
     expect(screen.getByText('Oats')).toBeOnTheScreen();
+    expect(screen.getByText('Chicken salad')).toBeOnTheScreen();
     expect(screen.getByText('190 of 500 kcal')).toBeOnTheScreen();
     expect(screen.getByText('· 50 g')).toBeOnTheScreen();
+    expect(screen.queryByRole('tab')).toBeNull();
   });
 
   it('deletes an item', async () => {
     await renderScreen(<MealsScreen />);
-    await fireEvent.press(await screen.findByRole('tab', { name: /Breakfast/ }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Delete Oats' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Delete Oats' }));
     await waitFor(() => expect(deleteFoodLog).toHaveBeenCalledWith('l1'));
   });
 
   it('shows an empty meal and opens logging for it', async () => {
     await renderScreen(<MealsScreen />);
-    await fireEvent.press(await screen.findByRole('tab', { name: 'Dinner' }));
-    expect(screen.getByText('Nothing logged yet')).toBeOnTheScreen();
-    expect(screen.getByText('Target: 700 kcal')).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: '+ Add food' }));
+    expect(await screen.findByText('Nothing logged yet · Target: 700 kcal')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Add food to Dinner' }));
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/log-food',
       params: expect.objectContaining({ slot: 'dinner' }),
     });
+  });
+
+  it('shows tomorrow’s plan one day to the right, and no further', async () => {
+    await renderScreen(<MealsScreen />);
+    await screen.findByText('610 / 2,000 kcal');
+    await fireEvent.press(screen.getByRole('button', { name: 'Next day' }));
+    expect(await screen.findByText('🌙 Tomorrow’s plan')).toBeOnTheScreen();
+    expect(screen.getByText('Tomorrow')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Log Food' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Next day' })).toBeDisabled();
   });
 
   it('shows an error state', async () => {
