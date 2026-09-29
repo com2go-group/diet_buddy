@@ -1330,7 +1330,7 @@ export const en = {
     support: 'Support',
     help: 'Help & FAQ',
     rate: 'Rate DietBuddy',
-    rateSoon: 'Rating opens the App Store or Google Play once DietBuddy is published.',
+    rateSoon: 'Rate DietBuddy in the App Store or Google Play app on your phone. Thank you!',
     terms: 'Terms of Service',
     privacyPolicy: 'Privacy Policy',
     website: 'Website',

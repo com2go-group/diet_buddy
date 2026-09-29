@@ -22,6 +22,7 @@ import { ProfileHeader } from './components/ProfileHeader';
 import { ProfileInfoSheet, type ProfileInfo } from './components/ProfileInfoSheet';
 import { SettingsRow, SettingsSection } from './components/Settings';
 import { minCalories } from './goals';
+import { openStoreReview } from './rate';
 import { useAdPrivacyOptions } from '../ads';
 import { useHealthStore } from '../health/useHealth';
 import { usePaywall } from '../subscriptions/usePaywall';
@@ -197,7 +198,13 @@ export function ProfileScreen() {
             label={t('profile.help')}
             onPress={() => router.push('/help')}
           />
-          <SettingsRow icon="star" label={t('profile.rate')} onPress={() => setInfo('rate')} />
+          <SettingsRow
+            icon="star"
+            label={t('profile.rate')}
+            onPress={async () => {
+              if (!(await openStoreReview())) setInfo('rate');
+            }}
+          />
           <SettingsRow
             icon="file-text"
             label={t('profile.terms')}
