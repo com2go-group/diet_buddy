@@ -24,6 +24,8 @@ const aiMeal = (maxIngredients: number) =>
     title: z.string().trim().min(3).max(80),
     description: z.string().trim().max(200).default(''),
     ingredients: z.array(aiItem).min(1).max(maxIngredients),
+    steps: z.array(z.string().trim().min(3).max(200)).max(6).default([]),
+    prep_minutes: z.number().int().min(1).max(180).optional(),
   });
 export const aiPlanSchema = z.object({
   meals: z.object({
@@ -53,6 +55,28 @@ export interface PlannedItem {
 export interface Dish {
   title: string;
   description: string;
+  /** Short recipe steps (version 3 plans). */
+  steps?: string[];
+  prepMinutes?: number;
+}
+
+/**
+ * Recipe steps as shown: amounts are removed (portions are listed with the ingredients and adapt
+ * during the day) and steps that talk about calories are dropped (numbers come from USDA only).
+ */
+export function cleanSteps(steps: string[]): string[] {
+  return steps
+    .filter((s) => !/\b(k?cal|calories?|kilojoules?|kj)\b/i.test(s))
+    .map((s) =>
+      s
+        .replace(
+          /\b\d+(?:[.,]\d+)?\s*(?:g|grams?|kg|ml|millilit(?:er|re)s?|oz|ounces?)\b\s*(?:of\s+)?/gi,
+          '',
+        )
+        .replace(/\s{2,}/g, ' ')
+        .trim(),
+    )
+    .filter((s) => s.length >= 3);
 }
 
 export interface MealPlan {

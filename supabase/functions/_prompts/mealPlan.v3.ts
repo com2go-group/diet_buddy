@@ -1,12 +1,12 @@
 /**
- * Meal plan prompt, version 2: each meal is one complete dish (a title, a line on how to put it
- * together and its ingredients). The model only chooses dishes, ingredients and portions; every
+ * Meal plan prompt, version 3: each meal is one complete dish (a title, a one-line summary, its
+ * ingredients, and short recipe steps with a preparation time). The model only chooses dishes, ingredients and portions; every
  * calorie and macro number is looked up in USDA FoodData Central afterwards (CLAUDE.md §9), and
  * dish names and ingredients are checked against the user's allergies and restrictions in code
  * (dietRules.ts).
  */
 
-export const MEAL_PLAN_PROMPT_VERSION = 'mealPlan.v2';
+export const MEAL_PLAN_PROMPT_VERSION = 'mealPlan.v3';
 
 type Slot = 'breakfast' | 'lunch' | 'snack' | 'dinner';
 
@@ -31,13 +31,15 @@ function requirements(input: MealPlanPromptInput): string {
 
 const MEAL_RULES = `Rules:
 - Each meal is one complete, appetising dish or plate that people really eat, with a clear title, e.g. "Greek yogurt bowl with berries and oats", "Chicken, rice and roasted vegetables", "Lentil and spinach curry with brown rice". A snack can be simple, e.g. "Apple with cottage cheese".
-- The description is one short sentence on how to put it together (no full recipe, no health claims).
+- The description is one short sentence summing up the dish (no health claims).
+- Steps: 2–6 short, clear recipe steps (a simple snack may have 1). Refer to ingredients by name only, never with amounts or grams (portions are shown separately and may change), and never mention calories. Only use ingredients from the list, plus water, salt, pepper, herbs and spices.
+- prep_minutes: realistic total time in minutes.
 - List 2–6 ingredients per meal (2–4 for a snack), each a single plain food with a short USDA search query (e.g. "oats rolled dry", "chicken breast roasted", "spinach cooked") and a portion in grams. Include oils or sauces that matter for calories.
 - Do not state calories or macros; they are looked up separately.
 - Balanced meals: a protein source, vegetables or fruit, and a sensible carbohydrate where the diet allows. No supplements, no alcohol.
 - When unsure whether a food fits the requirements, choose something else.`;
 
-const MEAL_JSON = `{"title":"...","description":"...","ingredients":[{"name":"...","usda_query":"...","grams":80}]}`;
+const MEAL_JSON = `{"title":"...","description":"...","ingredients":[{"name":"...","usda_query":"...","grams":80}],"steps":["...","..."],"prep_minutes":15}`;
 
 export function mealPlanSystemPrompt(input: MealPlanPromptInput): string {
   return `You are DietBuddy's meal planner. Plan one day of simple, realistic meals.

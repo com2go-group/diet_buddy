@@ -9,6 +9,7 @@ import type { Dish, PlannedItem } from '../mealPlanApi';
 import { mealTotals } from '../sequence';
 import { HiddenPlanItems } from './HiddenPlanItems';
 import { PlanItemRow } from './PlanItemRow';
+import { RecipeSteps } from './RecipeSteps';
 
 /**
  * A planned meal as a dish: its name, how to put it together, its ingredients and totals (USDA
@@ -43,6 +44,11 @@ export function MealCard({
           {dish.description}
         </Text>
       ) : null}
+      {dish.prepMinutes ? (
+        <Text variant="caption" tone="muted">
+          ⏱ {t('mealPlan.prepTime', { minutes: dish.prepMinutes })}
+        </Text>
+      ) : null}
       <Text variant="caption" className="font-semibold">
         {t('mealPlan.mealTotal', { kcal: formatNumber(total.kcal) })} ·{' '}
         <Text variant="caption" style={{ color: accentColor('green', scheme) }}>
@@ -56,6 +62,8 @@ export function MealCard({
         ))}
       </View>
       {hidden > 0 ? <HiddenPlanItems count={hidden} watching={watching} onWatch={onWatch} /> : null}
+      {/* The recipe names every ingredient, so it's revealed with them. */}
+      {!locked && dish.steps?.length ? <RecipeSteps steps={dish.steps} /> : null}
       {children}
     </View>
   );

@@ -155,6 +155,28 @@ describe('generate-meal-plan', () => {
     expect(plan.dishes.snack.title).toBe('Apple');
   });
 
+  it('keeps recipe steps without amounts or calories, and checks them for allergens', async () => {
+    const withSteps = (steps: string[]) => {
+      const json = JSON.parse(planJson(item('Apple', 'apple', 150)));
+      json.meals.snack.steps = steps;
+      json.meals.snack.prep_minutes = 5;
+      return JSON.stringify(json);
+    };
+    const { deps, requests } = setup({
+      prefs: { allergies: ['peanuts'] },
+      replies: [
+        withSteps(['Slice the apple.', 'Spread with peanut butter.']),
+        withSteps(['Slice 150 g of apple.', 'This snack has 80 kcal.', 'Enjoy with tea.']),
+      ],
+    });
+    const { plan } = await (await handleGenerateMealPlan(post(), deps)).json();
+    expect(requests[1]!.messages.at(-1)!.content).toContain('breaks allergy peanuts');
+    expect(plan.dishes.snack).toMatchObject({
+      steps: ['Slice apple.', 'Enjoy with tea.'],
+      prepMinutes: 5,
+    });
+  });
+
   it('rejects a plan with an allergen and regenerates with feedback', async () => {
     const { deps, requests, saved } = setup({
       prefs: { allergies: ['peanuts'] },

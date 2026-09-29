@@ -1539,6 +1539,8 @@ export const en = {
     privacy: 'Health data is never sold or used for ads.',
   },
   mealPlan: {
+    howTo: 'How to make it ({{count}} steps)',
+    prepTime: '{{minutes}} min',
     title: 'AI meal plan',
     createTitle: 'Your AI meal plan for today',
     regenerate: 'New plan',

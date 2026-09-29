@@ -215,6 +215,30 @@ describe('MealPlanSection', () => {
     });
   });
 
+  it('shows the recipe once the meal is revealed', async () => {
+    useStorePremium.setState({ premium: true });
+    (loadMealPlan as jest.Mock).mockResolvedValue({
+      plan: {
+        ...plan,
+        dishes: {
+          ...plan.dishes,
+          breakfast: {
+            title: 'Overnight oats with berries',
+            description: '',
+            steps: ['Mix the oats and yogurt.', 'Top with blueberries.'],
+            prepMinutes: 5,
+          },
+        },
+      },
+      unlockedSlots: [],
+    });
+    await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
+    expect(await screen.findByText('⏱ 5 min')).toBeOnTheScreen();
+    expect(screen.queryByText('Top with blueberries.')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'How to make it (2 steps)' }));
+    expect(screen.getByText('Top with blueberries.')).toBeOnTheScreen();
+  });
+
   it('swaps the dish for another idea', async () => {
     (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
     (mealPlanAction as jest.Mock).mockResolvedValue({

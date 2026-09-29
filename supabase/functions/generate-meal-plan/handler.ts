@@ -6,7 +6,7 @@ import {
   mealPlanSystemPrompt,
   retryFeedback,
   type MealPlanPromptInput,
-} from '../_prompts/mealPlan.v2.ts';
+} from '../_prompts/mealPlan.v3.ts';
 import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
 import { dayOffset } from '../_shared/dates.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
@@ -15,6 +15,7 @@ import type { FoodResult } from '../_shared/usda.ts';
 import {
   aiMealSchema,
   aiPlanSchema,
+  cleanSteps,
   pickFood,
   scaleSlot,
   SLOT_SHARE,
@@ -120,6 +121,17 @@ function makeLookup(deps: MealPlanDeps) {
 }
 type Lookup = ReturnType<typeof makeLookup>;
 
+/** The dish as stored and shown: title, summary, cleaned recipe steps and time. */
+export function dishFrom(meal: AiMeal): Dish {
+  const steps = cleanSteps(meal.steps);
+  return {
+    title: meal.title,
+    description: meal.description,
+    ...(steps.length ? { steps } : {}),
+    ...(meal.prep_minutes ? { prepMinutes: meal.prep_minutes } : {}),
+  };
+}
+
 /** Ingredients → USDA foods, plus the problems to feed back to the model. */
 async function resolveMeal(
   slot: Slot,
@@ -137,7 +149,7 @@ async function resolveMeal(
   // The dish name and description are checked too (e.g. "Satay chicken" for a peanut allergy).
   const violations = findViolations(
     [
-      { slot, name: meal.title, source: meal.description },
+      { slot, name: meal.title, source: [meal.description, ...meal.steps].join(' ') },
       ...resolved.map((i) => ({ slot, name: i.name, source: i.food.name })),
     ],
     prefs,
@@ -298,10 +310,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
           SLOTS.map((s) => [s, scaleSlot(resolved[s], input.slotCalories[s])]),
         ) as Record<Slot, PlannedItem[]>;
         const dishes = Object.fromEntries(
-          SLOTS.map((s) => [
-            s,
-            { title: ai.data.meals[s].title, description: ai.data.meals[s].description },
-          ]),
+          SLOTS.map((s) => [s, dishFrom(ai.data.meals[s])]),
         ) as Record<Slot, Dish>;
         return { value: { slots, dishes } };
       },
@@ -375,7 +384,7 @@ async function alternative(
       return {
         value: {
           items: scaleSlot(meal.resolved, input.slotCalories[slot]),
-          dish: { title: ai.data.meal.title, description: ai.data.meal.description },
+          dish: dishFrom(ai.data.meal),
         },
       };
     },

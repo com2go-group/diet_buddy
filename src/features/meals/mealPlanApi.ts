@@ -19,6 +19,9 @@ export interface PlannedItem {
 export interface Dish {
   title: string;
   description: string;
+  /** Short recipe steps, without amounts (newer plans). */
+  steps?: string[];
+  prepMinutes?: number;
 }
 
 export interface MealPlan {
