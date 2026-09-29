@@ -11,6 +11,7 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import { NotificationBell } from '../notifications';
+import { OfflineBanner } from '../offline';
 import { CopyYesterday } from './components/CopyYesterday';
 import { DayNav, dayLabel } from './components/DayNav';
 import { FoodLogRow } from './components/FoodLogRow';
@@ -194,6 +195,7 @@ export function MealsScreen() {
           </View>
         </View>
         <DayNav day={day} now={now} onChange={setDay} />
+        <OfflineBanner />
         {body()}
       </ScrollView>
     </SafeAreaView>

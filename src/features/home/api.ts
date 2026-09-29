@@ -41,8 +41,13 @@ export async function loadHome(userId: string, now: Date): Promise<HomeData> {
   };
 }
 
-export async function addGlass(userId: string): Promise<void> {
-  optional(await supabase.from('water_logs').insert({ user_id: userId, ml: GLASS_ML }));
+/** A glass of water, now or at the time it was logged offline. */
+export async function addGlass(userId: string, at?: Date, ml = GLASS_ML): Promise<void> {
+  optional(
+    await supabase
+      .from('water_logs')
+      .insert({ user_id: userId, ml, ...(at ? { logged_at: at.toISOString() } : {}) }),
+  );
 }
 
 export async function removeWaterLog(id: string): Promise<void> {

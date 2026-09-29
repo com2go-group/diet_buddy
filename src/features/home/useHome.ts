@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { haptics } from '@/lib/haptics';
+import { isNetworkError, useOfflineQueue } from '@/lib/offline/queue';
 
 import { useSessionStore } from '../auth/sessionStore';
 import { mirrorToHealth } from '../health/useHealth';
@@ -37,7 +38,18 @@ export function useHome() {
     ]);
 
   const add = useMutation({
-    mutationFn: () => addGlass(userId!),
+    mutationFn: async () => {
+      const at = new Date();
+      try {
+        await addGlass(userId!, at);
+      } catch (e) {
+        // Offline: keep the glass on this phone and send it later.
+        if (!isNetworkError(e)) throw e;
+        useOfflineQueue
+          .getState()
+          .add({ kind: 'water', userId: userId!, loggedAt: at.toISOString(), ml: GLASS_ML });
+      }
+    },
     onMutate: optimistic((d) => ({
       ...d,
       water: [

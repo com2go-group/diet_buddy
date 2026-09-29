@@ -1645,6 +1645,9 @@ export const en = {
     log: 'Log what you’ve eaten today so your plan can keep up with you.',
     praise: 'Nice work today. Small steps like these add up, keep going!',
   },
+  offline: {
+    pending: 'Saved on your phone ({{count}}). It will sync when you’re back online.',
+  },
   checklist: {
     title: 'Your first steps',
     doneTitle: 'All set! 🎉',

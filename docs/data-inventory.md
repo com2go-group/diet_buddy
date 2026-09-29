@@ -68,3 +68,5 @@ Health stores (when the user connects Apple Health or Health Connect): weight sa
 Not collected: precise location, contacts, analytics and crash data (PostHog/Sentry, later).
 
 Store forms built from this file: `docs/store/apple-app-privacy.md` and `docs/store/google-data-safety.md`. Update them together.
+
+Offline logging: when there is no connection, food and water entries are kept on the device (AsyncStorage key `offline-queue`) with their user ID and time, and sent to Supabase when the app is online again. Nothing else is stored; the queue is cleared on sign-out.

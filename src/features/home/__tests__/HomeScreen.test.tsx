@@ -91,7 +91,7 @@ describe('HomeScreen', () => {
     await fireEvent.press(
       screen.getAllByRole('button', { name: 'Add a glass of water (250 ml)' })[0]!,
     );
-    await waitFor(() => expect(addGlass).toHaveBeenCalledWith('user-1'));
+    await waitFor(() => expect(addGlass).toHaveBeenCalledWith('user-1', expect.any(Date)));
     await waitFor(() => expect(loadHome).toHaveBeenCalledTimes(2));
     await fireEvent.press(screen.getByRole('button', { name: 'Remove the last glass of water' }));
     await waitFor(() => expect(removeWaterLog).toHaveBeenCalledWith('w1'));

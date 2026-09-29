@@ -30,6 +30,7 @@ import { ONBOARDING_ROUTES, useAppRoute } from '@/features/account';
 import { UpdateRequired, useUpdateRequired } from '@/features/config';
 import { useAdsSetup } from '@/features/ads';
 import { useHealthSync } from '@/features/health';
+import { useOfflineSync } from '@/features/offline';
 import { usePushSetup } from '@/features/notifications/usePush';
 import { usePurchasesSetup } from '@/features/subscriptions';
 import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
@@ -161,5 +162,6 @@ function SignedInServices() {
   useAdsSetup();
   usePushSetup();
   useHealthSync();
+  useOfflineSync();
   return null;
 }

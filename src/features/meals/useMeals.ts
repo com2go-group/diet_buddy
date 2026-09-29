@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { dayKey } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
+import { isNetworkError, useOfflineQueue } from '@/lib/offline/queue';
 
 import { useSessionStore } from '../auth/sessionStore';
 import {
@@ -60,11 +61,34 @@ export function useMealsDay(day: Date) {
   return { query, remove };
 }
 
+/**
+ * Logs foods in order. Without a connection the rest are kept on this phone and sent later
+ * (offline queue), keeping the time they were logged; other errors fail as before.
+ */
+export async function logOrQueue(userId: string, entries: NewFoodLog[]): Promise<void> {
+  for (const [i, entry] of entries.entries()) {
+    try {
+      await logFood(userId, entry);
+    } catch (e) {
+      if (!isNetworkError(e)) throw e;
+      const queue = useOfflineQueue.getState();
+      for (const rest of entries.slice(i)) {
+        queue.add({
+          kind: 'food',
+          userId,
+          entry: { ...rest, loggedAt: rest.loggedAt.toISOString() },
+        });
+      }
+      return;
+    }
+  }
+}
+
 export function useLogFood() {
   const userId = useSessionStore((s) => s.session?.user.id);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (entry: NewFoodLog) => logFood(userId!, entry),
+    mutationFn: (entry: NewFoodLog) => logOrQueue(userId!, [entry]),
     onSuccess: () => haptics.success(),
     onSettled: () => invalidateFood(queryClient),
   });
@@ -75,9 +99,7 @@ export function useLogFoods() {
   const userId = useSessionStore((s) => s.session?.user.id);
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (entries: NewFoodLog[]) => {
-      for (const entry of entries) await logFood(userId!, entry);
-    },
+    mutationFn: (entries: NewFoodLog[]) => logOrQueue(userId!, entries),
     onSuccess: () => haptics.success(),
     onSettled: () => invalidateFood(queryClient),
   });

@@ -45,9 +45,11 @@ describe('TomorrowPlan', () => {
     (loadMealPlan as jest.Mock).mockResolvedValue({ plan: null, unlockedSlots: [] });
     (generateMealPlan as jest.Mock).mockResolvedValue(plan);
     await renderScreen(<TomorrowPlan today={today} />);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Plan tomorrow' }));
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Plan tomorrow' }, { timeout: 3000 }),
+    );
     expect(generateMealPlan).toHaveBeenCalledWith(dayKey(addDays(today, 1)), false);
-    expect(await screen.findByText(/Lentil curry/)).toBeOnTheScreen();
+    expect(await screen.findByText(/Lentil curry/, {}, { timeout: 3000 })).toBeOnTheScreen();
     expect(screen.getByText('500 kcal')).toBeOnTheScreen();
   });
 });

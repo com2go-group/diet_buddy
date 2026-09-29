@@ -11,6 +11,7 @@ import { purchasesAvailable } from '@/lib/purchases';
 import { useTheme } from '@/theme';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { OfflineBanner } from '../offline';
 import { PlanCheckCard } from '../planReview/PlanCheckCard';
 import { openPaywall } from '../subscriptions/paywallRoute';
 import { usePremium } from '../subscriptions/usePremium';
@@ -90,6 +91,7 @@ export function HomeScreen() {
     return (
       <>
         <HomeHeader name={profile.name ?? ''} now={now} />
+        <OfflineBanner />
         {userId ? (
           <FirstDayChecklist userId={userId} data={query.data} now={now} onAddGlass={addGlass} />
         ) : null}
