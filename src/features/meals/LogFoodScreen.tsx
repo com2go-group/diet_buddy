@@ -9,6 +9,7 @@ import { t } from '@/i18n';
 import { parseDayKey } from '@/lib/dates';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
+import { FavoriteToggle } from './components/FavoriteToggle';
 import { ManualForm } from './components/ManualForm';
 import { useFeature } from '../config';
 import { PhotoPanel } from './components/PhotoPanel';
@@ -68,6 +69,7 @@ export function LogFoodScreen() {
       >
         <ScrollView contentContainerClassName="px-5 pb-8" keyboardShouldPersistTaps="handled">
           <SlotTabs value={slot} onChange={setSlot} />
+          {picked ? <FavoriteToggle food={picked} /> : null}
           {picked ? (
             <PortionPanel
               food={picked}

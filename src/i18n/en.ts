@@ -666,6 +666,8 @@ export const en = {
     sun: 'Sun',
   },
   meals: {
+    sameAsYesterday: 'Same as yesterday ({{count}} items · {{kcal}} kcal)',
+    copyFailed: 'We couldn’t copy yesterday’s meal. Try again.',
     title: 'Meals',
     logFood: 'Log Food',
     caloriesToday: 'Calories Today',
@@ -689,6 +691,10 @@ export const en = {
     macroShort: 'P: {{p}}g · C: {{c}}g · F: {{f}}g',
   },
   logFood: {
+    favorites: 'Favourites',
+    favorite: 'Favourite',
+    favoriteOn: 'In your favourites',
+    favoriteOff: 'Add to favourites',
     title: 'Log Food',
     close: 'Close',
     back: 'Back to search',

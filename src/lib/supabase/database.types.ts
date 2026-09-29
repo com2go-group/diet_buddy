@@ -511,6 +511,39 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_foods: {
+        Row: {
+          created_at: string
+          food: Json
+          food_key: string | null
+          food_ref: string | null
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          food: Json
+          food_key?: string | null
+          food_ref?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          food?: Json
+          food_key?: string | null
+          food_ref?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       food_logs: {
         Row: {
           calories: number

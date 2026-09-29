@@ -11,6 +11,7 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import { NotificationBell } from '../notifications';
+import { CopyYesterday } from './components/CopyYesterday';
 import { DayNav, dayLabel } from './components/DayNav';
 import { FoodLogRow } from './components/FoodLogRow';
 import { MealPlanSection } from './components/MealPlanSection';
@@ -139,18 +140,21 @@ export function MealsScreen() {
             ))}
           </View>
         ) : (
-          <View className="mb-4 rounded-2xl border border-dashed border-border bg-card">
-            <EmptyState
-              emoji={SLOT_EMOJI[slot]}
-              title={t('meals.empty')}
-              message={
-                target === null
-                  ? undefined
-                  : t('meals.emptyTarget', { target: formatNumber(target) })
-              }
-              actionLabel={t('meals.addFood')}
-              onAction={() => openLog(slot)}
-            />
+          <View className="mb-4 gap-2">
+            <CopyYesterday day={day} slot={slot} />
+            <View className="rounded-2xl border border-dashed border-border bg-card">
+              <EmptyState
+                emoji={SLOT_EMOJI[slot]}
+                title={t('meals.empty')}
+                message={
+                  target === null
+                    ? undefined
+                    : t('meals.emptyTarget', { target: formatNumber(target) })
+                }
+                actionLabel={t('meals.addFood')}
+                onAction={() => openLog(slot)}
+              />
+            </View>
           </View>
         )}
         <FormMessage message={remove.isError ? t('meals.deleteFailed') : undefined} />

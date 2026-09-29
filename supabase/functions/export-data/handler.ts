@@ -25,6 +25,7 @@ export const EXPORT_TABLES = [
   'xp_events',
   'ai_insights',
   'wellness_insights',
+  'favorite_foods',
   'grocery_lists',
   'safety_events',
   'support_tickets',

@@ -8,6 +8,7 @@ import { useTheme } from '@/theme';
 
 import { FoodSearchError } from '../api';
 import type { FoodResult, PortionFood } from '../types';
+import { useFavorites } from '../favorites';
 import { useFoodSearch, useRecentFoods } from '../useMeals';
 import { useFeature } from '../../config';
 import { BarcodeScanner } from './BarcodeScanner';
@@ -35,6 +36,7 @@ export function SearchPanel({ onPick }: { onPick: (food: PortionFood) => void })
   const barcodeOn = useFeature('barcode');
   const search = useFoodSearch(text);
   const recent = useRecentFoods();
+  const favorites = useFavorites().query;
 
   const results = () => {
     if (search.pending) return <SkeletonCard lines={4} />;
@@ -120,11 +122,21 @@ export function SearchPanel({ onPick }: { onPick: (food: PortionFood) => void })
       {search.enabled ? (
         results()
       ) : (
-        <View className="gap-2">
-          <Text variant="label" accessibilityRole="header" className="font-bold">
-            {t('logFood.recent')}
-          </Text>
-          {recentList()}
+        <View className="gap-4">
+          {favorites.data?.length ? (
+            <View className="gap-2">
+              <Text variant="label" accessibilityRole="header" className="font-bold">
+                ⭐ {t('logFood.favorites')}
+              </Text>
+              <FoodList foods={favorites.data.map((f) => f.food)} onPick={onPick} />
+            </View>
+          ) : null}
+          <View className="gap-2">
+            <Text variant="label" accessibilityRole="header" className="font-bold">
+              {t('logFood.recent')}
+            </Text>
+            {recentList()}
+          </View>
         </View>
       )}
     </View>
