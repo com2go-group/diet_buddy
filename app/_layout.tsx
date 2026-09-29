@@ -36,6 +36,7 @@ import { usePushSetup } from '@/features/notifications/usePush';
 import { usePurchasesSetup } from '@/features/subscriptions';
 import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
 import { t } from '@/i18n';
+import { useLanguageStore } from '@/i18n/languageStore';
 import { queryClient } from '@/lib/query/queryClient';
 import { initCrashReporting } from '@/lib/telemetry';
 import { palette, useApplyThemePreference, useTheme } from '@/theme';
@@ -79,6 +80,8 @@ export default function RootLayout() {
 
   useEffect(() => startSessionListener(), []);
   const { session, initialized } = useSessionStore();
+  // Changing the language re-renders every screen with the new strings.
+  const language = useLanguageStore((s) => s.language);
   const ready = (fontsLoaded || Boolean(fontError)) && initialized;
 
   useEffect(() => {
@@ -93,7 +96,7 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider value={navigationTheme(scheme)}>
             <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-            <RootNavigator signedIn={session !== null} />
+            <RootNavigator key={language} signedIn={session !== null} />
           </ThemeProvider>
         </QueryClientProvider>
       </SafeAreaProvider>

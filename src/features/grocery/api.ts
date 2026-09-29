@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { optional, supabase } from '@/lib/supabase';
 
 import type { MealPlan } from '../meals/mealPlanApi';
+import { getLanguage } from '@/i18n';
 
 export const AISLES = [
   'produce',
@@ -103,7 +104,7 @@ export async function generateGroceryList(
   regenerate: boolean,
 ): Promise<GroceryList> {
   const { data, error } = await supabase.functions.invoke('generate-grocery-list', {
-    body: { startDate, regenerate },
+    body: { startDate, regenerate, language: getLanguage() },
   });
   if (error) {
     let code: GroceryErrorCode = 'failed';

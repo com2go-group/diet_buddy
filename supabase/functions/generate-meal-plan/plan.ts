@@ -54,6 +54,8 @@ export interface PlannedItem {
 
 export interface Dish {
   title: string;
+  /** The English title the dish was checked and generated under, when `title` is translated. */
+  sourceTitle?: string;
   description: string;
   /** Short recipe steps (version 3 plans). */
   steps?: string[];

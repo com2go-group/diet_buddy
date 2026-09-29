@@ -5,7 +5,8 @@ import { Linking, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, ErrorState, SkeletonCard, Text } from '@/components';
-import { t } from '@/i18n';
+import { LANGUAGE_NAMES, LANGUAGES, t } from '@/i18n';
+import { useLanguageStore, type LanguagePreference } from '@/i18n/languageStore';
 import { formatDecimal, formatLongDate, formatNumber, formatWeight } from '@/lib/format';
 import { parseDayKey } from '@/lib/dates';
 import { siteLinks } from '@/lib/site';
@@ -40,7 +41,8 @@ export function ProfileScreen() {
   const adPrivacy = useAdPrivacyOptions();
   const healthConnected = useHealthStore((s) => s.connected);
   const { available: purchasesOn, restore } = usePaywall();
-  const [sheet, setSheet] = useState<'theme' | 'units' | null>(null);
+  const [sheet, setSheet] = useState<'theme' | 'units' | 'language' | null>(null);
+  const { preference: languagePref, setPreference: setLanguagePref } = useLanguageStore();
   const [edit, setEdit] = useState<GoalEdit | null>(null);
   const [info, setInfo] = useState<ProfileInfo>(null);
   const [signingOut, setSigningOut] = useState(false);
@@ -110,6 +112,14 @@ export function ProfileScreen() {
             label={t('profile.appearance')}
             value={t(`profile.theme_${preference}`)}
             onPress={() => setSheet('theme')}
+          />
+          <SettingsRow
+            icon="globe"
+            label={t('profile.language')}
+            value={
+              languagePref === 'system' ? t('profile.theme_system') : LANGUAGE_NAMES[languagePref]
+            }
+            onPress={() => setSheet('language')}
           />
           <SettingsRow
             icon="sliders"
@@ -266,6 +276,17 @@ export function ProfileScreen() {
             label: t(`profile.theme_${v}`),
           }))}
           onChoose={setPreference}
+          onClose={() => setSheet(null)}
+        />
+        <ChoiceSheet<LanguagePreference>
+          title={t('profile.language')}
+          visible={sheet === 'language'}
+          value={languagePref}
+          options={[
+            { value: 'system', label: t('profile.theme_system') },
+            ...LANGUAGES.map((l) => ({ value: l, label: LANGUAGE_NAMES[l] })),
+          ]}
+          onChoose={setLanguagePref}
           onClose={() => setSheet(null)}
         />
         <ChoiceSheet

@@ -75,4 +75,35 @@ describe('food-search handler', () => {
     });
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('*');
   });
+
+  it('turns a search in another language into English for USDA', async () => {
+    const fetchFn = jest.fn(async () => new Response(JSON.stringify({ foods: [] })));
+    const llm = {
+      complete: jest.fn(async () => ({
+        text: '{"t": ["chicken breast"]}',
+        model: 'm',
+        inputTokens: 1,
+        outputTokens: 1,
+      })),
+    };
+    await handleFoodSearch(post({ query: 'Hähnchenbrust', language: 'de' }), {
+      apiKey: 'k',
+      fetch: fetchFn as unknown as typeof fetch,
+      llm,
+    });
+    expect(llm.complete).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchFn.mock.calls[0] as unknown as [string, RequestInit | undefined];
+    expect(`${url} ${String(init?.body ?? '')}`).toContain('chicken');
+  });
+
+  it('searches English queries as typed, without a model call', async () => {
+    const fetchFn = jest.fn(async () => new Response(JSON.stringify({ foods: [] })));
+    const llm = { complete: jest.fn() };
+    await handleFoodSearch(post({ query: 'banana', language: 'en' }), {
+      apiKey: 'k',
+      fetch: fetchFn as unknown as typeof fetch,
+      llm,
+    });
+    expect(llm.complete).not.toHaveBeenCalled();
+  });
 });

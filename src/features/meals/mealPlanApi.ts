@@ -3,6 +3,7 @@ import { FunctionsHttpError } from '@supabase/supabase-js';
 import { optional, supabase } from '@/lib/supabase';
 
 import type { MealSlot } from './types';
+import { getLanguage } from '@/i18n';
 
 /** Mirrors MealPlan in supabase/functions/generate-meal-plan/plan.ts. */
 export interface PlannedItem {
@@ -112,7 +113,9 @@ export function mealPlanAction(
 }
 
 async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
-  const { data, error } = await supabase.functions.invoke('generate-meal-plan', { body });
+  const { data, error } = await supabase.functions.invoke('generate-meal-plan', {
+    body: { ...body, language: getLanguage() },
+  });
   if (error) {
     let code: MealPlanErrorCode = 'failed';
     if (error instanceof FunctionsHttpError) {

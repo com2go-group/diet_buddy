@@ -10,6 +10,7 @@ import {
 import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
 import { dayOffset } from '../_shared/dates.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import { languageField, translateTexts, type Language } from '../_shared/language.ts';
 import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
 import type { FoodResult } from '../_shared/usda.ts';
 import {
@@ -63,6 +64,8 @@ const requestSchema = z.object({
   /** plan (default): the day's plan. alternative: another idea for one meal. skip/unskip. */
   action: z.enum(['plan', 'alternative', 'skip', 'unskip']).optional(),
   slot: z.enum(SLOTS).optional(),
+  /** The app's language: dish text and ingredient names are translated after the checks. */
+  language: languageField,
 });
 
 export const MAX_ATTEMPTS = 3;
@@ -107,6 +110,50 @@ export function dishesOf(plan: MealPlan): Record<Slot, Dish> {
 }
 
 type Resolved = { name: string; food: FoodResult; grams: number }[];
+
+/**
+ * Translates what the user reads (dish title, description, steps, ingredient names) once the
+ * plan has passed the diet checks in English. The English title is kept for de-duplication.
+ */
+async function localize(
+  deps: MealPlanDeps,
+  userId: string,
+  meals: { dish: Dish; items: PlannedItem[] }[],
+  language: Language | undefined,
+): Promise<{ dish: Dish; items: PlannedItem[] }[]> {
+  const texts = meals.flatMap(({ dish, items }) => [
+    dish.title,
+    dish.description,
+    ...(dish.steps ?? []),
+    ...items.map((i) => i.name),
+  ]);
+  const out = await translateTexts(deps.llm, texts, language);
+  if (out.usage) {
+    const u = out.usage;
+    await deps.store.logUsage(userId, u.model, u.inputTokens, u.outputTokens);
+  }
+  if (out.texts === texts) return meals;
+  let i = 0;
+  const next = () => out.texts[i++]!;
+  return meals.map(({ dish, items }) => {
+    const title = next();
+    const description = next();
+    const steps = dish.steps?.map(() => next());
+    return {
+      dish: {
+        ...dish,
+        title,
+        description,
+        ...(steps ? { steps } : {}),
+        sourceTitle: dish.sourceTitle ?? dish.title,
+      },
+      items: items.map((item) => ({ ...item, name: next() })),
+    };
+  });
+}
+
+/** The English title of a dish (what the model and the duplicate check see). */
+const englishTitle = (dish: Dish) => dish.sourceTitle ?? dish.title;
 
 /** USDA lookups for one request, remembering whether the food database itself failed. */
 function makeLookup(deps: MealPlanDeps) {
@@ -258,7 +305,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
     ) {
       return fail('invalid_request', 400);
     }
-    const { date, regenerate = false, action = 'plan', slot } = parsed.data;
+    const { date, regenerate = false, action = 'plan', slot, language } = parsed.data;
     const { store } = deps;
     const existing = await store.existing(userId, date);
 
@@ -274,7 +321,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
         await store.save(userId, date, plan, existing.regenerations);
         return json({ plan });
       }
-      return await alternative(deps, userId, date, slot, existing, now);
+      return await alternative(deps, userId, date, slot, existing, now, language);
     }
 
     if (existing && !regenerate) return json({ plan: existing.plan });
@@ -323,12 +370,26 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
     );
     if ('response' in result) return result.response;
 
+    const local = await localize(
+      deps,
+      userId,
+      SLOTS.map((s) => ({ dish: result.value.dishes[s], items: result.value.slots[s] })),
+      language,
+    );
+    const slots = Object.fromEntries(SLOTS.map((s, i) => [s, local[i]!.items])) as Record<
+      Slot,
+      PlannedItem[]
+    >;
+    const dishes = Object.fromEntries(SLOTS.map((s, i) => [s, local[i]!.dish])) as Record<
+      Slot,
+      Dish
+    >;
     const plan: MealPlan = {
       version: 2,
       date,
-      slots: result.value.slots,
-      dishes: result.value.dishes,
-      totals: totals(result.value.slots),
+      slots,
+      dishes,
+      totals: totals(slots),
       targets: { kcal: ctx.targets.calories, proteinG: ctx.targets.proteinG },
       promptVersion: MEAL_PLAN_PROMPT_VERSION,
       model: result.model,
@@ -352,6 +413,7 @@ async function alternative(
   slot: Slot,
   existing: StoredPlan,
   now: Date,
+  language: Language | undefined,
 ): Promise<Response> {
   const ctx = await deps.store.context(userId);
   if (!ctx.targets) return fail('no_targets', 409);
@@ -369,7 +431,7 @@ async function alternative(
   const dishes = dishesOf(existing.plan);
   const rejected = existing.plan.rejected ?? {};
   const avoidTitles = [
-    ...new Set([...(rejected[slot] ?? []), ...SLOTS.map((s) => dishes[s].title)]),
+    ...new Set([...(rejected[slot] ?? []), ...SLOTS.map((s) => englishTitle(dishes[s]))]),
   ];
   const input = promptInput(ctx);
   const lookup = makeLookup(deps);
@@ -397,14 +459,15 @@ async function alternative(
   );
   if ('response' in result) return result.response;
 
-  const slots = { ...existing.plan.slots, [slot]: result.value.items };
+  const [local] = await localize(deps, userId, [result.value], language);
+  const slots = { ...existing.plan.slots, [slot]: local!.items };
   const plan: MealPlan = {
     ...existing.plan,
     version: 2,
     slots,
-    dishes: { ...dishes, [slot]: result.value.dish },
+    dishes: { ...dishes, [slot]: local!.dish },
     totals: totals(slots),
-    rejected: { ...rejected, [slot]: [...(rejected[slot] ?? []), dishes[slot].title] },
+    rejected: { ...rejected, [slot]: [...(rejected[slot] ?? []), englishTitle(dishes[slot])] },
     skipped: (existing.plan.skipped ?? []).filter((s) => s !== slot),
     alternatives: used + 1,
   };

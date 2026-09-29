@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
 import { ProgressBar, Text } from '@/components';
-import { t } from '@/i18n';
+import { getLocale, t } from '@/i18n';
 import { formatDecimal, formatNumber } from '@/lib/format';
 import { accentColor, useTheme } from '@/theme';
 
@@ -37,7 +37,7 @@ export function AchievementsTab({ achievements }: { achievements: AchievementVie
               accessibilityLabel={`${a.title}. ${a.description}. ${
                 done
                   ? t('progress.achievementUnlocked', {
-                      date: new Date(a.unlockedAt!).toLocaleDateString('en-GB'),
+                      date: new Date(a.unlockedAt!).toLocaleDateString(getLocale()),
                     })
                   : `${t('progress.achievementLocked')}, ${progress}`
               }. ${t('progress.xpReward', { xp: a.xp })}`}
@@ -59,7 +59,7 @@ export function AchievementsTab({ achievements }: { achievements: AchievementVie
                   <Text variant="caption" tone="success" className="font-semibold">
                     ✓{' '}
                     {t('progress.achievementUnlocked', {
-                      date: new Date(a.unlockedAt!).toLocaleDateString('en-GB'),
+                      date: new Date(a.unlockedAt!).toLocaleDateString(getLocale()),
                     })}
                   </Text>
                 ) : (

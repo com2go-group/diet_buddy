@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { GradientFill, Text } from '@/components';
-import { t } from '@/i18n';
+import { getLocale, t } from '@/i18n';
 import { MIN_TOUCH_TARGET } from '@/theme';
 
 import { NotificationBell } from '../../notifications';
@@ -25,7 +25,7 @@ export function HomeHeader({ name, now }: { name: string; now: Date }) {
           {name.trim()}
         </Text>
         <Text variant="label" tone="muted" className="font-normal">
-          {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+          {now.toLocaleDateString(getLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}
         </Text>
       </View>
       <View className="flex-row items-center gap-2">

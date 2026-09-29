@@ -64,6 +64,7 @@ export const PRIVACY_POLICY: LegalDoc = {
             'Meal plans and grocery lists: your targets, diet style, restrictions, allergies and foods to avoid, or the week’s ingredient names and amounts.',
             'AI insights: daily totals and check-in answers for the last 14 days, without food names or free text.',
             'Food photo scan and restaurant mode: the meal or menu photo you take (location data removed), or the dishes you type. These photos are not stored.',
+            'Other languages: if you use DietBuddy in a language other than English, the food searches you type are translated into English for the food database, and AI texts are translated into your language. Only that text is sent.',
           ],
         },
         'Anthropic processes this data for us under a data processing agreement and does not use it to train its models. Calorie and nutrient numbers come from food databases (USDA FoodData Central and Open Food Facts), not from the AI. We check AI meal plans against your allergies and restrictions in our own code. AI output can be wrong, so always use your own judgement.',

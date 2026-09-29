@@ -1,6 +1,7 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 
 import { optional, required, supabase, type Enums } from '@/lib/supabase';
+import { getLanguage } from '@/i18n';
 
 export type Persona = Enums<'coach_persona'>;
 
@@ -90,7 +91,13 @@ export async function sendMessage(
   conversationId: string | null,
 ): Promise<SendResult> {
   const { data, error } = await supabase.functions.invoke('coach-chat', {
-    body: { persona, message, conversationId, timezoneOffset: new Date().getTimezoneOffset() },
+    body: {
+      persona,
+      message,
+      conversationId,
+      timezoneOffset: new Date().getTimezoneOffset(),
+      language: getLanguage(),
+    },
   });
   if (error) {
     let code: CoachErrorCode = 'failed';

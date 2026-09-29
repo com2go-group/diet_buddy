@@ -2,14 +2,14 @@ import { Feather } from '@expo/vector-icons';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/components';
-import { t } from '@/i18n';
+import { getLocale, t } from '@/i18n';
 import { addDays, dayKey } from '@/lib/dates';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 export function dayLabel(day: Date, now: Date): string {
   if (dayKey(day) === dayKey(now)) return t('meals.today');
   if (dayKey(day) === dayKey(addDays(now, -1))) return t('meals.yesterday');
-  return day.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  return day.toLocaleDateString(getLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
 /** Previous/next day switcher; the future is not reachable. */

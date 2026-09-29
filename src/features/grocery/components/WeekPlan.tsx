@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/components';
-import { t } from '@/i18n';
+import { getLocale, t } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
@@ -11,7 +11,7 @@ import { dishOf, type MealPlan } from '../../meals/mealPlanApi';
 import { MEAL_SLOTS } from '../../meals/portion';
 
 export function dayName(date: string): string {
-  return new Date(`${date}T12:00:00`).toLocaleDateString('en-GB', {
+  return new Date(`${date}T12:00:00`).toLocaleDateString(getLocale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',

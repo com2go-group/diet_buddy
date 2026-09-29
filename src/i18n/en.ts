@@ -1317,6 +1317,7 @@ export const en = {
     notifications: 'Notifications',
     notificationsDesc: 'Reminders, streaks and weekly report',
     appearance: 'Appearance',
+    language: 'Language',
     theme_system: 'System',
     theme_light: 'Light',
     theme_dark: 'Dark',

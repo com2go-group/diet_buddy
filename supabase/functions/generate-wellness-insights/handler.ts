@@ -7,13 +7,9 @@ import {
   WELLNESS_THEMES,
 } from '../_prompts/wellness.v1.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import { languageField, translateFields, type Language } from '../_shared/language.ts';
 import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
-import {
-  combineFlags,
-  screenMessage,
-  SUPPORT_NOTES,
-  type SafetyFlag,
-} from '../coach-chat/safety.ts';
+import { combineFlags, screenMessage, supportNote, type SafetyFlag } from '../coach-chat/safety.ts';
 import { unsafeText } from '../generate-insights/safety.ts';
 import { quotesMessages } from './privacy.ts';
 
@@ -68,6 +64,7 @@ export const MAX_ATTEMPTS = 2;
 
 const requestSchema = z.object({
   tzOffsetMinutes: z.number().int().min(-840).max(840),
+  language: languageField,
 });
 
 const aiSchema = z.object({
@@ -87,15 +84,15 @@ const aiSchema = z.object({
 const addDays = (day: string, n: number) =>
   new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 
-function support(flag: 'crisis' | 'disordered_eating'): Response {
-  return json({ status: 'support', flag, note: SUPPORT_NOTES[flag] });
+function support(flag: 'crisis' | 'disordered_eating', language?: Language): Response {
+  return json({ status: 'support', flag, note: supportNote(flag, language) });
 }
 
 const needsSupport = (flag: SafetyFlag): flag is 'crisis' | 'disordered_eating' =>
   flag === 'crisis' || flag === 'disordered_eating';
 
 /**
- * POST { tzOffsetMinutes } → { status: 'ok' | 'support' | 'not_enough', … }. Premium and the
+ * POST { tzOffsetMinutes, language? } → { status: 'ok' | 'support' | 'not_enough', … }. Premium and the
  * separate `coach_insights` consent only. Themes from the user's own coach messages of the last
  * 14 days, one new set per week. Messages are screened in code first: any sign of disordered
  * eating or crisis returns a professional-help note instead of insights. Model output is
@@ -109,7 +106,7 @@ export async function handleWellnessInsights(req: Request, deps: WellnessDeps): 
     if (!userId) return fail('unauthorized', 401);
     const parsed = requestSchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) return fail('invalid_request', 400);
-    const offset = parsed.data.tzOffsetMinutes;
+    const { tzOffsetMinutes: offset, language } = parsed.data;
     const now = deps.now?.() ?? new Date();
     const today = new Date(now.getTime() + offset * 60_000).toISOString().slice(0, 10);
     const { store } = deps;
@@ -122,7 +119,7 @@ export async function handleWellnessInsights(req: Request, deps: WellnessDeps): 
     const screened = messages
       .map((m) => screenMessage(m.content))
       .reduce<SafetyFlag>((a, b) => combineFlags(a, b), 'none');
-    if (needsSupport(screened)) return support(screened);
+    if (needsSupport(screened)) return support(screened, language);
 
     const latest = await store.latest(userId);
     if (latest && latest.periodEnd > addDays(today, -REFRESH_DAYS)) {
@@ -168,19 +165,25 @@ export async function handleWellnessInsights(req: Request, deps: WellnessDeps): 
         chat.push({ role: 'user', content: retryFeedback('the JSON was not valid') });
         continue;
       }
-      if (needsSupport(ai.data.safety)) return support(ai.data.safety);
+      if (needsSupport(ai.data.safety)) return support(ai.data.safety, language);
       const ok = ai.data.insights.filter(
         (i) =>
           !unsafeText(`${i.title} ${i.body}`) && !quotesMessages(`${i.title} ${i.body}`, texts),
       );
       const lastAttempt = attempt === MAX_ATTEMPTS - 1;
       if (ok.length && (ok.length === ai.data.insights.length || lastAttempt)) {
+        // Screened in English above; the user reads them in the app's language.
+        const local = await translateFields(deps.llm, ok, ['title', 'body'], language);
+        if (local.usage) {
+          const u = local.usage;
+          await store.logUsage(userId, u.model, u.inputTokens, u.outputTokens);
+        }
         const saved = await store.save(
           userId,
           {
             periodStart: addDays(today, -(WINDOW_DAYS - 1)),
             periodEnd: today,
-            insights: ok,
+            insights: local.items,
             messagesAnalysed: picked.length,
           },
           result.model,

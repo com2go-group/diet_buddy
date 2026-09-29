@@ -140,6 +140,43 @@ describe('generate-meal-plan', () => {
     expect(saved).toHaveLength(1);
   });
 
+  it('translates what the user reads after the checks, keeping the English title', async () => {
+    const english = [
+      ...['Oats with blueberries', 'Put it together on a plate.', 'Rolled oats', 'Blueberries'],
+      ...['Chicken and rice', 'Put it together on a plate.', 'Roast chicken', 'Rice'],
+      ...['Apple', 'Put it together on a plate.', 'Apple'],
+      ...['Lentils with broccoli', 'Put it together on a plate.', 'Lentils', 'Broccoli'],
+    ];
+    const { deps, requests } = setup({
+      replies: [
+        planJson(item('Apple', 'apple', 150)),
+        JSON.stringify({ t: english.map((e) => `EL ${e}`) }),
+      ],
+    });
+    const res = await handleGenerateMealPlan(post({ date: DATE, language: 'el' }), deps);
+    const { plan } = await res.json();
+    expect(requests[1]!.system).toContain('Greek');
+    expect(JSON.parse(requests[1]!.messages[0]!.content as string)).toEqual(english);
+    expect(plan.dishes.lunch).toEqual({
+      title: 'EL Chicken and rice',
+      description: 'EL Put it together on a plate.',
+      sourceTitle: 'Chicken and rice',
+    });
+    expect(plan.slots.lunch[0]).toMatchObject({
+      name: 'EL Roast chicken',
+      source: 'Chicken, breast, roasted',
+    });
+  });
+
+  it('keeps English when the translation doesn’t fit', async () => {
+    const { deps } = setup({
+      replies: [planJson(item('Apple', 'apple', 150)), JSON.stringify({ t: ['only one'] })],
+    });
+    const res = await handleGenerateMealPlan(post({ date: DATE, language: 'de' }), deps);
+    const { plan } = await res.json();
+    expect(plan.dishes.lunch.title).toBe('Chicken and rice');
+  });
+
   it('checks the dish name too, not only the ingredients', async () => {
     const { deps, requests } = setup({
       prefs: { allergies: ['peanuts'] },

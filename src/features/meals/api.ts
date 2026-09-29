@@ -12,6 +12,7 @@ import {
   type FoodResult,
   type NewFoodLog,
 } from './types';
+import { getLanguage } from '@/i18n';
 
 const LOG_COLUMNS =
   'id, logged_at, meal_slot, food_ref, name, quantity, unit, calories, protein_g, carbs_g, fat_g, source';
@@ -74,7 +75,9 @@ export class FoodSearchError extends Error {
 
 /** USDA search through the food-search Edge Function (the API key never ships in the app). */
 export async function searchFoods(query: string): Promise<FoodResult[]> {
-  const { data, error } = await supabase.functions.invoke('food-search', { body: { query } });
+  const { data, error } = await supabase.functions.invoke('food-search', {
+    body: { query, language: getLanguage() },
+  });
   if (error) {
     let code: SearchErrorCode = 'failed';
     if (error instanceof FunctionsHttpError) {

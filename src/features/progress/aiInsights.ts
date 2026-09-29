@@ -6,6 +6,7 @@ import { dayKey } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { getLanguage } from '@/i18n';
 
 /** Mirrors the generate-insights response; validated here. */
 const responseSchema = z.object({
@@ -26,7 +27,7 @@ export class AiInsightsError extends Error {
 
 export async function fetchAiInsights(now: Date): Promise<AiInsightsResult> {
   const { data, error } = await supabase.functions.invoke('generate-insights', {
-    body: { tzOffsetMinutes: -now.getTimezoneOffset() },
+    body: { tzOffsetMinutes: -now.getTimezoneOffset(), language: getLanguage() },
   });
   if (error) {
     let code: AiInsightsErrorCode = 'failed';

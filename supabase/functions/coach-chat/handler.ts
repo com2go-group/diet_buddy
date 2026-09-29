@@ -2,6 +2,7 @@ import { z } from 'npm:zod@4';
 
 import { COACH_PROMPT_VERSION, coachSystemPrompt, type Persona } from '../_prompts/coach.v1.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import { languageField, replyLanguageLine } from '../_shared/language.ts';
 import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
 import { buildCoachContext, type CoachContextData } from './context.ts';
 import { combineFlags, screenMessage, withSupportNote, type SafetyFlag } from './safety.ts';
@@ -12,6 +13,8 @@ export const requestSchema = z.object({
   conversationId: z.uuid().nullish(),
   /** Date.getTimezoneOffset() on the device, so "today" matches the user's day. */
   timezoneOffset: z.number().int().min(-840).max(840).optional(),
+  /** The app's language: the coach replies in it. */
+  language: languageField,
 });
 
 const replySchema = z.object({
@@ -76,7 +79,7 @@ export function localDayStart(now: Date, timezoneOffset = 0): Date {
 }
 
 /**
- * POST { persona, message, conversationId?, timezoneOffset? }
+ * POST { persona, message, conversationId?, timezoneOffset?, language? }
  *   → { conversationId, messages: [user, assistant], remaining, safety }
  * Limits and safety are enforced here, not in the app (CLAUDE.md §7.7, §9, §11).
  */
@@ -99,7 +102,7 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
 
   const parsed = requestSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail('invalid_request', 400);
-  const { persona, message, conversationId, timezoneOffset = 0 } = parsed.data;
+  const { persona, message, conversationId, timezoneOffset = 0, language } = parsed.data;
   const { store, llm } = deps;
   const now = deps.now?.() ?? new Date();
   const dayStart = localDayStart(now, timezoneOffset);
@@ -129,7 +132,7 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
     await store.loadContext(userId, dayStart),
     localNow(now, timezoneOffset),
   );
-  const system = coachSystemPrompt(persona, context);
+  const system = coachSystemPrompt(persona, context) + replyLanguageLine(language);
   const history = conversation ? await store.history(conversation, HISTORY_MESSAGES) : [];
   const messages: LlmMessage[] = [...history, { role: 'user', content: message }];
 
@@ -148,7 +151,7 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
   if (!reply) return fail('ai_failed', 502);
 
   const safety: SafetyFlag = combineFlags(reply.safety, screenMessage(message));
-  const content = withSupportNote(reply.reply, safety);
+  const content = withSupportNote(reply.reply, safety, language);
 
   conversation ??= await store.createConversation(userId, persona, message.slice(0, 60));
   const saved = await store.saveExchange(userId, conversation, persona, message, content);

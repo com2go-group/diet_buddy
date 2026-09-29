@@ -3,6 +3,7 @@ import { z } from 'npm:zod@4';
 import { AISLES, GROCERY_PROMPT_VERSION, grocerySystemPrompt } from '../_prompts/grocery.v1.ts';
 import { dayOffset } from '../_shared/dates.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import { languageField, replyLanguageLine } from '../_shared/language.ts';
 import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
 import { ingredientsFrom, totalCost, type GroceryItem, type PlanItem } from './list.ts';
 
@@ -42,6 +43,7 @@ export const MAX_ATTEMPTS = 2;
 const requestSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   regenerate: z.boolean().optional(),
+  language: languageField,
 });
 
 const aiSchema = z.object({
@@ -65,7 +67,7 @@ export function weekDates(startDate: string): string[] {
 }
 
 /**
- * POST { startDate, regenerate? } → { list }. Premium only. Builds the week's shopping list from
+ * POST { startDate, regenerate?, language? } → { list }. Premium only. Builds the week's shopping list from
  * the stored meal plans for startDate … +6 days: amounts are summed in code; the model only adds
  * the aisle, a pack to buy and a rough price. Stored per week; regenerating resets the ticks.
  */
@@ -83,7 +85,7 @@ export async function handleGenerateGroceryList(
     if (!parsed.success || Math.abs(dayOffset(parsed.data.startDate, now)) > 1) {
       return fail('invalid_request', 400);
     }
-    const { startDate, regenerate = false } = parsed.data;
+    const { startDate, regenerate = false, language } = parsed.data;
     const { store } = deps;
     if (!(await store.isPremium(userId))) return fail('premium_required', 403);
 
@@ -109,7 +111,11 @@ export async function handleGenerateGroceryList(
     ];
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const result = await deps.llm
-        .complete({ system: grocerySystemPrompt(currency), messages, maxTokens: 2500 })
+        .complete({
+          system: grocerySystemPrompt(currency) + replyLanguageLine(language),
+          messages,
+          maxTokens: 2500,
+        })
         .catch(() => null);
       if (!result) continue;
       await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);

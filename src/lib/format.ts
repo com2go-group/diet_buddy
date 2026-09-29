@@ -1,13 +1,11 @@
 import { cmToFeetInches, kgToLb, type UnitSystem } from '@/lib/nutrition';
-import { t } from '@/i18n';
-
-const locale = 'en-GB';
+import { getLocale, t } from '@/i18n';
 
 /** "72.5 kg" / "159.8 lb". */
 export function formatWeight(kg: number, units: UnitSystem, decimals = 1): string {
   const value = units === 'imperial' ? kgToLb(kg) : kg;
   const rounded = Number(value.toFixed(decimals));
-  return `${rounded.toLocaleString(locale, { maximumFractionDigits: decimals })} ${
+  return `${rounded.toLocaleString(getLocale(), { maximumFractionDigits: decimals })} ${
     units === 'imperial' ? t('units.lb') : t('units.kg')
   }`;
 }
@@ -20,22 +18,22 @@ export function formatHeight(cm: number, units: UnitSystem): string {
 }
 
 export function formatNumber(value: number): string {
-  return Math.round(value).toLocaleString(locale);
+  return Math.round(value).toLocaleString(getLocale());
 }
 
 /** Up to `decimals` fraction digits, trailing zeros dropped: 1.5 → "1.5", 2 → "2". */
 export function formatDecimal(value: number, decimals = 1): string {
-  return value.toLocaleString(locale, { maximumFractionDigits: decimals });
+  return value.toLocaleString(getLocale(), { maximumFractionDigits: decimals });
 }
 
 /** "March 2027". */
 export function formatMonthYear(date: Date): string {
-  return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+  return date.toLocaleDateString(getLocale(), { month: 'long', year: 'numeric' });
 }
 
 /** "Mar 27" (short month and year), for tight labels. */
 export function formatShortMonth(date: Date): string {
-  return date.toLocaleDateString(locale, { month: 'short', year: '2-digit' });
+  return date.toLocaleDateString(getLocale(), { month: 'short', year: '2-digit' });
 }
 
 /** Food amounts: "450 g" / "1.2 kg", or "9.5 oz" / "2.6 lb". */
@@ -49,17 +47,17 @@ export function formatFoodAmount(grams: number, units: UnitSystem): string {
 
 /** "€12.40". */
 export function formatMoney(value: number, currency: string): string {
-  return value.toLocaleString(locale, { style: 'currency', currency });
+  return value.toLocaleString(getLocale(), { style: 'currency', currency });
 }
 
 /** "12 Sep". */
 export function formatShortDate(date: Date): string {
-  return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+  return date.toLocaleDateString(getLocale(), { day: 'numeric', month: 'short' });
 }
 
 /** "25 September 2026". */
 export function formatLongDate(date: Date): string {
-  return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 /** Up to 13 weeks in weeks, then in months (prototype weeksToMonths). */

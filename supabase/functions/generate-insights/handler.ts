@@ -6,6 +6,7 @@ import {
   retryFeedback,
 } from '../_prompts/insights.v1.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import { languageField, translateFields } from '../_shared/language.ts';
 import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
 import { MIN_DAYS_LOGGED, summarise, windowDays, type RawData } from './aggregate.ts';
 import { unsafeText } from './safety.ts';
@@ -46,6 +47,7 @@ export const MAX_ATTEMPTS = 2;
 const requestSchema = z.object({
   /** Minutes to add to UTC for the user's local time (e.g. 120 in Berlin in summer). */
   tzOffsetMinutes: z.number().int().min(-840).max(840),
+  language: languageField,
 });
 
 const aiSchema = z.object({
@@ -62,7 +64,7 @@ const aiSchema = z.object({
 });
 
 /**
- * POST { tzOffsetMinutes } → { insights, day }. Premium only. Returns today's stored insights, or
+ * POST { tzOffsetMinutes, language? } → { insights, day }. Premium only. Returns today's stored insights, or
  * generates them from the last 14 local days of aggregated numbers (at least 5 logged days),
  * screens them for restrictive advice in code, and stores them (one set per day).
  */
@@ -74,7 +76,7 @@ export async function handleGenerateInsights(req: Request, deps: InsightsDeps): 
     if (!userId) return fail('unauthorized', 401);
     const parsed = requestSchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) return fail('invalid_request', 400);
-    const offset = parsed.data.tzOffsetMinutes;
+    const { tzOffsetMinutes: offset, language } = parsed.data;
     const now = deps.now?.() ?? new Date();
     const day = new Date(now.getTime() + offset * 60_000).toISOString().slice(0, 10);
     const { store } = deps;
@@ -127,8 +129,14 @@ export async function handleGenerateInsights(req: Request, deps: InsightsDeps): 
       const ok = ai.data.insights.filter((i) => !unsafeText(`${i.title} ${i.body}`));
       const lastAttempt = attempt === MAX_ATTEMPTS - 1;
       if (ok.length === ai.data.insights.length || (lastAttempt && ok.length)) {
-        safe = ok;
-        await store.save(userId, day, ok, result.model);
+        // Screened in English above; the user reads them in the app's language.
+        const local = await translateFields(deps.llm, ok, ['title', 'body'], language);
+        if (local.usage) {
+          const u = local.usage;
+          await store.logUsage(userId, u.model, u.inputTokens, u.outputTokens);
+        }
+        safe = local.items;
+        await store.save(userId, day, safe, result.model);
       } else {
         messages.push({
           role: 'user',

@@ -1,14 +1,18 @@
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import { englishQuery, languageField } from '../_shared/language.ts';
+import type { LlmProvider } from '../_shared/llm.ts';
 import { parseQuery } from '../_shared/usda.ts';
 import { searchUsda, UsdaError } from '../_shared/usdaClient.ts';
 
 export interface FoodSearchDeps {
   apiKey: string | undefined;
   fetch: typeof fetch;
+  /** Turns searches typed in the app's other languages into English (USDA is English only). */
+  llm?: LlmProvider | null;
 }
 
 /**
- * POST { query } → { foods: FoodResult[] }. Nutrition numbers come only from USDA (CLAUDE.md §9);
+ * POST { query, language? } → { foods: FoodResult[] }. Nutrition numbers come only from USDA (CLAUDE.md §9);
  * the API key stays on the server. Supabase verifies the caller's JWT before this runs.
  */
 export async function handleFoodSearch(req: Request, deps: FoodSearchDeps): Promise<Response> {
@@ -22,8 +26,11 @@ export async function handleFoodSearch(req: Request, deps: FoodSearchDeps): Prom
   } catch {
     return fail('invalid_request', 400);
   }
-  const query = parseQuery((body as { query?: unknown } | null)?.query);
-  if (!query) return fail('invalid_query', 400);
+  const input = body as { query?: unknown; language?: unknown } | null;
+  const typed = parseQuery(input?.query);
+  if (!typed) return fail('invalid_query', 400);
+  const language = languageField.parse(input?.language);
+  const query = parseQuery(await englishQuery(deps.llm ?? null, typed, language)) ?? typed;
 
   let foods;
   try {

@@ -43,7 +43,7 @@ describe('AiInsightsCard', () => {
     expect(await screen.findByText('Hydration dips')).toBeOnTheScreen();
     expect(screen.getByText(/not medical advice/)).toBeOnTheScreen();
     expect(invoke).toHaveBeenCalledWith('generate-insights', {
-      body: { tzOffsetMinutes: -new Date().getTimezoneOffset() },
+      body: { tzOffsetMinutes: -new Date().getTimezoneOffset(), language: 'en' },
     });
   });
 

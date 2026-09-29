@@ -4,6 +4,7 @@ import {
   combineFlags,
   screenMessage,
   SUPPORT_NOTES,
+  supportNote,
   withSupportNote,
 } from '../../functions/coach-chat/safety';
 
@@ -38,6 +39,37 @@ describe('coach safety screen', () => {
     expect(reply).toContain(SUPPORT_NOTES.disordered_eating);
     expect(withSupportNote(reply, 'disordered_eating')).toBe(reply); // not duplicated
     expect(withSupportNote('Try oats.', 'none')).toBe('Try oats.');
+  });
+});
+
+describe("safety screen in the app's other languages", () => {
+  it.each([
+    ['Ich will nicht mehr leben', 'crisis'],
+    ['Je veux mourir', 'crisis'],
+    ['Quiero morir', 'crisis'],
+    ['Voglio morire', 'crisis'],
+    ['Σκέφτομαι να αυτοκτονήσω', 'crisis'],
+    ['Ich nehme Abführmittel nach dem Essen', 'disordered_eating'],
+    ['Je prends des laxatifs', 'disordered_eating'],
+    ['Tuve un atracón anoche', 'disordered_eating'],
+    ['Mi faccio vomitare dopo cena', 'disordered_eating'],
+    ['Παίρνω καθαρτικά για να χάσω βάρος', 'disordered_eating'],
+  ] as const)('flags "%s"', (text, flag) => expect(screenMessage(text)).toBe(flag));
+
+  it.each([
+    'Wie viel Protein brauche ich?',
+    'Je suis mort de rire',
+    'Quiero comer más verduras',
+    'Mi piace la pasta',
+    'Τι να φάω για βραδινό;',
+  ])('leaves "%s" alone', (text) => expect(screenMessage(text)).toBe('none'));
+
+  it("appends the support note in the user's language", () => {
+    const reply = withSupportNote('Σε ακούω.', 'crisis', 'el');
+    expect(reply).toContain(supportNote('crisis', 'el'));
+    expect(reply).toContain('112');
+    expect(supportNote('disordered_eating', 'de')).not.toBe(SUPPORT_NOTES.disordered_eating);
+    expect(supportNote('crisis', 'en')).toBe(SUPPORT_NOTES.crisis);
   });
 });
 

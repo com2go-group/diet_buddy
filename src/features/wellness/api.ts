@@ -2,6 +2,7 @@ import { FunctionsHttpError } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 import { optional, supabase } from '@/lib/supabase';
+import { getLanguage } from '@/i18n';
 
 export const WELLNESS_THEMES = [
   'sleep',
@@ -59,7 +60,7 @@ export class WellnessError extends Error {
 
 export async function fetchWellness(now: Date): Promise<WellnessResult> {
   const { data, error } = await supabase.functions.invoke('generate-wellness-insights', {
-    body: { tzOffsetMinutes: -now.getTimezoneOffset() },
+    body: { tzOffsetMinutes: -now.getTimezoneOffset(), language: getLanguage() },
   });
   if (error) {
     let code: WellnessErrorCode = 'failed';
