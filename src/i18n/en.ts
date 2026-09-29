@@ -87,6 +87,24 @@ export const en = {
     savePassword: 'Save password',
     signOut: 'Sign out',
   },
+  goalJourney: {
+    reachedTitle: 'You reached your goal!',
+    reached:
+      'Your trend weight is at your goal. Amazing work! Now let’s keep it: we’ll move you to a sustainable maintenance plan, raising calories in small steps every two weeks so your weight stays steady.',
+    nextTitle: 'Next maintenance step',
+    next: 'Your weight has held steady. Time for the next small step towards your maintenance calories.',
+    step: 'Daily target: {{from}} → {{to}} kcal (maintenance is about {{maintenance}} kcal).',
+    stepFinal: 'Daily target: {{from}} → {{to}} kcal, your maintenance level.',
+    switch: 'Switch to maintenance',
+    applyStep: 'Take the next step',
+    newGoal: 'Set a new goal instead',
+    appliedTitle: 'Plan updated',
+    applied: 'Your new daily target is {{kcal}} kcal. Keep logging and weighing in as usual.',
+    failed: 'We couldn’t update your plan. Try again.',
+    regainTitle: 'A little above your kept weight',
+    regain:
+      'Small ups and downs are normal. If you’d like to refocus, you can set a gentle goal to get back.',
+  },
   care: {
     title: 'How are you doing?',
     body: 'Your last few days were logged well below your plan. Eating enough fuels your energy, mood and progress, and losing weight faster than planned isn’t the goal.',

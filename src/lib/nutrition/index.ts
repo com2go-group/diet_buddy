@@ -12,4 +12,5 @@ export * from './exercise';
 export * from './forecast';
 export * from './adherence';
 export * from './lowIntake';
+export * from './maintenance';
 export * from './adaptive';

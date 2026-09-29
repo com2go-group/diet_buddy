@@ -88,3 +88,5 @@ Abuse limits: `rate_limits` holds fixed-window counters keyed by `food_search:<u
 Retention: see `docs/backend.md` → Abuse limits and data retention. Coach messages 24 months, notifications 6, AI usage 25, safety flags 12, AI/wellness insights 12, meal plans and grocery lists 12, stale push tokens 12; the health log is kept until deleted by the user or with the account.
 
 Reminders: `notification_preferences.water_reminders` (new switch). Meal-time learning and the water/check-in checks for reminders run on the device from the logs Home already loads; nothing extra is stored or sent.
+
+Goal reached: `goals.reached_at` records when the user switched from weight loss to maintenance (their goal weight is kept as the weight to maintain). Maintenance steps are new `plans` versions with `generated_by = 'maintenance'`.

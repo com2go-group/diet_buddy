@@ -86,6 +86,25 @@ export const es: Translation = {
     savePassword: 'Guardar contraseña',
     signOut: 'Cerrar sesión',
   },
+  goalJourney: {
+    reachedTitle: '¡Has alcanzado tu objetivo!',
+    reached:
+      'Tu peso de tendencia está en tu objetivo. ¡Enhorabuena! Ahora vamos a mantenerlo: te pasamos a un plan de mantenimiento sostenible, subiendo las calorías en pequeños pasos cada dos semanas para que tu peso se mantenga estable.',
+    nextTitle: 'Siguiente paso de mantenimiento',
+    next: 'Tu peso se ha mantenido estable. Es hora del siguiente pequeño paso hacia tus calorías de mantenimiento.',
+    step: 'Objetivo diario: {{from}} → {{to}} kcal (el mantenimiento es de unas {{maintenance}} kcal).',
+    stepFinal: 'Objetivo diario: {{from}} → {{to}} kcal, tu nivel de mantenimiento.',
+    switch: 'Pasar a mantenimiento',
+    applyStep: 'Dar el siguiente paso',
+    newGoal: 'Fijar un nuevo objetivo',
+    appliedTitle: 'Plan actualizado',
+    applied:
+      'Tu nuevo objetivo diario es de {{kcal}} kcal. Sigue registrando y pesándote como siempre.',
+    failed: 'No pudimos actualizar tu plan. Inténtalo de nuevo.',
+    regainTitle: 'Un poco por encima de tu peso de mantenimiento',
+    regain:
+      'Los pequeños altibajos son normales. Si quieres volver a centrarte, puedes fijar un objetivo suave para volver.',
+  },
   care: {
     title: '¿Cómo estás?',
     body: 'Tus últimos días se registraron muy por debajo de tu plan. Comer lo suficiente alimenta tu energía, tu ánimo y tu progreso; perder peso más rápido de lo previsto no es el objetivo.',

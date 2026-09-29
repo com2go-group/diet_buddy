@@ -618,6 +618,7 @@ export type Database = {
           motivation_other: string | null
           motivations: string[]
           pace: Database["public"]["Enums"]["pace"] | null
+          reached_at: string | null
           start_weight_kg: number | null
           updated_at: string
           user_id: string
@@ -632,6 +633,7 @@ export type Database = {
           motivation_other?: string | null
           motivations?: string[]
           pace?: Database["public"]["Enums"]["pace"] | null
+          reached_at?: string | null
           start_weight_kg?: number | null
           updated_at?: string
           user_id?: string
@@ -646,6 +648,7 @@ export type Database = {
           motivation_other?: string | null
           motivations?: string[]
           pace?: Database["public"]["Enums"]["pace"] | null
+          reached_at?: string | null
           start_weight_kg?: number | null
           updated_at?: string
           user_id?: string

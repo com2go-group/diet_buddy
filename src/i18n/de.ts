@@ -86,6 +86,24 @@ export const de: Translation = {
     savePassword: 'Passwort speichern',
     signOut: 'Abmelden',
   },
+  goalJourney: {
+    reachedTitle: 'Du hast dein Ziel erreicht!',
+    reached:
+      'Dein Trendgewicht ist bei deinem Ziel. Großartig! Jetzt halten wir es: Wir stellen dich auf einen nachhaltigen Erhaltungsplan um und erhöhen die Kalorien alle zwei Wochen in kleinen Schritten, damit dein Gewicht stabil bleibt.',
+    nextTitle: 'Nächster Erhaltungsschritt',
+    next: 'Dein Gewicht ist stabil geblieben. Zeit für den nächsten kleinen Schritt zu deinen Erhaltungskalorien.',
+    step: 'Tagesziel: {{from}} → {{to}} kcal (Erhaltung liegt bei etwa {{maintenance}} kcal).',
+    stepFinal: 'Tagesziel: {{from}} → {{to}} kcal, dein Erhaltungsniveau.',
+    switch: 'Zur Erhaltung wechseln',
+    applyStep: 'Nächsten Schritt machen',
+    newGoal: 'Stattdessen ein neues Ziel setzen',
+    appliedTitle: 'Plan aktualisiert',
+    applied: 'Dein neues Tagesziel ist {{kcal}} kcal. Trag weiter ein und wieg dich wie gewohnt.',
+    failed: 'Wir konnten deinen Plan nicht aktualisieren. Versuch es erneut.',
+    regainTitle: 'Etwas über deinem gehaltenen Gewicht',
+    regain:
+      'Kleine Schwankungen sind normal. Wenn du dich neu ausrichten möchtest, kannst du ein sanftes Ziel setzen, um zurückzukommen.',
+  },
   care: {
     title: 'Wie geht es dir?',
     body: 'Deine letzten Tage wurden deutlich unter deinem Plan eingetragen. Genug zu essen gibt dir Energie, gute Laune und Fortschritt – schneller abzunehmen als geplant ist nicht das Ziel.',

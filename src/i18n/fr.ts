@@ -86,6 +86,25 @@ export const fr: Translation = {
     savePassword: 'Enregistrer le mot de passe',
     signOut: 'Se déconnecter',
   },
+  goalJourney: {
+    reachedTitle: 'Tu as atteint ton objectif !',
+    reached:
+      'Ton poids tendance est à ton objectif. Bravo ! Maintenant, gardons-le : on te passe à un plan de maintien durable, en augmentant les calories par petites étapes toutes les deux semaines pour que ton poids reste stable.',
+    nextTitle: 'Prochaine étape de maintien',
+    next: 'Ton poids est resté stable. C’est le moment de la prochaine petite étape vers tes calories de maintien.',
+    step: 'Objectif du jour : {{from}} → {{to}} kcal (le maintien est d’environ {{maintenance}} kcal).',
+    stepFinal: 'Objectif du jour : {{from}} → {{to}} kcal, ton niveau de maintien.',
+    switch: 'Passer au maintien',
+    applyStep: 'Faire l’étape suivante',
+    newGoal: 'Fixer plutôt un nouvel objectif',
+    appliedTitle: 'Plan mis à jour',
+    applied:
+      'Ton nouvel objectif quotidien est de {{kcal}} kcal. Continue à noter et à te peser comme d’habitude.',
+    failed: 'Nous n’avons pas pu mettre à jour ton plan. Réessaie.',
+    regainTitle: 'Un peu au-dessus de ton poids de maintien',
+    regain:
+      'Les petites variations sont normales. Si tu veux te recentrer, tu peux fixer un objectif doux pour revenir.',
+  },
   care: {
     title: 'Comment vas-tu ?',
     body: 'Tes derniers jours ont été enregistrés bien en dessous de ton plan. Manger suffisamment nourrit ton énergie, ton humeur et tes progrès ; perdre du poids plus vite que prévu n’est pas l’objectif.',

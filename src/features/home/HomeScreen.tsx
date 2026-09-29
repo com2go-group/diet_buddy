@@ -12,6 +12,7 @@ import { usualMealTimes } from '@/lib/push';
 import { useTheme } from '@/theme';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { GoalJourneyCard } from '../goalJourney';
 import { useSmartReminders } from '../notifications/usePush';
 import { OfflineBanner } from '../offline';
 import { PlanCheckCard } from '../planReview/PlanCheckCard';
@@ -120,6 +121,7 @@ export function HomeScreen() {
             now={now}
           />
         ) : null}
+        {userId ? <GoalJourneyCard userId={userId} now={now} /> : null}
         <PlanCheckCard now={now} />
         <ScoreCard
           score={today.score}
