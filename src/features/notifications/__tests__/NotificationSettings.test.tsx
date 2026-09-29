@@ -51,7 +51,11 @@ describe('NotificationSettingsScreen', () => {
       }),
     );
     expect(requestPermission).toHaveBeenCalled();
-    expect((scheduleReminders as jest.Mock).mock.calls[0][0]).toHaveLength(4);
+    // Meals and check-in for the next days; water waits until Home knows the day's target.
+    const kinds = new Set(
+      ((scheduleReminders as jest.Mock).mock.calls[0][0] as { kind: string }[]).map((r) => r.kind),
+    );
+    expect(kinds).toEqual(new Set(['meal', 'checkin']));
   });
 
   it('saves a preference and reschedules reminders', async () => {
@@ -62,9 +66,10 @@ describe('NotificationSettingsScreen', () => {
         onConflict: 'user_id',
       }),
     );
-    await waitFor(() =>
-      expect((scheduleReminders as jest.Mock).mock.calls.at(-1)[0]).toHaveLength(1),
-    );
+    await waitFor(() => expect(scheduleReminders).toHaveBeenCalled());
+    const last = (scheduleReminders as jest.Mock).mock.calls.at(-1)[0] as { kind: string }[];
+    expect(last.length).toBeGreaterThan(0);
+    expect(last.every((r) => r.kind === 'checkin')).toBe(true);
   });
 
   it('keeps promotions off without marketing consent', async () => {

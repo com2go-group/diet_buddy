@@ -86,3 +86,5 @@ Offline logging: when there is no connection, food and water entries are kept on
 Abuse limits: `rate_limits` holds fixed-window counters keyed by `food_search:<user id>`, `food_barcode:<user id>` or `sms:<HMAC of the phone number>` with a hit count; rows are deleted after 8 days by `purge_old_data()`. Not exported (short-lived security data). Sign-up, sign-in and code requests pass a Cloudflare Turnstile check when enabled (`EXPO_PUBLIC_TURNSTILE_SITE_KEY`); Cloudflare sees device and browser signals and the IP address; nothing from it is stored by us.
 
 Retention: see `docs/backend.md` → Abuse limits and data retention. Coach messages 24 months, notifications 6, AI usage 25, safety flags 12, AI/wellness insights 12, meal plans and grocery lists 12, stale push tokens 12; the health log is kept until deleted by the user or with the account.
+
+Reminders: `notification_preferences.water_reminders` (new switch). Meal-time learning and the water/check-in checks for reminders run on the device from the logs Home already loads; nothing extra is stored or sent.

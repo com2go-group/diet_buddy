@@ -2,7 +2,7 @@
 
 The app code is done:
 
-- **Local reminders** (meals at 8:30 / 12:30 / 19:00, check-in at 20:30) are scheduled on the phone and work as soon as the user allows notifications, with no server setup.
+- **Local reminders** are planned on the phone (`src/lib/push/reminders.ts`) and work as soon as the user allows notifications, with no server setup: meal reminders 20 minutes after each meal's usual time (learned from the last week's logs, defaults 8:30 / 12:30 / 19:00) and only for meals not logged yet; up to 3 water nudges (10:30, 13:30, 16:00, 18:30) only when behind the day's pace; the 20:30 check-in reminder unless done. They are one-off notifications for today and the next two days, re-planned whenever Home's data changes, so they stop a few days after someone stops opening the app.
 - **Server pushes** (achievements, streak milestones, the weekly report, and promotions for users with marketing consent) are created as rows in `notifications` and sent by the `push-dispatch` Edge Function through Expo's push service.
 - Users manage everything in Profile → Notifications.
 

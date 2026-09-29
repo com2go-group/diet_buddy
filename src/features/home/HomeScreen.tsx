@@ -8,9 +8,11 @@ import { AppBanner } from '@/features/ads';
 import { ActivityCard } from '@/features/health';
 import { t } from '@/i18n';
 import { purchasesAvailable } from '@/lib/purchases';
+import { usualMealTimes } from '@/lib/push';
 import { useTheme } from '@/theme';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { useSmartReminders } from '../notifications/usePush';
 import { OfflineBanner } from '../offline';
 import { PlanCheckCard } from '../planReview/PlanCheckCard';
 import { openPaywall } from '../subscriptions/paywallRoute';
@@ -57,6 +59,20 @@ export function HomeScreen() {
   const summary = useMemo(
     () => (query.data ? summarizeHome(query.data, now) : null),
     [query.data, now],
+  );
+  useSmartReminders(
+    summary && query.data
+      ? {
+          mealTimes: usualMealTimes(query.data.food),
+          loggedToday: Object.entries(summary.today.meals)
+            .filter(([, logs]) => logs.length > 0)
+            .map(([slot]) => slot),
+          waterMlToday: summary.today.waterMl,
+          waterTargetMl: summary.targets?.waterMl ?? null,
+          checkedInToday: Boolean(summary.today.checkIn),
+        }
+      : null,
+    now,
   );
   useCoachTipReminder(
     summary

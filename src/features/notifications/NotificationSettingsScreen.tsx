@@ -112,6 +112,11 @@ export function NotificationSettingsScreen() {
                 t('notificationSettings.mealRemindersDesc'),
               )}
               {toggle(
+                'water_reminders',
+                t('notificationSettings.waterReminders'),
+                t('notificationSettings.waterRemindersDesc'),
+              )}
+              {toggle(
                 'checkin_reminder',
                 t('notificationSettings.checkinReminder'),
                 t('notificationSettings.checkinReminderDesc'),

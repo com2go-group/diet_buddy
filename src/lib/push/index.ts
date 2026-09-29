@@ -3,9 +3,15 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { REMINDER_PREFIX, type Reminder } from './reminders';
+import { REMINDER_PREFIX, type PlannedReminder } from './reminders';
 
-export { remindersFor, routeFor, type Reminder } from './reminders';
+export {
+  planReminders,
+  routeFor,
+  usualMealTimes,
+  type PlannedReminder,
+  type ReminderPrefs,
+} from './reminders';
 
 /** Push needs a real phone; the web build and simulators get in-app notifications only. */
 export const pushSupported = Platform.OS !== 'web' && Device.isDevice;
@@ -53,10 +59,10 @@ export async function getPushToken(): Promise<string | null> {
   return currentToken;
 }
 
-/** Replaces DietBuddy's local reminders with these (daily, at local times). */
+/** Replaces DietBuddy's planned local reminders with these (one-off, at their times). */
 export async function scheduleReminders(
-  reminders: Reminder[],
-  text: (r: Reminder) => { title: string; body: string },
+  reminders: PlannedReminder[],
+  text: (r: PlannedReminder) => { title: string; body: string },
 ) {
   if (!pushSupported) return;
   const scheduled = await Notifications.getAllScheduledNotificationsAsync();
@@ -70,11 +76,7 @@ export async function scheduleReminders(
     await Notifications.scheduleNotificationAsync({
       identifier: r.id,
       content: { ...text(r), data: { route: r.route } },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        hour: r.hour,
-        minute: r.minute,
-      },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: r.at },
     });
   }
 }
