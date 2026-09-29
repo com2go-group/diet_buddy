@@ -6,6 +6,7 @@ import { t } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 
 import { loadStats, type AdminStats } from '../api';
+import { AiEconomicsCard } from './AiEconomicsCard';
 import { PageTitle, QueryState } from './common';
 
 const usd = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -84,6 +85,7 @@ export function OverviewPage() {
                 ))}
               </View>
               <AiUsage stats={s} />
+              <AiEconomicsCard />
             </>
           );
         }}

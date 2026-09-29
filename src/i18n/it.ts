@@ -875,6 +875,7 @@ export const it: Translation = {
       'La scansione foto non è ancora configurata su questo server. Per ora usa la ricerca.',
     limitReached:
       'Hai usato le scansioni foto gratuite di oggi. Con Premium ne hai di più ogni giorno.',
+    aiBudget: 'Hai usato l’IA gratuita di oggi. Si rinnova a mezzanotte.',
     rateLimited: 'Hai raggiunto il limite di scansioni foto di oggi. Riprova domani.',
     upgrade: 'Scopri Premium',
     warningAllergy: 'Può contenere {{what}}, che hai indicato come allergia',
@@ -1151,8 +1152,8 @@ export const it: Translation = {
     you: 'Tu',
     remaining: 'Ti restano {{count}} di {{limit}} messaggi gratuiti oggi',
     remainingNone: 'Hai usato i {{limit}} messaggi gratuiti di oggi. Si rinnovano a mezzanotte.',
-    premiumNote: 'Premium include coaching illimitato.',
-    upgrade: 'Coaching illimitato con Premium',
+    premiumNote: 'Premium include fino a 60 messaggi al giorno.',
+    upgrade: 'Fino a 60 messaggi al giorno con Premium',
     explainDeficit:
       'Il tuo piano in breve 📋 Il tuo corpo consuma circa {{tdee}} kcal al giorno. Il tuo obiettivo di {{kcal}} kcal è {{gap}} kcal in meno: un deficit costante per perdere grasso senza patire la fame.',
     explainSurplus:
@@ -1172,6 +1173,8 @@ export const it: Translation = {
     error_rate_limited: 'Stai inviando messaggi molto velocemente. Attendi un attimo e riprova.',
     error_not_configured: 'Il coach non è ancora configurato su questo server.',
     error_ai_failed: 'Il coach non è riuscito a rispondere ora. Riprova.',
+    error_ai_budget: 'Hai usato l’IA gratuita di oggi. Si rinnova a mezzanotte.',
+    error_fair_use_limit: 'Oggi hai inviato molti messaggi. Il coach torna domani.',
     error_failed: 'Il messaggio non è stato inviato. Controlla la connessione e riprova.',
     loadFailed: 'Non siamo riusciti a caricare la conversazione.',
   },
@@ -1185,7 +1188,8 @@ export const it: Translation = {
     checkIn: 'Check-in',
     checkedIn: 'Check-in fatto ✓',
     upgradeTitle: 'Passa a Premium',
-    upgradeDesc: 'Niente pubblicità, coach IA illimitato e piani alimentari completi ogni giorno.',
+    upgradeDesc:
+      'Niente pubblicità, fino a 60 messaggi al coach al giorno e piani pasti completi ogni giorno.',
     restore: 'Ripristina acquisti',
     healthApps: 'App salute',
     healthConnected: 'Collegato',
@@ -1244,7 +1248,8 @@ export const it: Translation = {
     faq4a:
       'Solo tu. Sono conservati nell’UE, mai venduti né usati per la pubblicità. Puoi esportarli o eliminarli in Privacy e dati.',
     faq5q: 'Perché non posso inviare altri messaggi al coach?',
-    faq5a: 'Il piano gratuito include 5 messaggi al coach al giorno. Si rinnovano a mezzanotte.',
+    faq5a:
+      'Il piano gratuito include 3 messaggi al coach al giorno, e ogni breve video che scegli di guardare ne aggiunge 3 (fino a 3 video al giorno). Si rinnovano a mezzanotte. Premium include fino a 60 messaggi al giorno.',
   },
   privacy: {
     title: 'Privacy e dati',
@@ -1302,7 +1307,7 @@ export const it: Translation = {
     saveBadge: 'Risparmi il {{pct}}%',
     includedNow: 'Incluso',
     featureNoAds: 'Niente pubblicità',
-    featureCoach: 'Messaggi illimitati al coach IA',
+    featureCoach: 'Fino a 60 messaggi al coach IA al giorno',
     featureMealPlans: 'Piani alimentari IA completi ogni giorno, senza video',
     featurePhotos: 'Confronto foto prima e dopo',
     featureInsights: 'Analisi quotidiane dei progressi scritte dall’IA',
@@ -1346,6 +1351,12 @@ export const it: Translation = {
     terms: 'Termini',
     privacy: 'Privacy',
     upgrade: 'Passa a Premium',
+  },
+  aiBoost: {
+    watch: 'Guarda un breve video per {{count}} in più oggi',
+    watchBudget: 'Guarda un breve video per continuare a usare l’IA oggi',
+    notEarned: 'Il video è stato chiuso prima della fine, quindi non è stato aggiunto nulla.',
+    unavailable: 'Nessun video disponibile al momento. Riprova più tardi o vai oltre con Premium.',
   },
   ads: {
     label: 'Pubblicità',
@@ -1454,6 +1465,7 @@ export const it: Translation = {
     error_food_data_unavailable:
       'Il database degli alimenti non è disponibile al momento. Riprova tra qualche minuto.',
     error_failed: 'Qualcosa è andato storto. Controlla la connessione e riprova.',
+    error_ai_budget: 'Hai usato l’IA gratuita di oggi. Si rinnova a mezzanotte.',
     totals: 'Totale del piano: {{kcal}} kcal · {{protein}} g di proteine',
     planning: 'Pianificazione dei pasti di oggi…',
     planningDesc: 'Bilanciato sui tuoi obiettivi, la tua dieta e le tue allergie.',

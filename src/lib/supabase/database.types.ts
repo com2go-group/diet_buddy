@@ -164,6 +164,8 @@ export type Database = {
       }
       ai_usage: {
         Row: {
+          cache_read_tokens: number
+          cache_write_tokens: number
           created_at: string
           function_name: string
           id: string
@@ -174,6 +176,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cache_read_tokens?: number
+          cache_write_tokens?: number
           created_at?: string
           function_name: string
           id?: string
@@ -184,6 +188,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cache_read_tokens?: number
+          cache_write_tokens?: number
           created_at?: string
           function_name?: string
           id?: string
@@ -1291,6 +1297,10 @@ export type Database = {
         Args: { p_user: string; p_role: Database["public"]["Enums"]["admin_role"] | null }
         Returns: undefined
       }
+      admin_ai_economics: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
       admin_stats: {
         Args: never
         Returns: Json
@@ -1369,7 +1379,7 @@ export type Database = {
       pace: "sustainable" | "balanced" | "fast"
       training_frequency: "0_1" | "2_3" | "4_5" | "6_plus"
       unit_system: "metric" | "imperial"
-      unlock_type: "meal_plan" | "ai_plan"
+      unlock_type: "meal_plan" | "ai_plan" | "ai_boost"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1403,7 +1413,7 @@ export const Constants = {
       pace: ["sustainable", "balanced", "fast"],
       training_frequency: ["0_1", "2_3", "4_5", "6_plus"],
       unit_system: ["metric", "imperial"],
-      unlock_type: ["meal_plan", "ai_plan"],
+      unlock_type: ["meal_plan", "ai_plan", "ai_boost"],
     },
   },
 } as const

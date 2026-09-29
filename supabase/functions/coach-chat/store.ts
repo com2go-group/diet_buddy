@@ -6,7 +6,6 @@ import type { CoachContextData } from './context.ts';
 import type { CoachStore, StoredMessage } from './handler.ts';
 
 const FUNCTION_NAME = 'coach-chat';
-const DEFAULT_DAILY_LIMIT = 5;
 
 function must<T>(result: { data: T; error: { message: string } | null }): T {
   if (result.error) throw new Error(result.error.message);
@@ -16,23 +15,6 @@ function must<T>(result: { data: T; error: { message: string } | null }): T {
 /** CoachStore on a service-role client (bypasses RLS, so every query filters by user_id). */
 export function supabaseCoachStore(db: SupabaseClient): CoachStore {
   return {
-    async isPremium(userId) {
-      const row = must(
-        await db.from('profiles').select('is_premium').eq('user_id', userId).single(),
-      );
-      return Boolean((row as { is_premium: boolean }).is_premium);
-    },
-
-    async dailyLimit() {
-      const { data } = await db
-        .from('app_config')
-        .select('value')
-        .eq('key', 'coach_daily_message_limit_free')
-        .maybeSingle();
-      const value = Number((data as { value: unknown } | null)?.value);
-      return Number.isFinite(value) && value >= 0 ? value : DEFAULT_DAILY_LIMIT;
-    },
-
     async countUserMessagesSince(userId, since) {
       const rows = must(
         await db
@@ -260,7 +242,7 @@ export function supabaseCoachStore(db: SupabaseClient): CoachStore {
       must(await db.from('safety_events').insert({ user_id: userId, persona, flag }));
     },
 
-    async logUsage(userId, model, inputTokens, outputTokens) {
+    async logUsage(userId, model, inputTokens, outputTokens, cache) {
       must(
         await db.from('ai_usage').insert({
           user_id: userId,
@@ -268,6 +250,8 @@ export function supabaseCoachStore(db: SupabaseClient): CoachStore {
           model,
           input_tokens: inputTokens,
           output_tokens: outputTokens,
+          cache_read_tokens: cache?.read ?? 0,
+          cache_write_tokens: cache?.write ?? 0,
         }),
       );
     },

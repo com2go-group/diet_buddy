@@ -876,6 +876,7 @@ export const es: Translation = {
     notConfigured:
       'El escaneo de fotos aún no está configurado en este servidor. De momento usa la búsqueda.',
     limitReached: 'Has usado los escaneos de fotos gratis de hoy. Con Premium tienes más cada día.',
+    aiBudget: 'Has usado la IA gratuita de hoy. Se renueva a medianoche.',
     rateLimited: 'Has alcanzado el límite de escaneos de fotos de hoy. Vuelve a intentarlo mañana.',
     upgrade: 'Ver Premium',
     warningAllergy: 'Puede contener {{what}}, que indicaste como alergia',
@@ -1147,8 +1148,8 @@ export const es: Translation = {
     you: 'Tú',
     remaining: 'Te quedan {{count}} de {{limit}} mensajes gratis hoy',
     remainingNone: 'Has usado los {{limit}} mensajes gratis de hoy. Se renuevan a medianoche.',
-    premiumNote: 'Premium incluye coaching ilimitado.',
-    upgrade: 'Coaching ilimitado con Premium',
+    premiumNote: 'Premium incluye hasta 60 mensajes al día.',
+    upgrade: 'Hasta 60 mensajes al día con Premium',
     explainDeficit:
       'Tu plan en resumen 📋 Tu cuerpo gasta unas {{tdee}} kcal al día. Tu objetivo de {{kcal}} kcal es {{gap}} kcal menos: un déficit constante para perder grasa sin pasar hambre.',
     explainSurplus:
@@ -1169,6 +1170,8 @@ export const es: Translation = {
       'Estás enviando mensajes muy rápido. Espera un momento e inténtalo de nuevo.',
     error_not_configured: 'El coach aún no está configurado en este servidor.',
     error_ai_failed: 'El coach no ha podido responder ahora. Inténtalo de nuevo.',
+    error_ai_budget: 'Has usado la IA gratuita de hoy. Se renueva a medianoche.',
+    error_fair_use_limit: 'Hoy has enviado muchos mensajes. El coach vuelve mañana.',
     error_failed: 'Tu mensaje no se ha enviado. Comprueba tu conexión e inténtalo de nuevo.',
     loadFailed: 'No hemos podido cargar tu conversación.',
   },
@@ -1182,7 +1185,8 @@ export const es: Translation = {
     checkIn: 'Registro diario',
     checkedIn: 'Registrado ✓',
     upgradeTitle: 'Pásate a Premium',
-    upgradeDesc: 'Sin anuncios, coach IA ilimitado y planes de comidas completos cada día.',
+    upgradeDesc:
+      'Sin anuncios, hasta 60 mensajes al coach al día y planes de comidas completos cada día.',
     restore: 'Restaurar compras',
     healthApps: 'Apps de salud',
     healthConnected: 'Conectado',
@@ -1241,7 +1245,8 @@ export const es: Translation = {
     faq4a:
       'Solo tú. Se guardan en la UE, nunca se venden ni se usan para publicidad. Puedes exportarlos o eliminarlos en Privacidad y datos.',
     faq5q: '¿Por qué no puedo enviar más mensajes al coach?',
-    faq5a: 'El plan gratuito incluye 5 mensajes al coach al día. Se renuevan a medianoche.',
+    faq5a:
+      'El plan gratuito incluye 3 mensajes al coach al día, y cada vídeo corto que decidas ver añade 3 más (hasta 3 vídeos al día). Se renuevan a medianoche. Premium incluye hasta 60 al día.',
   },
   privacy: {
     title: 'Privacidad y datos',
@@ -1299,7 +1304,7 @@ export const es: Translation = {
     saveBadge: 'Ahorra un {{pct}} %',
     includedNow: 'Incluido',
     featureNoAds: 'Sin anuncios',
-    featureCoach: 'Mensajes ilimitados al coach IA',
+    featureCoach: 'Hasta 60 mensajes al coach IA al día',
     featureMealPlans: 'Planes de comidas IA completos cada día, sin vídeos',
     featurePhotos: 'Comparación de fotos de antes y después',
     featureInsights: 'Análisis diarios de tu progreso escritos por IA',
@@ -1343,6 +1348,13 @@ export const es: Translation = {
     terms: 'Condiciones',
     privacy: 'Privacidad',
     upgrade: 'Mejorar',
+  },
+  aiBoost: {
+    watch: 'Ver un vídeo corto para {{count}} más hoy',
+    watchBudget: 'Ver un vídeo corto para seguir usando la IA hoy',
+    notEarned: 'El vídeo se cerró antes de tiempo, así que no se añadió nada.',
+    unavailable:
+      'No hay ningún vídeo disponible ahora. Inténtalo más tarde o llega más lejos con Premium.',
   },
   ads: {
     label: 'Anuncio',
@@ -1450,6 +1462,7 @@ export const es: Translation = {
     error_food_data_unavailable:
       'La base de datos de alimentos no está disponible ahora mismo. Inténtalo en unos minutos.',
     error_failed: 'Algo ha fallado. Comprueba tu conexión e inténtalo de nuevo.',
+    error_ai_budget: 'Has usado la IA gratuita de hoy. Se renueva a medianoche.',
     totals: 'Total del plan: {{kcal}} kcal · {{protein}} g de proteínas',
     planning: 'Planificando las comidas de hoy…',
     planningDesc: 'Equilibrado según tus objetivos, tu dieta y tus alergias.',

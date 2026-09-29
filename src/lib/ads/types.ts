@@ -9,8 +9,11 @@ export interface AdsConsent {
 
 export type RewardOutcome = 'earned' | 'dismissed' | 'failed';
 
+/** What a rewarded video unlocks (`ad_unlocks.unlock_type`, recorded by admob-ssv). */
+export type UnlockType = 'meal_plan' | 'ai_plan' | 'ai_boost';
+
 export interface RewardRequest {
   userId: string;
-  type: 'meal_plan' | 'ai_plan';
+  type: UnlockType;
   target: string;
 }

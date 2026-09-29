@@ -9,6 +9,7 @@ import {
   showRewarded,
   type AdsConsent,
   type RewardOutcome,
+  type UnlockType,
 } from '@/lib/ads';
 import { optional, supabase } from '@/lib/supabase';
 
@@ -78,7 +79,7 @@ export function useAdPrivacyOptions() {
 
 async function waitForUnlock(
   userId: string,
-  type: string,
+  type: UnlockType,
   target: string,
   tries = 8,
 ): Promise<boolean> {
@@ -87,7 +88,7 @@ async function waitForUnlock(
       .from('ad_unlocks')
       .select('id')
       .eq('user_id', userId)
-      .eq('unlock_type', type as 'meal_plan' | 'ai_plan')
+      .eq('unlock_type', type)
       .eq('target_id', target)
       .limit(1);
     if (data?.length) return true;
@@ -106,7 +107,7 @@ export function useRewardedUnlock() {
   const { personalised } = useShowAds();
   const queryClient = useQueryClient();
   return useCallback(
-    async (type: 'meal_plan' | 'ai_plan', target: string): Promise<RewardOutcome> => {
+    async (type: UnlockType, target: string): Promise<RewardOutcome> => {
       if (!userId) return 'failed';
       const outcome = await showRewarded({ userId, type, target }, personalised);
       if (outcome === 'earned') {
@@ -119,5 +120,24 @@ export function useRewardedUnlock() {
       return outcome;
     },
     [userId, personalised, queryClient],
+  );
+}
+
+/**
+ * Opt-in rewarded video for more AI today (an "AI boost", decision log 2026-09-29). Resolves
+ * once the server has recorded Google's reward callback, so the next AI request counts it:
+ * 'earned' (recorded), 'dismissed' (closed early), or 'failed' (no video, or not recorded).
+ */
+export function useRewardedBoost() {
+  const userId = useSessionStore((s) => s.session?.user.id);
+  const { personalised } = useShowAds();
+  return useCallback(
+    async (target: string): Promise<RewardOutcome> => {
+      if (!userId) return 'failed';
+      const outcome = await showRewarded({ userId, type: 'ai_boost', target }, personalised);
+      if (outcome !== 'earned') return outcome;
+      return (await waitForUnlock(userId, 'ai_boost', target)) ? 'earned' : 'failed';
+    },
+    [userId, personalised],
   );
 }

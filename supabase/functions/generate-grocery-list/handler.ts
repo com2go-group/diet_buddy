@@ -4,7 +4,13 @@ import { AISLES, GROCERY_PROMPT_VERSION, grocerySystemPrompt } from '../_prompts
 import { dayOffset } from '../_shared/dates.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { languageField, replyLanguageLine } from '../_shared/language.ts';
-import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
+import {
+  cacheOf,
+  type CacheTokens,
+  extractJson,
+  type LlmMessage,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 import { ingredientsFrom, totalCost, type GroceryItem, type PlanItem } from './list.ts';
 
 export interface StoredList {
@@ -25,7 +31,13 @@ export interface GroceryStore {
   ): Promise<{ date: string; slots: Record<string, PlanItem[]> }[]>;
   save(userId: string, list: StoredList, model: string): Promise<void>;
   callsSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface GroceryDeps {
@@ -118,7 +130,13 @@ export async function handleGenerateGroceryList(
         })
         .catch(() => null);
       if (!result) continue;
-      await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
+      await store.logUsage(
+        userId,
+        result.model,
+        result.inputTokens,
+        result.outputTokens,
+        cacheOf(result),
+      );
       const ai = aiSchema.safeParse(extractJson(result.text));
       if (!ai.success) {
         messages.push({ role: 'assistant', content: result.text });

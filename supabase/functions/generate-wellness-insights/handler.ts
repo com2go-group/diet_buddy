@@ -8,7 +8,13 @@ import {
 } from '../_prompts/wellness.v1.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { languageField, translateFields, type Language } from '../_shared/language.ts';
-import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
+import {
+  cacheOf,
+  type CacheTokens,
+  extractJson,
+  type LlmMessage,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 import { combineFlags, screenMessage, supportNote, type SafetyFlag } from '../coach-chat/safety.ts';
 import { unsafeText } from '../generate-insights/safety.ts';
 import { quotesMessages } from './privacy.ts';
@@ -42,7 +48,13 @@ export interface WellnessStore {
   messages(userId: string, since: Date): Promise<UserMessage[]>;
   save(userId: string, set: Omit<WellnessSet, 'createdAt'>, model: string): Promise<WellnessSet>;
   callsSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface WellnessDeps {
@@ -158,7 +170,13 @@ export async function handleWellnessInsights(req: Request, deps: WellnessDeps): 
         .complete({ system: WELLNESS_SYSTEM_PROMPT, messages: chat, maxTokens: 900 })
         .catch(() => null);
       if (!result) continue;
-      await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
+      await store.logUsage(
+        userId,
+        result.model,
+        result.inputTokens,
+        result.outputTokens,
+        cacheOf(result),
+      );
       chat.push({ role: 'assistant', content: result.text });
       const ai = aiSchema.safeParse(extractJson(result.text));
       if (!ai.success) {

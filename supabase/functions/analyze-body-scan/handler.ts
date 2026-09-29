@@ -3,7 +3,12 @@ import { z } from 'npm:zod@4';
 import { BODY_SCAN_PROMPT_VERSION, bodyScanSystemPrompt } from '../_prompts/bodyScan.v1.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { BASE64, detectMediaType, stripJpegMetadata } from '../_shared/image.ts';
-import { extractJson, type LlmContentBlock, type LlmProvider } from '../_shared/llm.ts';
+import {
+  type CacheTokens,
+  extractJson,
+  type LlmContentBlock,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 
 export interface BodyScanContext {
   premium: boolean;
@@ -16,7 +21,13 @@ export interface BodyScanContext {
 export interface BodyScanStore {
   context(userId: string): Promise<BodyScanContext>;
   scansSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface Measurements {

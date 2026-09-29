@@ -53,6 +53,27 @@ export interface AdminStats {
 export const loadStats = async () =>
   unwrap(await supabase.rpc('admin_stats')) as unknown as AdminStats;
 
+/** Free users' AI cost against estimated ad revenue (admin_ai_economics). */
+export interface AiEconomics {
+  days: number;
+  free_active_days: number;
+  free_ai_cost_usd: number;
+  rewarded_views: number;
+  est_ad_revenue_usd: number;
+  cost_per_free_active_day_usd: number | null;
+  revenue_per_free_active_day_usd: number | null;
+  premium_ai_cost_usd: number;
+  premium_users: number;
+  assumptions: {
+    rewarded_ecpm_usd?: number;
+    banner_ecpm_usd?: number;
+    banner_impressions_per_active_day?: number;
+  };
+}
+
+export const loadAiEconomics = async (days = 30) =>
+  unwrap(await supabase.rpc('admin_ai_economics', { p_days: days })) as unknown as AiEconomics;
+
 export const listUsers = async (search: string, offset = 0) =>
   unwrap(
     await supabase.rpc('admin_list_users', { p_search: search, p_limit: 50, p_offset: offset }),

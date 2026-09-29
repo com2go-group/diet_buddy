@@ -30,6 +30,12 @@ export interface LlmRequest {
   system: string;
   messages: LlmMessage[];
   maxTokens: number;
+  /**
+   * Prompt caching for multi-turn calls: the request is cached up to its last block, so the next
+   * turn reads the shared prefix at a tenth of the input price. Prefixes under the model's
+   * minimum (4,096 tokens on Haiku 4.5, 1,024 on Sonnet 5) are simply not cached.
+   */
+  cache?: boolean;
 }
 
 export interface LlmResponse {
@@ -37,7 +43,22 @@ export interface LlmResponse {
   model: string;
   inputTokens: number;
   outputTokens: number;
+  /** Prompt-cache tokens (priced differently from input_tokens, which excludes them). */
+  cacheReadTokens?: number;
+  cacheWriteTokens?: number;
 }
+
+/** Prompt-cache tokens of a call, as logged in ai_usage. */
+export interface CacheTokens {
+  read: number;
+  write: number;
+}
+
+/** The cache part of a response, for logUsage. */
+export const cacheOf = (r: LlmResponse): CacheTokens => ({
+  read: r.cacheReadTokens ?? 0,
+  write: r.cacheWriteTokens ?? 0,
+});
 
 export interface LlmProvider {
   complete(request: LlmRequest): Promise<LlmResponse>;
@@ -69,7 +90,7 @@ export function anthropicProvider(
   workspaceId: string | undefined = workspaceFromEnv(),
 ): LlmProvider {
   return {
-    async complete({ system, messages, maxTokens }) {
+    async complete({ system, messages, maxTokens, cache }) {
       const res = await fetchFn('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -83,6 +104,7 @@ export function anthropicProvider(
           system,
           messages: messages.map((m) => ({ role: m.role, content: toAnthropicContent(m.content) })),
           max_tokens: maxTokens,
+          ...(cache ? { cache_control: { type: 'ephemeral' } } : {}),
         }),
       }).catch((e: unknown) => {
         throw new LlmError(`network: ${String(e)}`);
@@ -96,7 +118,12 @@ export function anthropicProvider(
       const data = (await res.json()) as {
         model?: string;
         content?: { type: string; text?: string }[];
-        usage?: { input_tokens?: number; output_tokens?: number };
+        usage?: {
+          input_tokens?: number;
+          output_tokens?: number;
+          cache_read_input_tokens?: number;
+          cache_creation_input_tokens?: number;
+        };
       };
       return {
         text: (data.content ?? [])
@@ -106,6 +133,8 @@ export function anthropicProvider(
         model: data.model ?? model,
         inputTokens: data.usage?.input_tokens ?? 0,
         outputTokens: data.usage?.output_tokens ?? 0,
+        cacheReadTokens: data.usage?.cache_read_input_tokens ?? 0,
+        cacheWriteTokens: data.usage?.cache_creation_input_tokens ?? 0,
       };
     },
   };

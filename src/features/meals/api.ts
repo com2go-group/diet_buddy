@@ -1,5 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 
+import { aiHeaders, boostFrom, type AiBoost } from '@/lib/ai/headers';
 import { addDays } from '@/lib/dates';
 import { optional, supabase } from '@/lib/supabase';
 
@@ -92,10 +93,14 @@ export async function searchFoods(query: string): Promise<FoodResult[]> {
 }
 
 export type PhotoErrorCode =
-  'not_configured' | 'limit_reached' | 'rate_limited' | 'invalid_image' | 'failed';
+  'not_configured' | 'limit_reached' | 'ai_budget' | 'rate_limited' | 'invalid_image' | 'failed';
 
 export class FoodPhotoError extends Error {
-  constructor(readonly code: PhotoErrorCode) {
+  constructor(
+    readonly code: PhotoErrorCode,
+    /** A rewarded video that adds more scans today, when the server offers one. */
+    readonly boost: AiBoost | null = null,
+  ) {
     super(code);
   }
 }
@@ -103,6 +108,7 @@ export class FoodPhotoError extends Error {
 const PHOTO_CODES: PhotoErrorCode[] = [
   'not_configured',
   'limit_reached',
+  'ai_budget',
   'rate_limited',
   'invalid_image',
 ];
@@ -110,16 +116,19 @@ const PHOTO_CODES: PhotoErrorCode[] = [
 /** Sends a base64 photo to the analyze-food-photo Edge Function (it is not stored). */
 export async function analyzeFoodPhoto(image: string): Promise<FoodPhotoResult> {
   const { data, error } = await supabase.functions.invoke('analyze-food-photo', {
+    headers: aiHeaders(),
     body: { image },
   });
   if (error) {
     let code: PhotoErrorCode = 'failed';
+    let boost: AiBoost | null = null;
     if (error instanceof FunctionsHttpError) {
       const body = (await error.context.json().catch(() => null)) as { error?: string } | null;
       const found = PHOTO_CODES.find((c) => c === body?.error);
       if (found) code = found;
+      boost = boostFrom(body);
     }
-    throw new FoodPhotoError(code);
+    throw new FoodPhotoError(code, boost);
   }
   const parsed = foodPhotoResponseSchema.safeParse(data);
   if (!parsed.success) throw new FoodPhotoError('failed');

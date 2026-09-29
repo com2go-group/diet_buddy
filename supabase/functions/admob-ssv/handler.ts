@@ -20,13 +20,13 @@ export interface SsvDeps {
   subtle: SubtleCrypto;
   getKeys(): Promise<VerifierKey[]>;
   /** Records the unlock; duplicates (same user, type, target) are ignored. */
-  recordUnlock(userId: string, type: 'meal_plan' | 'ai_plan', target: string): Promise<void>;
+  recordUnlock(userId: string, type: UnlockType, target: string): Promise<void>;
   now?: () => Date;
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const customDataSchema = z.object({
-  type: z.enum(['meal_plan', 'ai_plan']),
+  type: z.enum(['meal_plan', 'ai_plan', 'ai_boost']),
   target: z.string().max(24),
 });
 
@@ -99,13 +99,19 @@ const parseJson = (s: string | null): unknown => {
 
 const dayKeyUtc = (d: Date) => d.toISOString().slice(0, 10);
 
+export type UnlockType = 'meal_plan' | 'ai_plan' | 'ai_boost';
+
 /**
- * Meal plans unlock one meal ("YYYY-MM-DD:slot") for "today" in any time zone (server date
- * ±1 day); the AI plan once.
+ * Meal plans unlock one meal ("YYYY-MM-DD:slot") and AI boosts add AI use for a day
+ * ("YYYY-MM-DD:n", n 1–10; the daily maximum is applied where boosts are counted), both for
+ * "today" in any time zone (server date ±1 day); the AI plan once.
  */
-export function validTarget(type: 'meal_plan' | 'ai_plan', target: string, now: Date): boolean {
+export function validTarget(type: UnlockType, target: string, now: Date): boolean {
   if (type === 'ai_plan') return target === 'initial';
-  const match = /^(\d{4}-\d{2}-\d{2}):(breakfast|lunch|snack|dinner)$/.exec(target);
+  const match =
+    type === 'ai_boost'
+      ? /^(\d{4}-\d{2}-\d{2}):([1-9]|10)$/.exec(target)
+      : /^(\d{4}-\d{2}-\d{2}):(breakfast|lunch|snack|dinner)$/.exec(target);
   if (!match) return false;
   const day = 86_400_000;
   return [-day, 0, day].some((d) => dayKeyUtc(new Date(now.getTime() + d)) === match[1]);

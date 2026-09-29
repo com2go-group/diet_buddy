@@ -9,7 +9,7 @@ import mobileAds, {
 import { requestOptions, unitId } from './config';
 import type { AdsConsent, RewardOutcome, RewardRequest } from './types';
 
-export type { AdsConsent, RewardOutcome, RewardRequest } from './types';
+export type { AdsConsent, RewardOutcome, RewardRequest, UnlockType } from './types';
 
 export const adsSupported = true;
 

@@ -62,7 +62,7 @@ Import weight, body fat, steps, active energy and water, and save the weight and
 
 PREMIUM
 Premium removes ads and adds:
-• Unlimited AI coach messages
+• Up to 60 AI coach messages a day
 • Full AI meal plans every day, planned up to 7 days ahead
 • AI body scan from two photos (the photos are not stored)
 • Restaurant mode: scan a menu and see the dishes that best fit your plan

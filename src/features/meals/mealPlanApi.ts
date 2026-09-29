@@ -1,5 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 
+import { aiHeaders, boostFrom, type AiBoost } from '@/lib/ai/headers';
 import { optional, supabase } from '@/lib/supabase';
 
 import type { MealSlot } from './types';
@@ -88,14 +89,18 @@ export type MealPlanErrorCode =
   | 'ai_unavailable'
   | 'food_data_unavailable'
   | 'alternative_limit'
+  | 'ai_budget'
   | 'no_plan'
   | 'failed';
 
 export class MealPlanError extends Error {
   readonly code: MealPlanErrorCode;
-  constructor(code: MealPlanErrorCode) {
+  /** A rewarded video that adds more meal ideas today, when the server offers one. */
+  readonly boost: AiBoost | null;
+  constructor(code: MealPlanErrorCode, boost: AiBoost | null = null) {
     super(code);
     this.code = code;
+    this.boost = boost;
   }
 }
 
@@ -114,10 +119,12 @@ export function mealPlanAction(
 
 async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
   const { data, error } = await supabase.functions.invoke('generate-meal-plan', {
+    headers: aiHeaders(),
     body: { ...body, language: getLanguage() },
   });
   if (error) {
     let code: MealPlanErrorCode = 'failed';
+    let boost: AiBoost | null = null;
     if (error instanceof FunctionsHttpError) {
       const body = (await error.context.json().catch(() => null)) as { error?: string } | null;
       const known: MealPlanErrorCode[] = [
@@ -130,11 +137,13 @@ async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
         'ai_unavailable',
         'food_data_unavailable',
         'alternative_limit',
+        'ai_budget',
         'no_plan',
       ];
       if (known.includes(body?.error as MealPlanErrorCode)) code = body!.error as MealPlanErrorCode;
+      boost = boostFrom(body);
     }
-    throw new MealPlanError(code);
+    throw new MealPlanError(code, boost);
   }
   return (data as { plan: MealPlan }).plan;
 }

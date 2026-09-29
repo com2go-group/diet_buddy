@@ -116,3 +116,41 @@ describe('RewardGate', () => {
     await waitFor(() => expect(onDone).toHaveBeenCalled(), { timeout: 3000 });
   });
 });
+
+describe('AiBoostButton', () => {
+  it('shows a rewarded video for more AI and reports it once the server recorded it', async () => {
+    const { AiBoostButton } = jest.requireActual('../AiBoostButton');
+    const { useSessionStore } = jest.requireActual('../../auth/sessionStore');
+    useSessionStore.setState({ session: { user: { id: 'user-1' } } });
+    (showRewarded as jest.Mock).mockResolvedValue('earned');
+    const onEarned = jest.fn();
+    await renderScreen(
+      <AiBoostButton boost={{ target: '2026-09-29:1', adds: 3 }} onEarned={onEarned} />,
+    );
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Watch a short video for 3 more today' }),
+    );
+    await waitFor(() => expect(onEarned).toHaveBeenCalled());
+    expect((showRewarded as jest.Mock).mock.calls.at(-1)[0]).toEqual({
+      userId: 'user-1',
+      type: 'ai_boost',
+      target: '2026-09-29:1',
+    });
+  });
+
+  it('says so when the video was closed early, and shows nothing without an offer', async () => {
+    const { AiBoostButton } = jest.requireActual('../AiBoostButton');
+    (showRewarded as jest.Mock).mockResolvedValue('dismissed');
+    const onEarned = jest.fn();
+    await renderScreen(
+      <AiBoostButton boost={{ target: '2026-09-29:2', adds: null }} onEarned={onEarned} />,
+    );
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Watch a short video to keep using AI today' }),
+    );
+    expect(await screen.findByText(/closed early/)).toBeOnTheScreen();
+    expect(onEarned).not.toHaveBeenCalled();
+    await renderScreen(<AiBoostButton boost={null} onEarned={onEarned} />);
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+});

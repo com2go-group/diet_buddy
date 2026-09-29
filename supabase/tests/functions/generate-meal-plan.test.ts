@@ -7,6 +7,7 @@ import {
   type MealPlanStore,
   type StoredPlan,
 } from '../../functions/generate-meal-plan/handler';
+import { fakeAllowance } from './allowance';
 
 const NOW = new Date('2026-09-27T10:00:00Z');
 const DATE = '2026-09-27';
@@ -74,6 +75,9 @@ function setup(opts: {
   premium?: boolean;
   existing?: StoredPlan | null;
   replies: string[];
+  boosts?: number;
+  spentUsd?: number;
+  freeLlm?: LlmProvider;
 }) {
   const saved: { plan: unknown; regenerations: number }[] = [];
   const requests: LlmRequest[] = [];
@@ -103,6 +107,12 @@ function setup(opts: {
   const deps: MealPlanDeps = {
     store,
     llm,
+    freeLlm: opts.freeLlm,
+    allowance: fakeAllowance({
+      premium: opts.premium ?? false,
+      boosts: opts.boosts ?? 0,
+      spentUsd: opts.spentUsd ?? 0,
+    }),
     now: () => NOW,
     getUserId: async () => 'user-1',
     searchFoods: async (q) => (usda[q] ? [usda[q]!] : []),
@@ -380,27 +390,42 @@ describe('generate-meal-plan', () => {
       expect(plan.dishes.lunch.title).toBe('Lentil soup');
     });
 
-    it('limits alternatives per day (more with Premium)', async () => {
+    it('limits alternatives per day: one free, more with videos or Premium', async () => {
       const existing = await storedPlan();
-      const used = { ...existing, plan: { ...existing.plan, alternatives: 3 } };
+      const used = { ...existing, plan: { ...existing.plan, alternatives: 1 } };
+      const call = (d: MealPlanDeps) =>
+        handleGenerateMealPlan(post({ date: DATE, action: 'alternative', slot: 'lunch' }), d);
       const free = setup({ existing: used, replies: [lentilSoup] });
-      expect(
-        await (
-          await handleGenerateMealPlan(
-            post({ date: DATE, action: 'alternative', slot: 'lunch' }),
-            free.deps,
-          )
-        ).json(),
-      ).toEqual({ error: 'alternative_limit' });
+      expect(await (await call(free.deps)).json()).toEqual({
+        error: 'alternative_limit',
+        limit: 1,
+        adds: 1,
+        boost: { target: expect.stringMatching(/:1$/), adds: 1 },
+      });
+      const boosted = setup({ existing: used, boosts: 1, replies: [lentilSoup] });
+      expect((await call(boosted.deps)).status).toBe(200);
+      const broke = setup({ existing, spentUsd: 1, replies: [lentilSoup] });
+      expect(await (await call(broke.deps)).json()).toMatchObject({ error: 'ai_budget' });
+      const tenth = { ...existing, plan: { ...existing.plan, alternatives: 10 } };
       const premium = setup({ existing: used, premium: true, replies: [lentilSoup] });
-      expect(
-        (
-          await handleGenerateMealPlan(
-            post({ date: DATE, action: 'alternative', slot: 'lunch' }),
-            premium.deps,
-          )
-        ).status,
-      ).toBe(200);
+      expect((await call(premium.deps)).status).toBe(200);
+      const premiumCapped = setup({ existing: tenth, premium: true, replies: [lentilSoup] });
+      expect(await (await call(premiumCapped.deps)).json()).toEqual({ error: 'alternative_limit' });
+    });
+
+    it('plans free users on the cheaper model, and today’s plan needs no budget', async () => {
+      const cheap = {
+        complete: jest.fn(async () => ({
+          text: planJson(item('Apple', 'apple', 150)),
+          model: 'claude-haiku-4-5',
+          inputTokens: 10,
+          outputTokens: 10,
+        })),
+      };
+      const { deps, llm } = setup({ replies: [], freeLlm: cheap, spentUsd: 1 });
+      expect((await handleGenerateMealPlan(post(), deps)).status).toBe(200);
+      expect(cheap.complete).toHaveBeenCalled();
+      expect(llm.complete).not.toHaveBeenCalled();
     });
 
     it('skips a meal and undoes it, without a model call', async () => {

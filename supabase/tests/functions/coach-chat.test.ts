@@ -8,6 +8,7 @@ import {
   type StoredMessage,
 } from '../../functions/coach-chat/handler';
 import { SUPPORT_NOTES } from '../../functions/coach-chat/safety';
+import { fakeAllowance } from './allowance';
 
 const USER = '11111111-1111-1111-1111-111111111111';
 const NOW = new Date('2026-09-26T15:00:00Z');
@@ -29,15 +30,13 @@ const context: CoachContextData = {
   latestCheckIn: null,
 };
 
-function memoryStore(opts: { premium?: boolean; used?: number; limit?: number } = {}) {
+function memoryStore(opts: { used?: number } = {}) {
   const messages: (StoredMessage & { conversation: string; user: string })[] = [];
   const usage: { model: string; inputTokens: number; outputTokens: number }[] = [];
   const safetyEvents: [string, string, string][] = [];
   const conversations = new Map<string, { user: string; persona: 'aria' | 'max' | 'luna' }>();
   let seq = 0;
   const store: CoachStore = {
-    isPremium: async () => opts.premium ?? false,
-    dailyLimit: async () => opts.limit ?? 5,
     countUserMessagesSince: async (_u, since) =>
       (since.getTime() > NOW.getTime() - 120_000 ? 0 : (opts.used ?? 0)) +
       messages.filter((m) => m.role === 'user' && new Date(m.created_at) >= since).length,
@@ -97,9 +96,16 @@ const post = (body: unknown, auth = true) =>
     headers: auth ? { Authorization: 'Bearer token' } : {},
     body: JSON.stringify(body),
   });
-const deps = (store: CoachStore, llm: LlmProvider | null): CoachDeps => ({
+const deps = (
+  store: CoachStore,
+  llm: LlmProvider | null,
+  allowance = fakeAllowance(),
+  freeLlm?: LlmProvider,
+): CoachDeps => ({
   store,
   llm,
+  freeLlm,
+  allowance,
   getUserId: async (req) => (req.headers.get('Authorization') ? USER : null),
   now: () => NOW,
 });
@@ -120,7 +126,7 @@ describe('coach-chat handler', () => {
     expect(body.messages[1].content).toBe(
       'Try Greek yogurt with berries for a protein-rich snack.',
     );
-    expect(body.remaining).toBe(4);
+    expect(body.remaining).toBe(2); // 3 free messages a day
     expect(body.safety).toBe('none');
     expect(mem.usage).toEqual([{ model: 'claude-test', inputTokens: 100, outputTokens: 20 }]);
     expect(requests[0]!.system).toMatch(/You are Aria/);
@@ -145,27 +151,90 @@ describe('coach-chat handler', () => {
     ]);
   });
 
-  it('enforces the free daily limit on the server', async () => {
-    const mem = memoryStore({ used: 5, limit: 5 });
+  it('enforces the free daily limit on the server and offers a rewarded video', async () => {
+    const mem = memoryStore({ used: 3 });
     const { llm } = fakeLlm(ok('x'));
     const res = await handleCoachChat(
-      post({ persona: 'aria', message: 'Hi' }),
+      new Request('http://localhost/coach-chat', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer token', 'x-client-tz-offset': '-120' },
+        body: JSON.stringify({ persona: 'aria', message: 'Hi' }),
+      }),
       deps(mem.store, llm),
     );
     expect(res.status).toBe(429);
-    expect(await res.json()).toEqual({ error: 'limit_reached', limit: 5 });
+    // The video target uses the user's local date (UTC+2 here).
+    const next = new Date(NOW.getTime() + 120 * 60_000).toISOString().slice(0, 10);
+    expect(await res.json()).toEqual({
+      error: 'limit_reached',
+      limit: 3,
+      adds: 3,
+      boost: { target: `${next}:1`, adds: 3 },
+    });
     expect(llm.complete).not.toHaveBeenCalled();
   });
 
-  it('lets Premium users past the daily limit', async () => {
-    const mem = memoryStore({ premium: true, used: 50 });
+  it('raises the free limit with each rewarded video, up to the daily maximum', async () => {
+    const mem = memoryStore({ used: 5 });
+    const { llm } = fakeLlm(ok('Sure.'));
+    const res = await handleCoachChat(
+      post({ persona: 'aria', message: 'Hi' }),
+      deps(mem.store, llm, fakeAllowance({ boosts: 1 })),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).remaining).toBe(0); // 3 + 3 - 5 - 1
+    const maxed = await handleCoachChat(
+      post({ persona: 'aria', message: 'Hi' }),
+      deps(memoryStore({ used: 12 }).store, llm, fakeAllowance({ boosts: 3 })),
+    );
+    expect((await maxed.json()).boost).toBeNull();
+  });
+
+  it('stops free users at the daily AI budget, and never offers videos on the web', async () => {
+    const { llm } = fakeLlm(ok('x'));
+    const res = await handleCoachChat(
+      new Request('http://localhost/coach-chat', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer token', 'x-client-platform': 'web' },
+        body: JSON.stringify({ persona: 'aria', message: 'Hi' }),
+      }),
+      deps(memoryStore().store, llm, fakeAllowance({ spentUsd: 0.006, budgetUsd: 0.006 })),
+    );
+    expect(res.status).toBe(429);
+    expect(await res.json()).toEqual({ error: 'ai_budget', boost: null });
+    expect(llm.complete).not.toHaveBeenCalled();
+  });
+
+  it('runs free users on the cheaper model with prompt caching, Premium on its own', async () => {
+    const premium = fakeLlm(ok('Premium answer.'));
+    const free = fakeLlm(ok('Free answer.'));
+    await handleCoachChat(
+      post({ persona: 'aria', message: 'Hi' }),
+      deps(memoryStore().store, premium.llm, fakeAllowance(), free.llm),
+    );
+    expect(free.llm.complete).toHaveBeenCalledTimes(1);
+    expect(premium.llm.complete).not.toHaveBeenCalled();
+    expect(free.requests[0]!.cache).toBe(true);
+    await handleCoachChat(
+      post({ persona: 'aria', message: 'Hi' }),
+      deps(memoryStore().store, premium.llm, fakeAllowance({ premium: true }), free.llm),
+    );
+    expect(premium.llm.complete).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives Premium users a fair-use limit instead of the free one', async () => {
     const { llm } = fakeLlm(ok('Sure.'));
     const res = await handleCoachChat(
       post({ persona: 'luna', message: 'Hi' }),
-      deps(mem.store, llm),
+      deps(memoryStore({ used: 50 }).store, llm, fakeAllowance({ premium: true, spentUsd: 5 })),
     );
     expect(res.status).toBe(200);
     expect((await res.json()).remaining).toBeNull();
+    const capped = await handleCoachChat(
+      post({ persona: 'luna', message: 'Hi' }),
+      deps(memoryStore({ used: 60 }).store, llm, fakeAllowance({ premium: true })),
+    );
+    expect(await capped.json()).toEqual({ error: 'fair_use_limit', limit: 60 });
   });
 
   it('adds professional-help guidance in code even if the model does not flag it', async () => {

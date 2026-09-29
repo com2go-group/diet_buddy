@@ -9,9 +9,22 @@ import {
 } from '../_prompts/mealPlan.v3.ts';
 import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
 import { dayOffset } from '../_shared/dates.ts';
+import {
+  clientDay,
+  outOfAi,
+  overBudget,
+  type AiAllowance,
+  type ClientDay,
+} from '../_shared/aiAllowance.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { languageField, translateTexts, type Language } from '../_shared/language.ts';
-import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
+import {
+  cacheOf,
+  type CacheTokens,
+  extractJson,
+  type LlmMessage,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 import type { FoodResult } from '../_shared/usda.ts';
 import {
   aiMealSchema,
@@ -46,13 +59,24 @@ export interface MealPlanStore {
   save(userId: string, date: string, plan: MealPlan, regenerations: number): Promise<void>;
   /** Model calls made by this function for the user since `since` (cost cap). */
   callsSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface MealPlanDeps {
   getUserId(req: Request): Promise<string | null>;
   store: MealPlanStore;
+  /** Premium's model. */
   llm: LlmProvider | null;
+  /** Free users' (cheaper) model; defaults to `llm`. */
+  freeLlm?: LlmProvider | null;
+  /** Free users' AI allowance ("another idea" limits and budget). */
+  allowance(userId: string, day: ClientDay): Promise<AiAllowance>;
   /** USDA search (server key). */
   searchFoods(query: string): Promise<FoodResult[]>;
   now?: () => Date;
@@ -71,9 +95,12 @@ const requestSchema = z.object({
 export const MAX_ATTEMPTS = 3;
 export const PREMIUM_REGENERATIONS = 3;
 export const DAILY_CALL_CAP = 15;
-/** "Another idea" per day (each is a model call, so this also caps cost). */
-export const FREE_ALTERNATIVES = 3;
+/** Premium's "another idea" per day (free users' limit is in app_config, raised by videos). */
 export const PREMIUM_ALTERNATIVES = 10;
+
+/** The model for this user: free users run on the cheaper one (decision log 2026-09-29). */
+const modelFor = (deps: MealPlanDeps, premium: boolean) =>
+  premium ? deps.llm : (deps.freeLlm ?? deps.llm);
 
 /** Premium can plan this many days ahead (for the week's grocery list). */
 export const PREMIUM_DAYS_AHEAD = 7;
@@ -117,6 +144,7 @@ type Resolved = { name: string; food: FoodResult; grams: number }[];
  */
 async function localize(
   deps: MealPlanDeps,
+  llm: LlmProvider,
   userId: string,
   meals: { dish: Dish; items: PlannedItem[] }[],
   language: Language | undefined,
@@ -127,7 +155,7 @@ async function localize(
     ...(dish.steps ?? []),
     ...items.map((i) => i.name),
   ]);
-  const out = await translateTexts(deps.llm, texts, language);
+  const out = await translateTexts(llm, texts, language);
   if (out.usage) {
     const u = out.usage;
     await deps.store.logUsage(userId, u.model, u.inputTokens, u.outputTokens);
@@ -238,7 +266,13 @@ async function attempt<T>(
       aiFailures++;
       continue;
     }
-    await deps.store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
+    await deps.store.logUsage(
+      userId,
+      result.model,
+      result.inputTokens,
+      result.outputTokens,
+      cacheOf(result),
+    );
     messages.push({ role: 'assistant', content: result.text });
     const built = await build(result.text);
     if ('value' in built) return { value: built.value, model: result.model };
@@ -321,7 +355,16 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
         await store.save(userId, date, plan, existing.regenerations);
         return json({ plan });
       }
-      return await alternative(deps, userId, date, slot, existing, now, language);
+      return await alternative(
+        deps,
+        userId,
+        date,
+        slot,
+        existing,
+        now,
+        language,
+        clientDay(req, now),
+      );
     }
 
     if (existing && !regenerate) return json({ plan: existing.plan });
@@ -332,7 +375,9 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       return fail(ctx.premium ? 'regenerate_limit' : 'premium_required', 403);
     }
     if (!ctx.targets) return fail('no_targets', 409);
-    if (!deps.llm) return fail('not_configured', 503);
+    // Today's (or tomorrow's) plan is always included for free users: no AI budget check here.
+    const llm = modelFor(deps, ctx.premium);
+    if (!llm) return fail('not_configured', 503);
     if ((await store.callsSince(userId, new Date(now.getTime() - 86_400_000))) >= DAILY_CALL_CAP) {
       return fail('rate_limited', 429);
     }
@@ -343,7 +388,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       slots: Record<Slot, PlannedItem[]>;
       dishes: Record<Slot, Dish>;
     }>(
-      { ...deps, llm: deps.llm },
+      { ...deps, llm },
       userId,
       mealPlanSystemPrompt(input),
       `Plan meals for ${date}.`,
@@ -372,6 +417,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
 
     const local = await localize(
       deps,
+      llm,
       userId,
       SLOTS.map((s) => ({ dish: result.value.dishes[s], items: result.value.slots[s] })),
       language,
@@ -414,13 +460,27 @@ async function alternative(
   existing: StoredPlan,
   now: Date,
   language: Language | undefined,
+  day: ClientDay,
 ): Promise<Response> {
   const ctx = await deps.store.context(userId);
   if (!ctx.targets) return fail('no_targets', 409);
-  if (!deps.llm) return fail('not_configured', 503);
+  const llm = modelFor(deps, ctx.premium);
+  if (!llm) return fail('not_configured', 503);
   const used = existing.plan.alternatives ?? 0;
-  if (used >= (ctx.premium ? PREMIUM_ALTERNATIVES : FREE_ALTERNATIVES)) {
-    return fail('alternative_limit', 403);
+  if (ctx.premium) {
+    if (used >= PREMIUM_ALTERNATIVES) return fail('alternative_limit', 403);
+  } else {
+    // Free: a daily limit that rewarded videos raise, within the AI budget.
+    const allowance = await deps.allowance(userId, day);
+    const { limits } = allowance;
+    const limit = limits.alternativesFree + allowance.boosts * limits.boostAlternatives;
+    if (used >= limit) {
+      return outOfAi('alternative_limit', allowance, day, {
+        limit,
+        adds: limits.boostAlternatives,
+      });
+    }
+    if (overBudget(allowance)) return outOfAi('ai_budget', allowance, day);
   }
   if (
     (await deps.store.callsSince(userId, new Date(now.getTime() - 86_400_000))) >= DAILY_CALL_CAP
@@ -436,7 +496,7 @@ async function alternative(
   const input = promptInput(ctx);
   const lookup = makeLookup(deps);
   const result = await attempt<{ items: PlannedItem[]; dish: Dish }>(
-    { ...deps, llm: deps.llm },
+    { ...deps, llm },
     userId,
     alternativeMealSystemPrompt(input, slot, avoidTitles),
     `Suggest another ${slot} for ${date}.`,
@@ -459,7 +519,7 @@ async function alternative(
   );
   if ('response' in result) return result.response;
 
-  const [local] = await localize(deps, userId, [result.value], language);
+  const [local] = await localize(deps, llm, userId, [result.value], language);
   const slots = { ...existing.plan.slots, [slot]: local!.items };
   const plan: MealPlan = {
     ...existing.plan,

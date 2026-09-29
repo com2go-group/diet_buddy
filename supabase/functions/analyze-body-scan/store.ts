@@ -48,7 +48,7 @@ export function supabaseBodyScanStore(db: SupabaseClient): BodyScanStore {
       return rows?.length ?? 0;
     },
 
-    async logUsage(userId, model, inputTokens, outputTokens) {
+    async logUsage(userId, model, inputTokens, outputTokens, cache) {
       must(
         await db.from('ai_usage').insert({
           user_id: userId,
@@ -56,6 +56,8 @@ export function supabaseBodyScanStore(db: SupabaseClient): BodyScanStore {
           model,
           input_tokens: inputTokens,
           output_tokens: outputTokens,
+          cache_read_tokens: cache?.read ?? 0,
+          cache_write_tokens: cache?.write ?? 0,
         }),
       );
     },

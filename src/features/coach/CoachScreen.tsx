@@ -17,6 +17,7 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import { NotificationBell } from '../notifications';
+import { AiBoostButton } from '../ads';
 import { CoachError, type Persona } from './api';
 import { MessageBubble } from './components/MessageBubble';
 import { PERSONAS, PersonaPicker } from './components/PersonaPicker';
@@ -56,6 +57,14 @@ export function CoachScreen() {
 
   const errorCode =
     send.error instanceof CoachError ? send.error.code : send.error ? 'failed' : null;
+  // Out of free messages or AI for today: a rewarded video adds more (not on the web).
+  const outOfAi = blocked || errorCode === 'limit_reached' || errorCode === 'ai_budget';
+  const boost =
+    send.error instanceof CoachError && send.error.boost
+      ? send.error.boost
+      : blocked
+        ? (thread?.boost ?? null)
+        : null;
 
   const body = () => {
     if (query.isPending) return <SkeletonCard lines={4} />;
@@ -177,8 +186,17 @@ export function CoachScreen() {
                   })}
             </Text>
           ) : null}
-          {blocked ? (
-            <Button label={t('coach.upgrade')} size="md" onPress={() => openPaywall('coach')} />
+          {outOfAi ? (
+            <>
+              <AiBoostButton
+                boost={boost}
+                onEarned={() => {
+                  send.reset();
+                  void query.refetch();
+                }}
+              />
+              <Button label={t('coach.upgrade')} size="md" onPress={() => openPaywall('coach')} />
+            </>
           ) : null}
           <ScrollView
             horizontal

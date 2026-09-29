@@ -9,6 +9,7 @@ import {
 import type { DietPrefs } from '../../functions/_shared/dietRules';
 import { anthropicProvider, type LlmProvider, type LlmRequest } from '../../functions/_shared/llm';
 import type { FoodResult } from '../../functions/_shared/usda';
+import { fakeAllowance } from './allowance';
 
 const JPEG = '/9j/' + 'A'.repeat(200);
 const noPrefs: DietPrefs = {
@@ -52,14 +53,13 @@ function setup(opts: {
   prefs?: Partial<DietPrefs>;
   premium?: boolean;
   used?: number;
-  limit?: number;
+  boosts?: number;
+  spentUsd?: number;
 }) {
   const usage: number[][] = [];
   const requests: LlmRequest[] = [];
   const store: FoodPhotoStore = {
-    isPremium: async () => opts.premium ?? false,
     prefs: async () => ({ ...noPrefs, ...opts.prefs }),
-    dailyLimit: async () => opts.limit ?? 3,
     scansSince: async () => opts.used ?? 0,
     logUsage: async (_u, _m, i, o) => void usage.push([i, o]),
   };
@@ -75,6 +75,11 @@ function setup(opts: {
   const deps: FoodPhotoDeps = {
     store,
     llm,
+    allowance: fakeAllowance({
+      premium: opts.premium ?? false,
+      boosts: opts.boosts ?? 0,
+      spentUsd: opts.spentUsd ?? 0,
+    }),
     getUserId: async () => 'user-1',
     searchFoods: async (q) => usda[q] ?? [],
   };
@@ -108,7 +113,7 @@ describe('analyze-food-photo', () => {
       // A generic (unbranded) food is preferred.
       expect.objectContaining({ food: expect.objectContaining({ ref: 'usda:rice white cooked' }) }),
     ]);
-    expect(body.remaining).toBe(2);
+    expect(body.remaining).toBe(0); // 1 free scan a day
     expect(usage).toEqual([[100, 20]]);
     const content = requests[0]!.messages[0]!.content;
     expect(Array.isArray(content) && content[0]).toEqual({
@@ -174,12 +179,25 @@ describe('analyze-food-photo', () => {
   });
 
   it('enforces the free daily limit and the Premium cost cap', async () => {
-    const free = setup({ replies: [], used: 3 });
+    const free = setup({ replies: [], used: 1 });
     const r1 = await handleAnalyzeFoodPhoto(post(), free.deps);
     expect(r1.status).toBe(429);
-    expect(await r1.json()).toEqual({ error: 'limit_reached' });
+    expect(await r1.json()).toEqual({
+      error: 'limit_reached',
+      limit: 1,
+      adds: 1,
+      boost: { target: expect.stringMatching(/^\d{4}-\d{2}-\d{2}:1$/), adds: 1 },
+    });
 
-    const premium = setup({ replies: ['{"items":[]}'], used: 3, premium: true });
+    const boosted = setup({ replies: ['{"items":[]}'], used: 1, boosts: 1 });
+    expect((await handleAnalyzeFoodPhoto(post(), boosted.deps)).status).toBe(200);
+
+    const broke = setup({ replies: [], spentUsd: 1 });
+    expect(await (await handleAnalyzeFoodPhoto(post(), broke.deps)).json()).toMatchObject({
+      error: 'ai_budget',
+    });
+
+    const premium = setup({ replies: ['{"items":[]}'], used: 3, premium: true, spentUsd: 1 });
     const r2 = await handleAnalyzeFoodPhoto(post(), premium.deps);
     expect(r2.status).toBe(200);
     expect((await r2.json()).remaining).toBeNull();

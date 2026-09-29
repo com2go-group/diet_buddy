@@ -6,28 +6,47 @@ import {
   retryFeedback,
 } from '../_prompts/foodPhoto.v1.ts';
 import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
+import {
+  clientDay,
+  outOfAi,
+  overBudget,
+  type AiAllowance,
+  type ClientDay,
+} from '../_shared/aiAllowance.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { BASE64, detectMediaType, stripJpegMetadata } from '../_shared/image.ts';
-import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
+import {
+  type CacheTokens,
+  extractJson,
+  type LlmMessage,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 import type { FoodResult } from '../_shared/usda.ts';
 import { pickFood } from '../generate-meal-plan/plan.ts';
 
 export { detectMediaType, stripJpegMetadata };
 
 export interface FoodPhotoStore {
-  isPremium(userId: string): Promise<boolean>;
   prefs(userId: string): Promise<DietPrefs>;
-  /** Free-tier scans per day, from app_config. */
-  dailyLimit(): Promise<number>;
   /** Scans (one ai_usage row each) by this user since `since`. */
   scansSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface FoodPhotoDeps {
   getUserId(req: Request): Promise<string | null>;
   store: FoodPhotoStore;
+  /** Premium's model. */
   llm: LlmProvider | null;
+  /** Free users' (cheaper) model; defaults to `llm`. */
+  freeLlm?: LlmProvider | null;
+  allowance(userId: string, day: ClientDay): Promise<AiAllowance>;
   /** USDA search of generic foods (server key). */
   searchFoods(query: string): Promise<FoodResult[]>;
   now?: () => Date;
@@ -35,7 +54,6 @@ export interface FoodPhotoDeps {
 
 /** ~3.7 MB of image data; the app sends a compressed JPEG well under this. */
 export const MAX_BASE64_LENGTH = 5_000_000;
-export const DEFAULT_DAILY_LIMIT = 3;
 /** Cost cap for everyone, Premium included. */
 export const PREMIUM_DAILY_LIMIT = 30;
 export const MAX_ATTEMPTS = 2;
@@ -87,13 +105,25 @@ export async function handleAnalyzeFoodPhoto(req: Request, deps: FoodPhotoDeps):
 
     const { store } = deps;
     const now = deps.now?.() ?? new Date();
-    const [premium, freeLimit, used] = await Promise.all([
-      store.isPremium(userId),
-      store.dailyLimit(),
-      store.scansSince(userId, new Date(now.getTime() - 86_400_000)),
+    // Free users: a daily limit that rewarded videos raise, and the AI budget (decision log
+    // 2026-09-29). Premium: a cost cap.
+    const day = clientDay(req, now);
+    const [allowance, used] = await Promise.all([
+      deps.allowance(userId, day),
+      store.scansSince(userId, day.dayStart),
     ]);
-    const limit = premium ? PREMIUM_DAILY_LIMIT : freeLimit;
-    if (used >= limit) return fail(premium ? 'rate_limited' : 'limit_reached', 429);
+    const { premium, limits } = allowance;
+    const limit = premium
+      ? PREMIUM_DAILY_LIMIT
+      : limits.foodPhotoFree + allowance.boosts * limits.boostFoodPhoto;
+    if (used >= limit) {
+      return premium
+        ? fail('rate_limited', 429)
+        : outOfAi('limit_reached', allowance, day, { limit, adds: limits.boostFoodPhoto });
+    }
+    if (overBudget(allowance)) return outOfAi('ai_budget', allowance, day);
+    const llm = premium ? deps.llm : (deps.freeLlm ?? deps.llm);
+    if (!llm) return fail('not_configured', 503);
 
     const messages: LlmMessage[] = [
       {
@@ -107,7 +137,7 @@ export async function handleAnalyzeFoodPhoto(req: Request, deps: FoodPhotoDeps):
     const usage = { model: '', input: 0, output: 0 };
     let items: z.infer<typeof aiSchema>['items'] | null = null;
     for (let attempt = 0; attempt < MAX_ATTEMPTS && !items; attempt++) {
-      const result = await deps.llm
+      const result = await llm
         .complete({ system: FOOD_PHOTO_SYSTEM_PROMPT, messages, maxTokens: 600 })
         .catch(() => null);
       if (!result) continue;

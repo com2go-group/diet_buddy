@@ -1,9 +1,22 @@
 import { z } from 'npm:zod@4';
 
 import { COACH_PROMPT_VERSION, coachSystemPrompt, type Persona } from '../_prompts/coach.v1.ts';
+import {
+  clientDay,
+  outOfAi,
+  overBudget,
+  type AiAllowance,
+  type ClientDay,
+} from '../_shared/aiAllowance.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { languageField, replyLanguageLine } from '../_shared/language.ts';
-import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
+import {
+  cacheOf,
+  type CacheTokens,
+  extractJson,
+  type LlmMessage,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 import { buildCoachContext, type CoachContextData } from './context.ts';
 import { combineFlags, screenMessage, withSupportNote, type SafetyFlag } from './safety.ts';
 
@@ -31,9 +44,7 @@ export interface StoredMessage {
 
 /** Database access for the coach, implemented with the service-role client in store.ts. */
 export interface CoachStore {
-  isPremium(userId: string): Promise<boolean>;
-  dailyLimit(): Promise<number>;
-  /** User messages sent since `since` (for the free-tier daily limit and burst limit). */
+  /** User messages sent since `since` (for the daily limits and the burst limit). */
   countUserMessagesSince(userId: string, since: Date): Promise<number>;
   loadContext(userId: string, dayStart: Date): Promise<CoachContextData>;
   /** The conversation's persona, or null if it isn't this user's. */
@@ -47,7 +58,13 @@ export interface CoachStore {
     userText: string,
     reply: string,
   ): Promise<{ user: StoredMessage; assistant: StoredMessage }>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
   /** Records that a reply was flagged (flag and persona only, never the text) for admin review. */
   recordSafetyEvent(
     userId: string,
@@ -59,7 +76,11 @@ export interface CoachStore {
 export interface CoachDeps {
   getUserId(req: Request): Promise<string | null>;
   store: CoachStore;
+  /** Premium's model. */
   llm: LlmProvider | null;
+  /** Free users' (cheaper) model; defaults to `llm`. */
+  freeLlm?: LlmProvider | null;
+  allowance(userId: string, day: ClientDay): Promise<AiAllowance>;
   now?: () => Date;
 }
 
@@ -103,25 +124,34 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
   const parsed = requestSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail('invalid_request', 400);
   const { persona, message, conversationId, timezoneOffset = 0, language } = parsed.data;
-  const { store, llm } = deps;
+  const { store } = deps;
   const now = deps.now?.() ?? new Date();
-  const dayStart = localDayStart(now, timezoneOffset);
+  const day = clientDay(req, now, timezoneOffset);
+  const { dayStart } = day;
 
-  // Limits: a burst limit for everyone, and the daily limit (app_config) on the free tier.
-  const premium = await store.isPremium(userId);
   if (
     (await store.countUserMessagesSince(userId, new Date(now.getTime() - 60_000))) >=
     BURST_LIMIT_PER_MINUTE
   ) {
     return fail('rate_limited', 429);
   }
-  let remaining: number | null = null;
-  if (!premium) {
-    const limit = await store.dailyLimit();
-    const used = await store.countUserMessagesSince(userId, dayStart);
-    if (used >= limit) return json({ error: 'limit_reached', limit }, 429);
-    remaining = limit - used - 1;
+  // Daily limits (app_config): free users' limit grows with today's rewarded videos, and their
+  // AI spend is capped too (decision log 2026-09-29); Premium has a fair-use limit.
+  const allowance = await deps.allowance(userId, day);
+  const { premium, limits } = allowance;
+  const limit = premium
+    ? limits.coachPremium
+    : limits.coachFree + allowance.boosts * limits.boostCoach;
+  const used = await store.countUserMessagesSince(userId, dayStart);
+  if (used >= limit) {
+    return premium
+      ? json({ error: 'fair_use_limit', limit }, 429)
+      : outOfAi('limit_reached', allowance, day, { limit, adds: limits.boostCoach });
   }
+  if (overBudget(allowance)) return outOfAi('ai_budget', allowance, day);
+  const remaining = premium ? null : limit - used - 1;
+  const llm = premium ? deps.llm : (deps.freeLlm ?? deps.llm);
+  if (!llm) return fail('not_configured', 503);
 
   let conversation = conversationId ?? null;
   if (conversation && (await store.conversationPersona(userId, conversation)) !== persona) {
@@ -140,8 +170,15 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
   let reply: z.infer<typeof replySchema> | null = null;
   for (let attempt = 0; attempt < 2 && !reply; attempt++) {
     try {
-      const result = await llm.complete({ system, messages, maxTokens: 700 });
-      await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
+      // Cached: the next message in the conversation reads this prefix at a tenth of the price.
+      const result = await llm.complete({ system, messages, maxTokens: 700, cache: true });
+      await store.logUsage(
+        userId,
+        result.model,
+        result.inputTokens,
+        result.outputTokens,
+        cacheOf(result),
+      );
       const candidate = replySchema.safeParse(extractJson(result.text));
       if (candidate.success) reply = candidate.data;
     } catch {

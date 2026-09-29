@@ -8,6 +8,7 @@ import { formatNumber } from '@/lib/format';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../../auth/components/FormMessage';
+import { AiBoostButton } from '../../ads';
 import { openPaywall } from '../../subscriptions/paywallRoute';
 import { dishOf, MealPlanError, type MealPlan } from '../mealPlanApi';
 import { logTimeFor } from '../portion';
@@ -68,12 +69,18 @@ export function CurrentMeal({
         </Callout>
       ) : null}
       <FormMessage message={errorText(act.error) ?? errorText(log.error)} />
-      {!premium && act.error instanceof MealPlanError && act.error.code === 'alternative_limit' ? (
-        <Button
-          label={t('mealPlan.moreIdeasPremium')}
-          size="md"
-          onPress={() => openPaywall('mealPlans')}
-        />
+      {!premium &&
+      act.error instanceof MealPlanError &&
+      (act.error.code === 'alternative_limit' || act.error.code === 'ai_budget') ? (
+        <>
+          {/* A rewarded video adds more ideas today (not on the web). */}
+          <AiBoostButton boost={act.error.boost} onEarned={() => act.reset()} />
+          <Button
+            label={t('mealPlan.moreIdeasPremium')}
+            size="md"
+            onPress={() => openPaywall('mealPlans')}
+          />
+        </>
       ) : null}
       <MealCard
         dish={dish}

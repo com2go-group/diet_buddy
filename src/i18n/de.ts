@@ -884,6 +884,8 @@ export const de: Translation = {
       'Der Fotoscan ist auf diesem Server noch nicht eingerichtet. Nutze vorerst die Suche.',
     limitReached:
       'Du hast die kostenlosen Fotoscans für heute genutzt. Mit Premium bekommst du jeden Tag mehr.',
+    aiBudget:
+      'Du hast die kostenlose KI für heute aufgebraucht. Um Mitternacht geht es wieder los.',
     rateLimited: 'Du hast das heutige Limit für Fotoscans erreicht. Versuche es morgen wieder.',
     upgrade: 'Premium ansehen',
     warningAllergy: 'Kann {{what}} enthalten, das du als Allergie angegeben hast',
@@ -1160,8 +1162,8 @@ export const de: Translation = {
     remaining: 'Heute noch {{count}} von {{limit}} kostenlosen Nachrichten',
     remainingNone:
       'Du hast die {{limit}} kostenlosen Nachrichten für heute genutzt. Sie werden um Mitternacht zurückgesetzt.',
-    premiumNote: 'Premium enthält unbegrenztes Coaching.',
-    upgrade: 'Unbegrenztes Coaching mit Premium',
+    premiumNote: 'Premium enthält bis zu 60 Nachrichten pro Tag.',
+    upgrade: 'Bis zu 60 Nachrichten pro Tag mit Premium',
     explainDeficit:
       'Dein Plan auf einen Blick 📋 Dein Körper verbraucht etwa {{tdee}} kcal am Tag. Dein Ziel von {{kcal}} kcal liegt {{gap}} kcal darunter – ein stetiges Defizit, mit dem du Fett verlierst, ohne zu hungern.',
     explainSurplus:
@@ -1181,6 +1183,10 @@ export const de: Translation = {
     error_rate_limited: 'Du schreibst sehr schnell. Warte kurz und versuche es erneut.',
     error_not_configured: 'Der Coach ist auf diesem Server noch nicht eingerichtet.',
     error_ai_failed: 'Der Coach konnte gerade nicht antworten. Bitte versuche es erneut.',
+    error_ai_budget:
+      'Du hast die kostenlose KI für heute aufgebraucht. Um Mitternacht geht es wieder los.',
+    error_fair_use_limit:
+      'Du hast heute schon viele Nachrichten geschickt. Der Coach ist morgen wieder für dich da.',
     error_failed:
       'Deine Nachricht wurde nicht gesendet. Prüfe deine Verbindung und versuche es erneut.',
     loadFailed: 'Dein Gespräch konnte nicht geladen werden.',
@@ -1195,7 +1201,8 @@ export const de: Translation = {
     checkIn: 'Check-in',
     checkedIn: 'Eingecheckt ✓',
     upgradeTitle: 'Auf Premium upgraden',
-    upgradeDesc: 'Keine Werbung, unbegrenzter KI-Coach und vollständige tägliche Ernährungspläne.',
+    upgradeDesc:
+      'Keine Werbung, bis zu 60 Coach-Nachrichten pro Tag und vollständige tägliche Essenspläne.',
     restore: 'Käufe wiederherstellen',
     healthApps: 'Gesundheits-Apps',
     healthConnected: 'Verbunden',
@@ -1255,7 +1262,7 @@ export const de: Translation = {
       'Nur du. Sie werden in der EU gespeichert, nie verkauft und nie für Werbung genutzt. Du kannst sie unter Datenschutz & Daten exportieren oder löschen.',
     faq5q: 'Warum kann ich keine weiteren Coach-Nachrichten senden?',
     faq5a:
-      'Der kostenlose Plan enthält 5 Coach-Nachrichten pro Tag. Sie werden um Mitternacht zurückgesetzt.',
+      'Der kostenlose Plan enthält 3 Coach-Nachrichten pro Tag, und jedes kurze Video, das du dir ansiehst, bringt 3 weitere (bis zu 3 Videos pro Tag). Sie werden um Mitternacht zurückgesetzt. Premium enthält bis zu 60 pro Tag.',
   },
   privacy: {
     title: 'Datenschutz & Daten',
@@ -1314,7 +1321,7 @@ export const de: Translation = {
     saveBadge: '{{pct}} % sparen',
     includedNow: 'Enthalten',
     featureNoAds: 'Keine Werbung',
-    featureCoach: 'Unbegrenzte Nachrichten an den KI-Coach',
+    featureCoach: 'Bis zu 60 KI-Coach-Nachrichten pro Tag',
     featureMealPlans: 'Vollständige tägliche KI-Ernährungspläne, ohne Videos',
     featurePhotos: 'Vorher-nachher-Fotovergleich',
     featureInsights: 'Tägliche KI-geschriebene Fortschritts-Einblicke',
@@ -1358,6 +1365,13 @@ export const de: Translation = {
     terms: 'Bedingungen',
     privacy: 'Datenschutz',
     upgrade: 'Upgraden',
+  },
+  aiBoost: {
+    watch: 'Kurzes Video ansehen für {{count}} mehr heute',
+    watchBudget: 'Kurzes Video ansehen, um die KI heute weiter zu nutzen',
+    notEarned: 'Das Video wurde vorzeitig geschlossen, daher wurde nichts hinzugefügt.',
+    unavailable:
+      'Gerade ist kein Video verfügbar. Versuch es später noch einmal oder hol dir mehr mit Premium.',
   },
   ads: {
     label: 'Anzeige',
@@ -1469,6 +1483,8 @@ export const de: Translation = {
     error_food_data_unavailable:
       'Die Lebensmitteldatenbank ist gerade nicht verfügbar. Versuche es in ein paar Minuten erneut.',
     error_failed: 'Etwas ist schiefgelaufen. Prüfe deine Verbindung und versuche es erneut.',
+    error_ai_budget:
+      'Du hast die kostenlose KI für heute aufgebraucht. Um Mitternacht geht es wieder los.',
     totals: 'Plan gesamt: {{kcal}} kcal · {{protein}} g Protein',
     planning: 'Die Mahlzeiten für heute werden geplant …',
     planningDesc: 'Abgestimmt auf deine Ziele, deine Ernährung und deine Allergien.',

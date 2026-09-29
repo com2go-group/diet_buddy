@@ -15,7 +15,9 @@ Owner decisions 2026-09-28: verification and password-reset emails go through **
 6. **Authentication → Rate Limits**: raise "emails sent per hour" to what you expect at launch (Brevo's free plan allows 300 emails a day; upgrade when needed).
 7. Test: sign up with a real address and check the 6-digit code arrives.
 
-## 2. sms.to (SMS)
+## 2. sms.to (SMS) — optional
+
+**Email is the default sign-up method and costs next to nothing; phone sign-up is off until you switch it on (step 6).** One EU text costs about €0.03–0.08, which is about a year of a typical free user's ad contribution after AI costs (see `docs/business/ai-ad-economics.xlsx`). Keep phone sign-up off unless a market needs it, and if you switch it on, keep the rate limits and CAPTCHA below.
 
 1. Create an account at [sms.to](https://sms.to), add credit, and create an **API key** (Settings → API Keys).
 2. Sender ID: register `DietBuddy` (some countries need pre-registration; others show a number instead).

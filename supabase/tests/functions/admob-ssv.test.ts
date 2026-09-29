@@ -92,6 +92,10 @@ describe('admob-ssv', () => {
     expect(validTarget('meal_plan', '2026-09-26:brunch', NOW)).toBe(false);
     expect(validTarget('meal_plan', '2026-09-28:breakfast', NOW)).toBe(true);
     expect(validTarget('ai_plan', 'other', NOW)).toBe(false);
+    expect(validTarget('ai_boost', '2026-09-26:1', NOW)).toBe(true);
+    expect(validTarget('ai_boost', '2026-09-26:0', NOW)).toBe(false);
+    expect(validTarget('ai_boost', '2026-09-26:lunch', NOW)).toBe(false);
+    expect(validTarget('ai_boost', '2026-09-20:1', NOW)).toBe(false);
   });
 
   it('answers Google’s unsigned verification ping', async () => {

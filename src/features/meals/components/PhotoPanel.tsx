@@ -13,6 +13,7 @@ import { photoWarningText } from '../photoWarnings';
 import type { FoodPhotoResult, Macros, PhotoItem } from '../types';
 import { usePhotoScan } from '../useMeals';
 import { PhotoItemRow, type PhotoChoice } from './PhotoItemRow';
+import { AiBoostButton } from '../../ads';
 import { openPaywall } from '../../subscriptions/paywallRoute';
 
 export interface PhotoEntry {
@@ -24,6 +25,7 @@ export interface PhotoEntry {
 const ERROR_TEXT = {
   not_configured: 'foodPhoto.notConfigured',
   limit_reached: 'foodPhoto.limitReached',
+  ai_budget: 'foodPhoto.aiBudget',
   rate_limited: 'foodPhoto.rateLimited',
   invalid_image: 'foodPhoto.invalidImage',
   failed: 'foodPhoto.failed',
@@ -92,17 +94,25 @@ export function PhotoPanel({
 
   if (scan.isError) {
     const code = scan.error instanceof FoodPhotoError ? scan.error.code : 'failed';
+    // Out of free scans or AI for today: a rewarded video adds more (not on the web).
+    const outOfAi = code === 'limit_reached' || code === 'ai_budget';
     return (
       <View className="gap-4">
         {code === 'failed' ? (
           <ErrorState message={t(ERROR_TEXT.failed)} onRetry={() => scan.reset()} />
         ) : (
-          <Callout emoji={code === 'limit_reached' ? '⭐' : '📷'} tone="info">
+          <Callout emoji={outOfAi ? '⭐' : '📷'} tone="info">
             {t(ERROR_TEXT[code])}
           </Callout>
         )}
-        {code === 'limit_reached' ? (
-          <Button label={t('foodPhoto.upgrade')} onPress={() => openPaywall('foodPhotos')} />
+        {outOfAi ? (
+          <>
+            <AiBoostButton
+              boost={scan.error instanceof FoodPhotoError ? scan.error.boost : null}
+              onEarned={() => scan.reset()}
+            />
+            <Button label={t('foodPhoto.upgrade')} onPress={() => openPaywall('foodPhotos')} />
+          </>
         ) : code !== 'failed' && code !== 'not_configured' ? (
           <Button label={t('foodPhoto.retake')} variant="outline" onPress={() => scan.reset()} />
         ) : null}

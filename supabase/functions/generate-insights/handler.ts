@@ -7,7 +7,13 @@ import {
 } from '../_prompts/insights.v1.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { languageField, translateFields } from '../_shared/language.ts';
-import { extractJson, type LlmMessage, type LlmProvider } from '../_shared/llm.ts';
+import {
+  cacheOf,
+  type CacheTokens,
+  extractJson,
+  type LlmMessage,
+  type LlmProvider,
+} from '../_shared/llm.ts';
 import { MIN_DAYS_LOGGED, summarise, windowDays, type RawData } from './aggregate.ts';
 import { unsafeText } from './safety.ts';
 
@@ -31,7 +37,13 @@ export interface InsightsStore {
   raw(userId: string, since: Date): Promise<RawData>;
   save(userId: string, day: string, insights: AiInsight[], model: string): Promise<void>;
   callsSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface InsightsDeps {
@@ -119,7 +131,13 @@ export async function handleGenerateInsights(req: Request, deps: InsightsDeps): 
         .complete({ system: INSIGHTS_SYSTEM_PROMPT, messages, maxTokens: 900 })
         .catch(() => null);
       if (!result) continue;
-      await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
+      await store.logUsage(
+        userId,
+        result.model,
+        result.inputTokens,
+        result.outputTokens,
+        cacheOf(result),
+      );
       messages.push({ role: 'assistant', content: result.text });
       const ai = aiSchema.safeParse(extractJson(result.text));
       if (!ai.success) {

@@ -1,7 +1,8 @@
 /** CORS headers for browser (web build) calls; native apps ignore them. */
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-client-tz-offset, x-client-platform',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 

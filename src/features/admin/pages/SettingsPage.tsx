@@ -10,10 +10,20 @@ import { FormMessage } from '../../auth/components/FormMessage';
 import { AdminError, listConfig, setConfig } from '../api';
 import { PageTitle, QueryState, errorText } from './common';
 
-type Kind = 'int' | 'budget' | 'text' | 'json';
+type Kind = 'int' | 'number' | 'budget' | 'text' | 'json';
 const FIELDS: [string, Kind][] = [
   ['coach_daily_message_limit_free', 'int'],
+  ['coach_daily_message_limit_premium', 'int'],
   ['food_photo_daily_limit_free', 'int'],
+  ['meal_alternatives_daily_free', 'int'],
+  ['ai_free_daily_budget_usd', 'number'],
+  ['ai_free_daily_budget_web_usd', 'number'],
+  ['ai_budget_per_boost_usd', 'number'],
+  ['ai_boosts_daily_max', 'int'],
+  ['ai_boost_coach_messages', 'int'],
+  ['ai_boost_food_photos', 'int'],
+  ['ai_boost_alternatives', 'int'],
+  ['ad_revenue_assumptions', 'json'],
   ['ai_monthly_budget_usd', 'budget'],
   ['sms_provider', 'text'],
   ['sms_sender_id', 'text'],
@@ -34,7 +44,7 @@ const toText = (v: Json | undefined, kind: Kind) =>
 function parse(text: string, kind: Kind): Json {
   const s = text.trim();
   if (kind === 'budget') return s === '' ? null : Number(s);
-  if (kind === 'int') return Number(s);
+  if (kind === 'int' || kind === 'number') return Number(s);
   if (kind === 'json') {
     try {
       return JSON.parse(s) as Json;
@@ -58,7 +68,9 @@ function Field({ name, kind, value }: { name: string; kind: Kind; value: Json | 
         label={t(`admin.setting_${name}` as StringKey)}
         value={text}
         onChangeText={(v) => (setText(v), save.reset())}
-        keyboardType={kind === 'int' || kind === 'budget' ? 'decimal-pad' : 'default'}
+        keyboardType={
+          kind === 'int' || kind === 'number' || kind === 'budget' ? 'decimal-pad' : 'default'
+        }
         autoCapitalize="none"
         multiline={kind === 'json'}
         style={kind === 'json' ? { minHeight: 120, fontFamily: 'monospace' } : undefined}

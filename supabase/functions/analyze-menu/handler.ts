@@ -5,6 +5,8 @@ import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
 import { corsHeaders, fail, json } from '../_shared/http.ts';
 import { BASE64, detectMediaType, stripJpegMetadata } from '../_shared/image.ts';
 import {
+  cacheOf,
+  type CacheTokens,
   extractJson,
   type LlmContentBlock,
   type LlmMessage,
@@ -25,7 +27,13 @@ export interface MenuStore {
   /** Calories and protein logged since `since` (the start of the user's local day). */
   eatenSince(userId: string, since: Date): Promise<{ kcal: number; proteinG: number }>;
   callsSince(userId: string, since: Date): Promise<number>;
-  logUsage(userId: string, model: string, inputTokens: number, outputTokens: number): Promise<void>;
+  logUsage(
+    userId: string,
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cache?: CacheTokens,
+  ): Promise<void>;
 }
 
 export interface MenuDeps {
@@ -151,7 +159,13 @@ export async function handleAnalyzeMenu(req: Request, deps: MenuDeps): Promise<R
         .complete({ system: MENU_SYSTEM_PROMPT, messages, maxTokens: 2500 })
         .catch(() => null);
       if (!result) continue;
-      await store.logUsage(userId, result.model, result.inputTokens, result.outputTokens);
+      await store.logUsage(
+        userId,
+        result.model,
+        result.inputTokens,
+        result.outputTokens,
+        cacheOf(result),
+      );
       const ai = aiSchema.safeParse(extractJson(result.text));
       if (ai.success) parsedAi = ai.data;
       else {

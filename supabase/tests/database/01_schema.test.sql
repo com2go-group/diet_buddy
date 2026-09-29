@@ -34,7 +34,7 @@ select ok(has_function_privilege('authenticated', 'public.bmi(numeric, numeric)'
 
 select is((select count(*)::int from public.achievements), 11, 'eleven achievements are seeded');
 select is((select value from public.app_config where key = 'coach_daily_message_limit_free'),
-  '5'::jsonb, 'free-tier coach limit is 5 messages per day');
+  '3'::jsonb, 'free-tier coach limit is 3 messages per day (more with rewarded videos)');
 
 select * from finish();
 rollback;

@@ -119,7 +119,7 @@ describe('PaywallScreen', () => {
     (useLocalSearchParams as jest.Mock).mockReturnValue({ feature: 'coach' });
     await renderScreen(<PaywallScreen />);
     expect(
-      await screen.findByText('Unlocks with Premium: Unlimited AI coach messages'),
+      await screen.findByText('Unlocks with Premium: Up to 60 AI coach messages a day'),
     ).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Continue free' })).toBeNull();
   });

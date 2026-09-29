@@ -1,7 +1,7 @@
 import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
 import type { DietPrefs } from '../_shared/dietRules.ts';
-import { DEFAULT_DAILY_LIMIT, type FoodPhotoStore } from './handler.ts';
+import type { FoodPhotoStore } from './handler.ts';
 
 const FUNCTION_NAME = 'analyze-food-photo';
 
@@ -12,13 +12,6 @@ function must<T>(r: { data: T; error: { message: string } | null }): T {
 
 export function supabaseFoodPhotoStore(db: SupabaseClient): FoodPhotoStore {
   return {
-    async isPremium(userId) {
-      const row = must(
-        await db.from('profiles').select('is_premium').eq('user_id', userId).single(),
-      );
-      return Boolean((row as { is_premium: boolean }).is_premium);
-    },
-
     async prefs(userId): Promise<DietPrefs> {
       const rows = must(
         await db
@@ -49,16 +42,6 @@ export function supabaseFoodPhotoStore(db: SupabaseClient): FoodPhotoStore {
       };
     },
 
-    async dailyLimit() {
-      const { data } = await db
-        .from('app_config')
-        .select('value')
-        .eq('key', 'food_photo_daily_limit_free')
-        .maybeSingle();
-      const value = Number((data as { value: unknown } | null)?.value);
-      return Number.isFinite(value) && value >= 0 ? value : DEFAULT_DAILY_LIMIT;
-    },
-
     async scansSince(userId, since) {
       const rows = must(
         await db
@@ -72,7 +55,7 @@ export function supabaseFoodPhotoStore(db: SupabaseClient): FoodPhotoStore {
       return rows?.length ?? 0;
     },
 
-    async logUsage(userId, model, inputTokens, outputTokens) {
+    async logUsage(userId, model, inputTokens, outputTokens, cache) {
       must(
         await db.from('ai_usage').insert({
           user_id: userId,
@@ -80,6 +63,8 @@ export function supabaseFoodPhotoStore(db: SupabaseClient): FoodPhotoStore {
           model,
           input_tokens: inputTokens,
           output_tokens: outputTokens,
+          cache_read_tokens: cache?.read ?? 0,
+          cache_write_tokens: cache?.write ?? 0,
         }),
       );
     },
