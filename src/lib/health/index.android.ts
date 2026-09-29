@@ -9,9 +9,9 @@ import {
   SdkAvailabilityStatus,
 } from 'react-native-health-connect';
 
-import type { HealthPlatform, TodayActivity, WeightSample } from './types';
+import type { HealthPlatform, TodayActivity, WeightSample, WorkoutSample } from './types';
 
-export type { HealthPlatform, TodayActivity, WeightSample } from './types';
+export type { HealthPlatform, TodayActivity, WeightSample, WorkoutSample } from './types';
 export { READ_SCOPES, WRITE_SCOPES } from './types';
 
 export const healthPlatform: HealthPlatform | null = 'health_connect';
@@ -36,6 +36,7 @@ export async function requestHealthAccess(): Promise<boolean> {
     { accessType: 'read', recordType: 'Steps' },
     { accessType: 'read', recordType: 'ActiveCaloriesBurned' },
     { accessType: 'read', recordType: 'Hydration' },
+    { accessType: 'read', recordType: 'ExerciseSession' },
     { accessType: 'write', recordType: 'Weight' },
     { accessType: 'write', recordType: 'Hydration' },
   ]);
@@ -69,6 +70,15 @@ export async function readToday(): Promise<TodayActivity> {
     steps: steps ? Math.round(steps.COUNT_TOTAL) : null,
     activeKcal: energy ? Math.round(energy.ACTIVE_CALORIES_TOTAL.inKilocalories) : null,
   };
+}
+
+/** Exercise sessions from any app or watch since `since`. */
+export async function readWorkouts(since: Date): Promise<WorkoutSample[]> {
+  if (!(await ensureReady())) return [];
+  const { records } = await readRecords('ExerciseSession', {
+    timeRangeFilter: { operator: 'after', startTime: since.toISOString() },
+  });
+  return records.map((r) => ({ start: new Date(r.startTime), end: new Date(r.endTime) }));
 }
 
 export async function writeWeight(kg: number, at: Date): Promise<void> {

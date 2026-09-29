@@ -9,6 +9,7 @@ import {
   healthPlatform,
   readToday,
   readWeights,
+  readWorkouts,
   requestHealthAccess,
   writeWater,
   writeWeight,
@@ -172,3 +173,19 @@ export const mirrorToHealth = {
     if (useHealthStore.getState().connected) writeWeight(kg, new Date()).catch(() => undefined);
   },
 };
+
+/**
+ * Workouts recorded this month by any app or watch (from the health store, read on the device;
+ * nothing is uploaded). Null when health data isn't connected on this device.
+ */
+export function useMonthWorkouts(now: Date): number | null {
+  const connected = useHealthStore((s) => s.connected);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const query = useQuery({
+    queryKey: ['healthWorkouts', monthStart.toISOString()],
+    enabled: connected && Boolean(healthPlatform),
+    staleTime: 15 * 60_000,
+    queryFn: async () => (await readWorkouts(monthStart)).length,
+  });
+  return connected && query.isSuccess ? query.data : null;
+}

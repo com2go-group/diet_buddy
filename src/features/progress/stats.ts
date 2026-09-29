@@ -42,6 +42,30 @@ export function weightSeries(metrics: MetricRow[], now: Date, days = 90): Weight
   return [...byDay.values()];
 }
 
+/** Daily smoothing factor of the trend line (the Hacker's Diet uses 0.1: a ~10-day memory). */
+export const TREND_ALPHA = 0.1;
+
+/**
+ * Smoothed trend weight (exponentially weighted moving average) at each weigh-in, so day-to-day
+ * water swings don't hide the real direction. Gaps between weigh-ins weigh the new reading more
+ * (alpha compounds per day). Same dates as the input.
+ */
+export function trendSeries(series: WeightPoint[], alpha = TREND_ALPHA): WeightPoint[] {
+  const out: WeightPoint[] = [];
+  let prev: WeightPoint | null = null;
+  for (const p of series) {
+    if (!prev) {
+      prev = { date: p.date, kg: p.kg };
+    } else {
+      const days = Math.max(1, Math.round((p.date.getTime() - prev.date.getTime()) / DAY_MS));
+      const a = 1 - (1 - alpha) ** days;
+      prev = { date: p.date, kg: prev.kg + a * (p.kg - prev.kg) };
+    }
+    out.push({ date: prev.date, kg: Math.round(prev.kg * 100) / 100 });
+  }
+  return out;
+}
+
 /** Least-squares slope in kg/week over the last 28 days; null without 3 points across 7+ days. */
 export function trendPerWeek(series: WeightPoint[], now: Date): number | null {
   const recent = series.filter((p) => now.getTime() - p.date.getTime() <= 28 * DAY_MS);

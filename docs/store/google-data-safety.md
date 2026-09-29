@@ -58,6 +58,7 @@ Play Console → App content → **Health Connect** (required before release). T
 | `READ_BODY_FAT`               | Show body fat from smart scales                                                    |
 | `READ_STEPS`                  | Show today's steps on Home (not stored)                                            |
 | `READ_ACTIVE_CALORIES_BURNED` | Show today's active energy on Home (not stored, never added to the calorie target) |
+| `READ_EXERCISE`               | Count this month's workouts on Progress (not stored)                               |
 | `READ_HYDRATION`              | Include water logged in other apps                                                 |
 | `WRITE_HYDRATION`             | Save water glasses to Health Connect                                               |
 

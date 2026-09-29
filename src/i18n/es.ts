@@ -86,6 +86,14 @@ export const es: Translation = {
     savePassword: 'Guardar contraseña',
     signOut: 'Cerrar sesión',
   },
+  care: {
+    title: '¿Cómo estás?',
+    body: 'Tus últimos días se registraron muy por debajo de tu plan. Comer lo suficiente alimenta tu energía, tu ánimo y tu progreso; perder peso más rápido de lo previsto no es el objetivo.',
+    help: 'Si comer se ha vuelto difícil o estresante, no estás solo/a. Hablar con tu médico o con un servicio de apoyo para trastornos de la conducta alimentaria puede ayudar mucho.',
+    maybeLogging: 'O quizá no se registró todo, y eso también está perfectamente bien.',
+    talk: 'Hablar con el coach',
+    dismiss: 'Estoy bien',
+  },
   authErrors: {
     captcha: 'La comprobación de seguridad no terminó. Revisa tu conexión e inténtalo de nuevo.',
     smsCountry: 'Todavía no podemos enviar SMS a ese país. Regístrate con tu correo electrónico.',
@@ -892,6 +900,12 @@ export const es: Translation = {
     warningRestrictionOther: 'Puede no cumplir tus restricciones alimentarias',
   },
   progress: {
+    workouts: 'Entrenamientos',
+    workoutsMonth: '{{count}} este mes',
+    trendWeight: '{{unit}} · tendencia',
+    lastWeighIn: 'Último pesaje {{weight}}',
+    trendNote:
+      'La línea es tu peso de tendencia: suaviza las variaciones de agua de un día a otro. Los puntos son tus pesajes.',
     title: 'Progreso',
     tabs: 'Secciones de progreso',
     overview: 'Resumen',

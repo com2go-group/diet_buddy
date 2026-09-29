@@ -15,6 +15,7 @@ import { OfflineBanner } from '../offline';
 import { PlanCheckCard } from '../planReview/PlanCheckCard';
 import { openPaywall } from '../subscriptions/paywallRoute';
 import { usePremium } from '../subscriptions/usePremium';
+import { CareCard } from './components/CareCard';
 import { CheckInCard } from './components/CheckInCard';
 import { FirstDayChecklist } from './components/FirstDayChecklist';
 import { HomeHeader } from './components/HomeHeader';
@@ -94,6 +95,14 @@ export function HomeScreen() {
         <OfflineBanner />
         {userId ? (
           <FirstDayChecklist userId={userId} data={query.data} now={now} onAddGlass={addGlass} />
+        ) : null}
+        {userId ? (
+          <CareCard
+            userId={userId}
+            food={query.data.food}
+            targetKcal={targets?.calories ?? null}
+            now={now}
+          />
         ) : null}
         <PlanCheckCard now={now} />
         <ScoreCard

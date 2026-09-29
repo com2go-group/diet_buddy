@@ -1,4 +1,5 @@
 import {
+  trendSeries,
   averageCalories,
   dailyCalories,
   insights,
@@ -120,5 +121,25 @@ describe('insights', () => {
       { kind: 'hydrationGap', avgMl: 1500, targetMl: 2000 },
       { kind: 'sleepEnergy', rested: 8, short: 5 },
     ]);
+  });
+});
+
+describe('trendSeries', () => {
+  const at = (day: number, kg: number) => ({ date: new Date(2026, 8, day, 8), kg });
+  it('smooths day-to-day swings', () => {
+    const noisy = [at(1, 80), at(2, 81), at(3, 79.6), at(4, 80.8), at(5, 79.9)];
+    const trend = trendSeries(noisy);
+    expect(trend.map((p) => p.date)).toEqual(noisy.map((p) => p.date));
+    expect(trend[0]!.kg).toBe(80);
+    for (const p of trend) expect(Math.abs(p.kg - 80)).toBeLessThan(0.2);
+  });
+  it('catches up faster after a gap', () => {
+    const daily = trendSeries([at(1, 80), at(2, 78)]);
+    const gap = trendSeries([at(1, 80), at(11, 78)]);
+    expect(daily[1]!.kg).toBeCloseTo(79.8, 2);
+    expect(gap[1]!.kg).toBeLessThan(79);
+  });
+  it('handles empty input', () => {
+    expect(trendSeries([])).toEqual([]);
   });
 });

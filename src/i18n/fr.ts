@@ -86,6 +86,14 @@ export const fr: Translation = {
     savePassword: 'Enregistrer le mot de passe',
     signOut: 'Se déconnecter',
   },
+  care: {
+    title: 'Comment vas-tu ?',
+    body: 'Tes derniers jours ont été enregistrés bien en dessous de ton plan. Manger suffisamment nourrit ton énergie, ton humeur et tes progrès ; perdre du poids plus vite que prévu n’est pas l’objectif.',
+    help: 'Si manger est devenu difficile ou stressant, tu n’es pas seul·e. En parler à ton médecin ou à un service spécialisé dans les troubles alimentaires peut vraiment aider.',
+    maybeLogging: 'Ou peut-être que tout n’a pas été enregistré — c’est tout à fait normal aussi.',
+    talk: 'Parler au coach',
+    dismiss: 'Ça va',
+  },
   authErrors: {
     captcha: 'La vérification de sécurité n’a pas abouti. Vérifie ta connexion et réessaie.',
     smsCountry:
@@ -901,6 +909,12 @@ export const fr: Translation = {
     warningRestrictionOther: 'Peut ne pas respecter vos restrictions alimentaires',
   },
   progress: {
+    workouts: 'Entraînements',
+    workoutsMonth: '{{count}} ce mois-ci',
+    trendWeight: '{{unit}} · tendance',
+    lastWeighIn: 'Dernière pesée {{weight}}',
+    trendNote:
+      'La ligne est ton poids tendance : elle lisse les variations d’eau d’un jour à l’autre. Les points sont tes pesées.',
     title: 'Progrès',
     tabs: 'Sections des progrès',
     overview: 'Aperçu',

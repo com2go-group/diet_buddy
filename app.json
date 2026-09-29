@@ -35,6 +35,7 @@
         "android.permission.health.READ_STEPS",
         "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
         "android.permission.health.READ_HYDRATION",
+        "android.permission.health.READ_EXERCISE",
         "android.permission.health.WRITE_HYDRATION"
       ]
     },
@@ -67,7 +68,7 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "DietBuddy reads your weight, body fat, steps, active energy and water to track your progress. This data is never used for advertising.",
+          "NSHealthShareUsageDescription": "DietBuddy reads your weight, body fat, steps, active energy, workouts and water to track your progress. This data is never used for advertising.",
           "NSHealthUpdateUsageDescription": "DietBuddy saves the weight and water you log so they appear in Apple Health.",
           "background": false
         }

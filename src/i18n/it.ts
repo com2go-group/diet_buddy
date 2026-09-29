@@ -85,6 +85,14 @@ export const it: Translation = {
     savePassword: 'Salva password',
     signOut: 'Esci',
   },
+  care: {
+    title: 'Come stai?',
+    body: 'Negli ultimi giorni hai registrato molto meno di quanto prevede il tuo piano. Mangiare abbastanza sostiene energia, umore e progressi; perdere peso più in fretta del previsto non è l’obiettivo.',
+    help: 'Se il cibo è diventato difficile o stressante, non sei solo/a. Parlarne con il tuo medico o con un servizio per i disturbi alimentari può davvero aiutare.',
+    maybeLogging: 'Oppure forse non hai registrato tutto: va benissimo anche così.',
+    talk: 'Parla con il coach',
+    dismiss: 'Sto bene',
+  },
   authErrors: {
     captcha:
       'Il controllo di sicurezza non è stato completato. Controlla la connessione e riprova.',
@@ -892,6 +900,12 @@ export const it: Translation = {
     warningRestrictionOther: 'Potrebbe non rispettare le tue restrizioni alimentari',
   },
   progress: {
+    workouts: 'Allenamenti',
+    workoutsMonth: '{{count}} questo mese',
+    trendWeight: '{{unit}} · tendenza',
+    lastWeighIn: 'Ultima pesata {{weight}}',
+    trendNote:
+      'La linea è il tuo peso di tendenza: attenua le oscillazioni di liquidi da un giorno all’altro. I punti sono le tue pesate.',
     title: 'Progressi',
     tabs: 'Sezioni dei progressi',
     overview: 'Panoramica',

@@ -58,7 +58,7 @@ PROGRESS YOU CAN SEE
 • A shareable weekly story of your progress
 
 WORKS WITH APPLE HEALTH
-Import weight, body fat, steps, active energy and water, and save the weight and water you log. Smart scales and watches that sync with Apple Health work too. Health data is never used for advertising.
+Import weight, body fat, steps, active energy, workouts and water, and save the weight and water you log. Smart scales and watches that sync with Apple Health work too. Health data is never used for advertising.
 
 PREMIUM
 Premium removes ads and adds:
@@ -102,7 +102,7 @@ DietBuddy is a nutrition and fitness tracker for adults (18+).
 Demo account: see the sign-in fields above. It has completed onboarding. To test onboarding yourself, create a new account (email sign-up sends a 6-digit code).
 
 Where to find things:
-- Apple Health: Profile > Health apps > Connect. DietBuddy reads weight, body fat, steps, active energy and water, and writes weight and water. Health data is never used for advertising or shared with ad networks.
+- Apple Health: Profile > Health apps > Connect. DietBuddy reads weight, body fat, steps, active energy, workouts and water, and writes weight and water. Health data is never used for advertising or shared with ad networks.
 - Premium subscription: Profile > Upgrade, or Home > Subscribe. Restore purchases is on the paywall and in Profile.
 - Account deletion: Profile > Privacy & Data > Delete account (type DELETE). Data export is on the same screen.
 - AI features (coach, meal plans, photo scans) use Anthropic's Claude on our servers. Calorie and nutrient numbers come from USDA FoodData Central and Open Food Facts, not from the AI.
@@ -134,7 +134,7 @@ Use the App Store description above with these two changes:
 
 ```
 WORKS WITH HEALTH CONNECT
-Import weight, body fat, steps, active energy and water, and save the weight and water you log. Smart scales and watches that sync with Health Connect (including Samsung Health) work too. Health data is never used for advertising.
+Import weight, body fat, steps, active energy, workouts and water, and save the weight and water you log. Smart scales and watches that sync with Health Connect (including Samsung Health) work too. Health data is never used for advertising.
 ```
 
 - Replace the subscription paragraph with:

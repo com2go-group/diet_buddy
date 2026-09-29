@@ -48,7 +48,7 @@ account ID, so they are "not linked" to the user; PostHog runs only with the ana
 ## Also in App Store Connect
 
 - **HealthKit:** enable the HealthKit capability (the config plugin does this). In the review
-  notes, explain that DietBuddy reads weight, body fat, steps, active energy and water, and writes
+  notes, explain that DietBuddy reads weight, body fat, steps, active energy, workouts and water, and writes
   weight and water, only to track progress, never for advertising (App Review Guideline 5.1.3).
 - **Sign in with Apple** is offered on iOS alongside Google (Guideline 4.8).
 - **Account deletion** is in the app: Profile → Privacy & Data → Delete account (Guideline

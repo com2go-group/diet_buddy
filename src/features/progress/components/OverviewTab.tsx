@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { Button, Text } from '@/components';
+import { useMonthWorkouts } from '@/features/health';
 import { t } from '@/i18n';
 import { dayKey } from '@/lib/dates';
 import { formatDecimal, formatMonthYear, formatNumber, formatWeight } from '@/lib/format';
@@ -10,7 +11,14 @@ import { kgToLb } from '@/lib/nutrition';
 import { accentColor, useTheme } from '@/theme';
 
 import type { ProgressData } from '../api';
-import { averageCalories, dailyCalories, projection, trendPerWeek, weightSeries } from '../stats';
+import {
+  averageCalories,
+  dailyCalories,
+  projection,
+  trendPerWeek,
+  trendSeries,
+  weightSeries,
+} from '../stats';
 import { CalorieBars } from './CalorieBars';
 import { StatTile } from './StatTile';
 import { WeightChart } from './WeightChart';
@@ -27,7 +35,10 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
   const units = data.profile.units;
   const w = (kg: number, d = 1) => formatWeight(Math.abs(kg), units, d);
   const series = weightSeries(data.metrics, now);
-  const latest = series[series.length - 1] ?? null;
+  // Totals and projections use the smoothed trend, not the last (noisy) weigh-in.
+  const smooth = trendSeries(series);
+  const latest = smooth[smooth.length - 1] ?? null;
+  const lastWeighIn = series[series.length - 1] ?? null;
   const losing = data.goal?.types.includes('lose_fat') ?? false;
   const start = data.goal?.startKg ?? series[0]?.kg ?? null;
   const change = latest && start !== null ? latest.kg - start : null;
@@ -35,6 +46,8 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
   const avg = averageCalories(days);
   const monthKey = dayKey(now).slice(0, 7);
   const checkinsThisMonth = data.checkins.filter((c) => c.date.startsWith(monthKey)).length;
+  // With Apple Health / Health Connect, the prototype's Workouts tile; otherwise check-ins.
+  const workouts = useMonthWorkouts(now);
   const trend = trendPerWeek(series, now);
   const goalKg = data.goal?.goalKg ?? null;
   const proj =
@@ -74,11 +87,19 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
           value={avg === null ? t('progress.none') : formatNumber(avg)}
           label={`${t('progress.avgCalories')} · ${t('progress.avgCaloriesHint')}`}
         />
-        <StatTile
-          emoji="✅"
-          value={t('progress.checkinsMonth', { count: checkinsThisMonth })}
-          label={t('progress.checkins')}
-        />
+        {workouts !== null ? (
+          <StatTile
+            emoji="💪"
+            value={t('progress.workoutsMonth', { count: workouts })}
+            label={t('progress.workouts')}
+          />
+        ) : (
+          <StatTile
+            emoji="✅"
+            value={t('progress.checkinsMonth', { count: checkinsThisMonth })}
+            label={t('progress.checkins')}
+          />
+        )}
       </View>
 
       <Card>
@@ -94,10 +115,7 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
                 style={{ color: change <= 0 ? green : accentColor('amber', scheme) }}
               >
                 {t('progress.weightChange', {
-                  change: signed(
-                    w(series[series.length - 1]!.kg - series[0]!.kg),
-                    series[series.length - 1]!.kg - series[0]!.kg,
-                  ),
+                  change: signed(w(latest!.kg - smooth[0]!.kg), latest!.kg - smooth[0]!.kg),
                   days: Math.max(
                     1,
                     Math.round((latest!.date.getTime() - series[0]!.date.getTime()) / 86_400_000),
@@ -112,16 +130,22 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
                 {formatDecimal(units === 'imperial' ? kgToLb(latest.kg) : latest.kg)}
               </Text>
               <Text variant="caption" tone="muted">
-                {t('progress.latest', {
+                {t('progress.trendWeight', {
                   unit: units === 'imperial' ? t('units.lb') : t('units.kg'),
                 })}
               </Text>
+              {lastWeighIn && Math.abs(lastWeighIn.kg - latest.kg) >= 0.05 ? (
+                <Text variant="caption" tone="muted">
+                  {t('progress.lastWeighIn', { weight: w(lastWeighIn.kg) })}
+                </Text>
+              ) : null}
             </View>
           ) : null}
         </View>
         {series.length > 1 ? (
           <WeightChart
             points={series}
+            trend={smooth}
             format={(kg) => formatWeight(kg, units, 0)}
             label={t('progress.weightChart', {
               from: w(series[0]!.kg),
@@ -134,6 +158,11 @@ export function OverviewTab({ data, now }: { data: ProgressData; now: Date }) {
             {t('progress.weightEmpty')}
           </Text>
         )}
+        {series.length > 1 ? (
+          <Text variant="caption" tone="muted" className="mt-2 text-[12px]">
+            {t('progress.trendNote')}
+          </Text>
+        ) : null}
       </Card>
 
       <Card>

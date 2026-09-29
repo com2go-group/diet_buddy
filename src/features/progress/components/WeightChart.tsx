@@ -9,13 +9,18 @@ import type { WeightPoint } from '../stats';
 const H = 140;
 const PAD = 8;
 
-/** Area line of weight over time with min/max labels; points are spaced by date. */
+/**
+ * Weight over time with min/max labels, spaced by date: the smoothed trend (`trend`) as the line
+ * and the weigh-ins as dots; without a trend the weigh-ins are the line.
+ */
 export function WeightChart({
   points,
+  trend,
   label,
   format,
 }: {
   points: WeightPoint[];
+  trend?: WeightPoint[];
   label: string;
   format: (kg: number) => string;
 }) {
@@ -23,14 +28,15 @@ export function WeightChart({
   const amber = ACCENTS.amber.dark;
   const t0 = points[0]!.date.getTime();
   const t1 = Math.max(points[points.length - 1]!.date.getTime(), t0 + 1);
-  const kgs = points.map((p) => p.kg);
+  const shown = trend && trend.length === points.length ? trend : points;
+  const kgs = [...points, ...shown].map((p) => p.kg);
   const lo = Math.min(...kgs) - 0.5;
   const hi = Math.max(...kgs) + 0.5;
   const x = (p: WeightPoint) => ((p.date.getTime() - t0) / (t1 - t0)) * 100;
   const y = (kg: number) => PAD + ((hi - kg) / (hi - lo)) * (H - PAD * 2);
-  const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(p)},${y(p.kg)}`).join(' ');
+  const line = shown.map((p, i) => `${i ? 'L' : 'M'}${x(p)},${y(p.kg)}`).join(' ');
   const area = `${line} L100,${H} L0,${H} Z`;
-  const last = points[points.length - 1]!;
+  const last = shown[shown.length - 1]!;
 
   return (
     <View accessible accessibilityRole="image" accessibilityLabel={label}>
@@ -72,6 +78,18 @@ export function WeightChart({
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
             />
+            {shown !== points
+              ? points.map((p) => (
+                  <Circle
+                    key={p.date.getTime()}
+                    cx={x(p)}
+                    cy={y(p.kg)}
+                    r={1.6}
+                    fill={colors.mutedForeground}
+                    opacity={0.6}
+                  />
+                ))
+              : null}
             <Circle cx={x(last)} cy={y(last.kg)} r={2.5} fill={amber} />
           </Svg>
         </View>

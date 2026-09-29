@@ -86,6 +86,14 @@ export const de: Translation = {
     savePassword: 'Passwort speichern',
     signOut: 'Abmelden',
   },
+  care: {
+    title: 'Wie geht es dir?',
+    body: 'Deine letzten Tage wurden deutlich unter deinem Plan eingetragen. Genug zu essen gibt dir Energie, gute Laune und Fortschritt – schneller abzunehmen als geplant ist nicht das Ziel.',
+    help: 'Wenn Essen gerade schwer oder belastend geworden ist, bist du nicht allein. Ein Gespräch mit deiner Ärztin oder deinem Arzt oder einer Beratungsstelle für Essstörungen kann wirklich helfen.',
+    maybeLogging: 'Vielleicht wurde auch nur nicht alles eingetragen – das ist völlig in Ordnung.',
+    talk: 'Mit dem Coach sprechen',
+    dismiss: 'Mir geht’s gut',
+  },
   authErrors: {
     captcha:
       'Die Sicherheitsprüfung wurde nicht abgeschlossen. Prüfe deine Verbindung und versuche es erneut.',
@@ -903,6 +911,12 @@ export const de: Translation = {
     warningRestrictionOther: 'Passt eventuell nicht zu deinen Ernährungseinschränkungen',
   },
   progress: {
+    workouts: 'Workouts',
+    workoutsMonth: '{{count}} diesen Monat',
+    trendWeight: '{{unit}} · Trend',
+    lastWeighIn: 'Letzte Messung {{weight}}',
+    trendNote:
+      'Die Linie ist dein Trendgewicht: Sie glättet tägliche Wasserschwankungen. Die Punkte sind deine Messungen.',
     title: 'Fortschritt',
     tabs: 'Fortschrittsbereiche',
     overview: 'Übersicht',

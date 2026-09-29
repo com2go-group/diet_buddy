@@ -73,7 +73,7 @@ export const PRIVACY_POLICY: LegalDoc = {
     {
       heading: '5. Health apps (Apple Health and Health Connect)',
       blocks: [
-        'If you connect Apple Health or Health Connect, DietBuddy reads your weight, body fat, steps, active energy and water, and writes the weight from your check-ins and the water you log. Weights are saved to your progress; steps and active energy are only shown. Data from these health apps is never used for advertising, marketing or data mining, and is never sold or given to advertisers or data brokers. You can disconnect at any time in Profile → Health apps and in your device settings.',
+        'If you connect Apple Health or Health Connect, DietBuddy reads your weight, body fat, steps, active energy, workouts and water, and writes the weight from your check-ins and the water you log. Weights are saved to your progress; steps and active energy are only shown. Data from these health apps is never used for advertising, marketing or data mining, and is never sold or given to advertisers or data brokers. You can disconnect at any time in Profile → Health apps and in your device settings.',
       ],
     },
     {

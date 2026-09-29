@@ -71,7 +71,7 @@ Food search: the search text (e.g. "chicken breast") goes to USDA FoodData Centr
 
 Ads (free tier): the Google Mobile Ads SDK collects the device's advertising ID and ad interaction data after the UMP consent flow; non-personalised ads are requested unless the user allows personalisation, and on iOS ads are always non-personalised (no App Tracking Transparency prompt, IDFA never read). No health data, keywords or content URLs are sent with ad requests. Rewarded-ad callbacks from Google contain only our user ID and `{type, target}`.
 
-Health stores (when the user connects Apple Health or Health Connect): weight samples are imported into `body_metrics` (`source` healthkit / health_connect); steps and active energy are read for display only and not stored; check-in weights and water glasses are written back to the store. The connection is recorded in `device_connections`. None of it goes to ad or analytics SDKs.
+Health stores (when the user connects Apple Health or Health Connect): weight samples are imported into `body_metrics` (`source` healthkit / health_connect); steps, active energy and workouts (this month's count on Progress) are read for display only and not stored; check-in weights and water glasses are written back to the store. The connection is recorded in `device_connections`. None of it goes to ad or analytics SDKs.
 
 Crash reports (Sentry, EU): when the app crashes, the error, stack trace, app version and device model are sent, with no user ID, email, request data or health data (scrubbed in `src/lib/telemetry/crash.ts`). Legitimate interest; users can switch it off in Privacy & Data (stored on the device). Only when `EXPO_PUBLIC_SENTRY_DSN` is set.
 

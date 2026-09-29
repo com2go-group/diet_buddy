@@ -2,14 +2,15 @@ import {
   isHealthDataAvailableAsync,
   queryQuantitySamples,
   queryStatisticsForQuantity,
+  queryWorkoutSamples,
   requestAuthorization,
   saveQuantitySample,
 } from '@kingstinct/react-native-healthkit';
 import { Linking } from 'react-native';
 
-import type { HealthPlatform, TodayActivity, WeightSample } from './types';
+import type { HealthPlatform, TodayActivity, WeightSample, WorkoutSample } from './types';
 
-export type { HealthPlatform, TodayActivity, WeightSample } from './types';
+export type { HealthPlatform, TodayActivity, WeightSample, WorkoutSample } from './types';
 export { READ_SCOPES, WRITE_SCOPES } from './types';
 
 export const healthPlatform: HealthPlatform | null = 'healthkit';
@@ -33,6 +34,7 @@ export async function requestHealthAccess(): Promise<boolean> {
       'HKQuantityTypeIdentifierStepCount',
       'HKQuantityTypeIdentifierActiveEnergyBurned',
       'HKQuantityTypeIdentifierDietaryWater',
+      'HKWorkoutTypeIdentifier',
     ],
     toShare: ['HKQuantityTypeIdentifierBodyMass', 'HKQuantityTypeIdentifierDietaryWater'],
   });
@@ -64,6 +66,16 @@ export async function readToday(): Promise<TodayActivity> {
     steps: steps?.sumQuantity ? Math.round(steps.sumQuantity.quantity) : null,
     activeKcal: energy?.sumQuantity ? Math.round(energy.sumQuantity.quantity) : null,
   };
+}
+
+/** Workouts from any app or watch (Apple Watch, Garmin, Strava …) since `since`. */
+export async function readWorkouts(since: Date): Promise<WorkoutSample[]> {
+  const workouts = await queryWorkoutSamples({
+    limit: 500,
+    ascending: true,
+    filter: { date: { startDate: since } },
+  });
+  return workouts.map((w) => ({ start: new Date(w.startDate), end: new Date(w.endDate) }));
 }
 
 export async function writeWeight(kg: number, at: Date): Promise<void> {

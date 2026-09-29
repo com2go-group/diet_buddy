@@ -55,11 +55,13 @@ describe('ProgressScreen', () => {
 
   it('shows totals, trend and projection', async () => {
     await renderScreen(<ProgressScreen />);
-    expect(await screen.findByLabelText('Total Lost: 1.5 kg')).toBeOnTheScreen();
+    // Totals use the smoothed trend (82 → 80.9), not the last weigh-in (80.5).
+    expect(await screen.findByLabelText('Total Lost: 1.1 kg')).toBeOnTheScreen();
     expect(screen.getByLabelText('Streak: 4 days')).toBeOnTheScreen();
-    expect(screen.getByText('−1.5 kg in 19 days')).toBeOnTheScreen();
+    expect(screen.getByText('−1.1 kg in 19 days')).toBeOnTheScreen();
+    expect(screen.getByText('Last weigh-in 80.5 kg')).toBeOnTheScreen();
     expect(screen.getByText(/you’d reach 70 kg around/)).toBeOnTheScreen();
-    expect(screen.getByText('10.5 kg to go')).toBeOnTheScreen();
+    expect(screen.getByText('10.9 kg to go')).toBeOnTheScreen();
   });
 
   it('shows body metrics with changes', async () => {

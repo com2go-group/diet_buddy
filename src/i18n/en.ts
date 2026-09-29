@@ -87,6 +87,14 @@ export const en = {
     savePassword: 'Save password',
     signOut: 'Sign out',
   },
+  care: {
+    title: 'How are you doing?',
+    body: 'Your last few days were logged well below your plan. Eating enough fuels your energy, mood and progress, and losing weight faster than planned isn’t the goal.',
+    help: 'If food has started to feel hard or stressful, you’re not alone. Talking to your doctor or an eating disorder support service can really help.',
+    maybeLogging: 'Or maybe not everything got logged — that’s completely fine too.',
+    talk: 'Talk to the coach',
+    dismiss: 'I’m OK',
+  },
   authErrors: {
     required: 'This field is required',
     invalidEmail: 'Enter a valid email address',
@@ -1065,6 +1073,8 @@ export const en = {
     warningRestrictionOther: 'May not fit your dietary restrictions',
   },
   progress: {
+    workouts: 'Workouts',
+    workoutsMonth: '{{count}} this mo.',
     title: 'Progress',
     tabs: 'Progress sections',
     overview: 'Overview',
@@ -1083,6 +1093,10 @@ export const en = {
     weightTrend: 'Weight Trend',
     weightChange: '{{change}} in {{days}} days',
     latest: '{{unit}} · latest',
+    trendWeight: '{{unit}} · trend',
+    lastWeighIn: 'Last weigh-in {{weight}}',
+    trendNote:
+      'The line is your trend weight: it smooths out day-to-day water swings. Dots are your weigh-ins.',
     weightEmpty: 'Add your weight in the daily check-in to see your trend.',
     weightChart: 'Weight from {{from}} to {{to}} over {{days}} days',
     weeklyCalories: 'Weekly Calories',
