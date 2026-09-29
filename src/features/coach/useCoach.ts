@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { haptics } from '@/lib/haptics';
+import { track } from '@/lib/telemetry';
 
 import { useSessionStore } from '../auth/sessionStore';
 import { CoachError, loadThread, sendMessage, type CoachThread, type Persona } from './api';
@@ -26,6 +27,7 @@ export function useCoach(persona: Persona) {
     mutationFn: (text: string) => sendMessage(persona, text, query.data?.conversationId ?? null),
     onSuccess: (result) => {
       haptics.selection();
+      track('coach_message_sent', { persona });
       queryClient.setQueryData<CoachThread>(key, (old) =>
         old
           ? {

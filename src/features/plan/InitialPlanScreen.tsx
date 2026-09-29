@@ -9,6 +9,7 @@ import { Button, Callout, Card, ErrorState, GradientFill, SkeletonCard, Text } f
 import { t } from '@/i18n';
 import { formatWeight } from '@/lib/format';
 import { haptics } from '@/lib/haptics';
+import { track } from '@/lib/telemetry';
 
 import { profileQueryKey } from '../account/useProfile';
 import { RewardGate, useShowAds } from '../ads';
@@ -77,6 +78,7 @@ function PlanView({ userId, data }: { userId: string; data: InitialPlanData }) {
       haptics.success();
       // Home then shows the first-day checklist and, once, the trial offer.
       useJourneyStore.getState().onboarded(userId);
+      track('onboarding_completed');
       await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
       router.replace('/home');
     },

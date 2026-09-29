@@ -11,6 +11,7 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import type { OptionalConsent } from './api';
+import { CrashReportsRow } from './components/CrashReportsRow';
 import { useConsents, useDeleteAccount, useExportData } from './useProfile';
 
 const back = () => (router.canGoBack() ? router.back() : router.replace('/profile'));
@@ -86,6 +87,7 @@ export function PrivacyScreen() {
                 </Text>
               </View>
               {toggle('analytics', t('privacy.analytics'), t('privacy.analyticsDesc'))}
+              <CrashReportsRow />
               {toggle('marketing', t('privacy.marketing'), t('privacy.marketingDesc'))}
               {toggle('body_photos', t('privacy.bodyPhotos'), t('privacy.bodyPhotosDesc'))}
               {toggle('coach_insights', t('privacy.coachInsights'), t('privacy.coachInsightsDesc'))}

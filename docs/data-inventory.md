@@ -65,7 +65,11 @@ Ads (free tier): the Google Mobile Ads SDK collects the device's advertising ID 
 
 Health stores (when the user connects Apple Health or Health Connect): weight samples are imported into `body_metrics` (`source` healthkit / health_connect); steps and active energy are read for display only and not stored; check-in weights and water glasses are written back to the store. The connection is recorded in `device_connections`. None of it goes to ad or analytics SDKs.
 
-Not collected: precise location, contacts, analytics and crash data (PostHog/Sentry, later).
+Crash reports (Sentry, EU): when the app crashes, the error, stack trace, app version and device model are sent, with no user ID, email, request data or health data (scrubbed in `src/lib/telemetry/crash.ts`). Legitimate interest; users can switch it off in Privacy & Data (stored on the device). Only when `EXPO_PUBLIC_SENTRY_DSN` is set.
+
+Analytics (PostHog, EU): only while the `analytics` consent is granted. Feature-use events (`docs/setup/telemetry.md`) with a random per-install ID that is reset on sign-out; never health values, food names or typed text. Only when `EXPO_PUBLIC_POSTHOG_KEY` is set.
+
+Not collected: precise location, contacts.
 
 Store forms built from this file: `docs/store/apple-app-privacy.md` and `docs/store/google-data-safety.md`. Update them together.
 

@@ -1,7 +1,6 @@
 import type { GoalType } from '@/lib/nutrition';
 
-import type { OnboardingDraft } from '../onboarding/draft';
-import { validateStep, type StepErrors } from '../onboarding/draft';
+import { validateStep, type OnboardingDraft, type StepErrors } from '../onboarding/draft';
 import { buildInitialPlan, type InitialPlan, type LatestMetric } from '../plan/buildPlan';
 
 /**

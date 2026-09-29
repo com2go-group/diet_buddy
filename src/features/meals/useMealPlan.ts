@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { dayKey } from '@/lib/dates';
+import { track } from '@/lib/telemetry';
 
 import { useSessionStore } from '../auth/sessionStore';
 import { useRewardedUnlock } from '../ads/useAds';
@@ -50,7 +51,10 @@ export function useMealPlan(day: Date, slot: MealSlot) {
   /** "Another idea", "Skip" and "Undo" for this meal. */
   const act = useMutation({
     mutationFn: (action: 'alternative' | 'skip' | 'unskip') => mealPlanAction(date, action, slot),
-    onSuccess: store,
+    onSuccess: (plan, action) => {
+      track('meal_plan_action', { action, slot });
+      store(plan);
+    },
   });
 
   const target = unlockTarget(date, slot);

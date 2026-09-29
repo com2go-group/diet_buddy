@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { haptics } from '@/lib/haptics';
+import { track } from '@/lib/telemetry';
 import {
   getPlans,
   purchase,
@@ -36,7 +37,16 @@ export function usePaywall() {
     }
   };
 
-  const buy = useMutation({ mutationFn: (planId: string) => purchase(planId), onSuccess: after });
+  const buy = useMutation({
+    mutationFn: (planId: string) => purchase(planId),
+    onMutate: (planId) => track('purchase_started', { plan: planId }),
+    onSuccess: (premium, planId) => {
+      track('purchase_completed', { plan: planId, premium });
+      return after(premium);
+    },
+    onError: (e) =>
+      track(e instanceof PurchaseCancelled ? 'purchase_cancelled' : 'purchase_failed'),
+  });
   const restoreMutation = useMutation({ mutationFn: () => restore(), onSuccess: after });
 
   return {

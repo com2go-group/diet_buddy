@@ -83,3 +83,9 @@ jest.mock('expo-camera', () => {
     useCameraPermissions: jest.fn(() => [{ granted: true }, jest.fn()]),
   };
 });
+
+jest.mock('@sentry/react-native', () => ({
+  init: jest.fn(),
+  captureException: jest.fn(),
+  wrap: (component: unknown) => component,
+}));

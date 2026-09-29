@@ -1376,7 +1376,11 @@ export const en = {
       'Needed to create your plan and track progress. To withdraw it, delete your account below — DietBuddy can’t work without it.',
     grantedOn: 'Given on {{date}}',
     analytics: 'Product analytics',
-    analyticsDesc: 'Anonymous usage statistics to improve the app. Not collected yet.',
+    analyticsDesc:
+      'Which features you use (e.g. a screen was opened), with a random ID, via PostHog in the EU. Never your health data, food or messages.',
+    crashReports: 'Crash reports',
+    crashReportsDesc:
+      'If the app crashes, send an anonymous error report (Sentry, EU) so we can fix it. No account or health data.',
     marketing: 'Marketing messages',
     marketingDesc: 'Occasional emails about new features and offers.',
     bodyPhotos: 'AI body scan photos',

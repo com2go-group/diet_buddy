@@ -31,12 +31,17 @@ import { UpdateRequired, useUpdateRequired } from '@/features/config';
 import { useAdsSetup } from '@/features/ads';
 import { useHealthSync } from '@/features/health';
 import { useOfflineSync } from '@/features/offline';
+import { useTelemetry } from '@/features/telemetry/useTelemetry';
 import { usePushSetup } from '@/features/notifications/usePush';
 import { usePurchasesSetup } from '@/features/subscriptions';
 import { signOut, startSessionListener, useSessionStore } from '@/features/auth';
 import { t } from '@/i18n';
 import { queryClient } from '@/lib/query/queryClient';
+import { initCrashReporting } from '@/lib/telemetry';
 import { palette, useApplyThemePreference, useTheme } from '@/theme';
+
+// Crash reporting starts before anything renders (no-op without EXPO_PUBLIC_SENTRY_DSN).
+initCrashReporting();
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
@@ -163,5 +168,6 @@ function SignedInServices() {
   usePushSetup();
   useHealthSync();
   useOfflineSync();
+  useTelemetry();
   return null;
 }

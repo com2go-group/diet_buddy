@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { dayKey } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
 import { isNetworkError, useOfflineQueue } from '@/lib/offline/queue';
+import { track } from '@/lib/telemetry';
 
 import { useSessionStore } from '../auth/sessionStore';
 import {
@@ -79,8 +80,10 @@ export async function logOrQueue(userId: string, entries: NewFoodLog[]): Promise
           entry: { ...rest, loggedAt: rest.loggedAt.toISOString() },
         });
       }
+      track('food_logged', { source: entry.source, offline: true });
       return;
     }
+    track('food_logged', { source: entry.source });
   }
 }
 

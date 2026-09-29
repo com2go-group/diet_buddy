@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { showInterstitial } from '@/lib/ads';
 import { formatWeight } from '@/lib/format';
 import { haptics } from '@/lib/haptics';
+import { track } from '@/lib/telemetry';
 
 import { profileQueryKey } from '../account/useProfile';
 import { useShowAds } from '../ads/useAds';
@@ -69,6 +70,7 @@ export function useOnboarding(initial: OnboardingState) {
       return next;
     },
     onSuccess: async (next) => {
+      track('onboarding_step', { step, next });
       if (next !== 'bodyScan') {
         setDirection(1);
         setStep(next);

@@ -32,9 +32,9 @@ on it.
 | Identifiers      | User ID                                             | Yes       | Yes    | No                | App Functionality                                                                     | Account ID (also sent to RevenueCat and in rewarded-ad callbacks)            |
 | Identifiers      | Device ID                                           | Yes       | Yes    | No                | App Functionality; Third-Party Advertising (**AdMob**)                                | Push token; ad SDK identifiers                                               |
 | Purchases        | Purchase History                                    | Yes       | Yes    | No                | App Functionality                                                                     | Premium status via RevenueCat                                                |
-| Usage Data       | Product Interaction                                 | Yes       | No     | No                | Third-Party Advertising, Analytics (**AdMob**)                                        | Ad SDK                                                                       |
+| Usage Data       | Product Interaction                                 | Yes       | No     | No                | Third-Party Advertising, Analytics (**AdMob**, **PostHog** with consent)              | Ad SDK; feature-use events, random install ID                                |
 | Usage Data       | Advertising Data                                    | Yes       | No     | No                | Third-Party Advertising (**AdMob**)                                                   | Ads seen and tapped                                                          |
-| Diagnostics      | Crash Data, Performance Data, Other Diagnostic Data | Yes       | No     | No                | Third-Party Advertising, Analytics (**AdMob**)                                        | Ad SDK diagnostics (add App Functionality when Sentry is added)              |
+| Diagnostics      | Crash Data, Performance Data, Other Diagnostic Data | Yes       | No     | No                | App Functionality (**Sentry**), Third-Party Advertising, Analytics (**AdMob**)        | Anonymous crash reports; ad SDK diagnostics                                  |
 | Location         | Coarse Location                                     | Yes       | No     | No                | Third-Party Advertising (**AdMob**)                                                   | Approximate location from IP address, for ad delivery                        |
 | Other Data       | Other Data Types                                    | Yes       | Yes    | No                | App Functionality                                                                     | Date of birth (age check), gender (calorie calculation)                      |
 
@@ -42,8 +42,8 @@ on it.
 
 Financial info (payments go through Apple), precise location, contacts, browsing history,
 search history (food searches aren't stored), audio, gameplay content, emails or text messages,
-sensitive info other than the above, and any analytics of our own (PostHog/Sentry aren't
-integrated yet; update this file when they are).
+sensitive info other than the above. Sentry crash reports and PostHog analytics carry no
+account ID, so they are "not linked" to the user; PostHog runs only with the analytics consent.
 
 ## Also in App Store Connect
 

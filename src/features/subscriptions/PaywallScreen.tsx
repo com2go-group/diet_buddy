@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Linking, Platform, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +8,7 @@ import { Button, EmptyState, ErrorState, GradientFill, SkeletonCard, Text } from
 import { t, type StringKey } from '@/i18n';
 import type { PlanOption } from '@/lib/purchases';
 import { ACCENTS, MIN_TOUCH_TARGET } from '@/theme';
+import { track } from '@/lib/telemetry';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import { openLegal } from '../legal/legal';
@@ -63,6 +64,9 @@ export function PaywallScreen() {
   const welcome = params.welcome === '1';
   const { premium } = usePremium();
   const { available, plans, buy, restore, cancelled } = usePaywall();
+  useEffect(() => {
+    track('paywall_viewed', { feature: featured, welcome });
+  }, [featured, welcome]);
   const [selected, setSelected] = useState<string | null>(null);
   const list = plans.data ?? [];
   const plan =
