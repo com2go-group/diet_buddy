@@ -22,6 +22,7 @@ export type NotificationPrefs = Pick<
   Tables<'notification_preferences'>,
   | 'meal_reminders'
   | 'checkin_reminder'
+  | 'coach_tips'
   | 'streaks'
   | 'achievements'
   | 'weekly_report'
@@ -31,6 +32,7 @@ export type NotificationPrefs = Pick<
 export const DEFAULT_PREFS: NotificationPrefs = {
   meal_reminders: true,
   checkin_reminder: true,
+  coach_tips: true,
   streaks: true,
   achievements: true,
   weekly_report: true,
@@ -40,7 +42,9 @@ export const DEFAULT_PREFS: NotificationPrefs = {
 async function loadPrefs(userId: string): Promise<NotificationPrefs> {
   const result = await supabase
     .from('notification_preferences')
-    .select('meal_reminders, checkin_reminder, streaks, achievements, weekly_report, promotions')
+    .select(
+      'meal_reminders, checkin_reminder, coach_tips, streaks, achievements, weekly_report, promotions',
+    )
     .eq('user_id', userId)
     .limit(1);
   return optional(result)?.[0] ?? DEFAULT_PREFS;

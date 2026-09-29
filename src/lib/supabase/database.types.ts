@@ -719,6 +719,7 @@ export type Database = {
         Row: {
           achievements: boolean
           checkin_reminder: boolean
+          coach_tips: boolean
           created_at: string
           id: string
           meal_reminders: boolean
@@ -731,6 +732,7 @@ export type Database = {
         Insert: {
           achievements?: boolean
           checkin_reminder?: boolean
+          coach_tips?: boolean
           created_at?: string
           id?: string
           meal_reminders?: boolean
@@ -743,6 +745,7 @@ export type Database = {
         Update: {
           achievements?: boolean
           checkin_reminder?: boolean
+          coach_tips?: boolean
           created_at?: string
           id?: string
           meal_reminders?: boolean

@@ -116,6 +116,11 @@ export function NotificationSettingsScreen() {
                 t('notificationSettings.checkinReminder'),
                 t('notificationSettings.checkinReminderDesc'),
               )}
+              {toggle(
+                'coach_tips',
+                t('notificationSettings.coachTips'),
+                t('notificationSettings.coachTipsDesc'),
+              )}
             </View>
             <View className="rounded-2xl border border-border bg-card px-4 py-2">
               <Text

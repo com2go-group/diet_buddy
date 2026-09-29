@@ -1494,6 +1494,8 @@ export const en = {
     mealRemindersDesc: 'At 8:30, 12:30 and 19:00',
     checkinReminder: 'Daily check-in',
     checkinReminderDesc: 'At 20:30',
+    coachTips: 'Coach tips',
+    coachTipsDesc: 'An evening tip from Aria, Max or Luna based on your day',
     updates: 'Updates',
     streaks: 'Streaks',
     streaksDesc: 'When you reach a streak milestone',
@@ -1631,6 +1633,17 @@ export const en = {
     update: 'Update to {{kcal}} kcal',
     notNow: 'Not now',
     failed: 'We couldn’t update your plan. Try again.',
+  },
+  coachTip: {
+    ariaTitle: 'Aria 🥗',
+    maxTitle: 'Max 💪',
+    lunaTitle: 'Luna 🧘',
+    protein:
+      'You still have about {{grams}} g of protein to go today. Yogurt, eggs, fish or lentils at dinner make it easy.',
+    water: 'A quick glass of water now helps your energy for the evening. You’ve got this!',
+    checkin: 'How did today feel? A 30-second check-in helps you spot what works for you.',
+    log: 'Log what you’ve eaten today so your plan can keep up with you.',
+    praise: 'Nice work today. Small steps like these add up, keep going!',
   },
   checklist: {
     title: 'Your first steps',

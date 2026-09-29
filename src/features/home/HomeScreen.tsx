@@ -26,6 +26,7 @@ import { TodayMeals } from './components/TodayMeals';
 import { WaterCard } from './components/WaterCard';
 import { WeeklyAdherence } from './components/WeeklyAdherence';
 import { useJourneyStore } from './journeyStore';
+import { useCoachTipReminder } from './useCoachTipReminder';
 import { homeInsight, summarizeHome } from './summary';
 import { useHome } from './useHome';
 
@@ -54,6 +55,20 @@ export function HomeScreen() {
   const summary = useMemo(
     () => (query.data ? summarizeHome(query.data, now) : null),
     [query.data, now],
+  );
+  useCoachTipReminder(
+    summary
+      ? {
+          proteinG: summary.today.proteinG,
+          waterMl: summary.today.waterMl,
+          checkedIn: Boolean(summary.today.checkIn),
+          loggedAnything: Object.values(summary.today.meals).some((m) => m.length > 0),
+          targets: summary.targets
+            ? { proteinG: summary.targets.proteinG, waterMl: summary.targets.waterMl }
+            : null,
+        }
+      : null,
+    now,
   );
 
   const body = () => {
