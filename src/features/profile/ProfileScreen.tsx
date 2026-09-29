@@ -170,7 +170,7 @@ export function ProfileScreen() {
                   })
                 : t('profile.weightGoalNone')
             }
-            onPress={() => setInfo('weightGoal')}
+            onPress={() => router.push('/edit-goal')}
           />
           {data.plan ? (
             <>

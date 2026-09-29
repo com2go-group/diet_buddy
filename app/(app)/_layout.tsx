@@ -17,6 +17,7 @@ export default function AppLayout() {
       <Stack.Screen name="twin" options={{ presentation: 'modal' }} />
       <Stack.Screen name="story" options={{ presentation: 'modal' }} />
       <Stack.Screen name="wellness" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="edit-goal" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
