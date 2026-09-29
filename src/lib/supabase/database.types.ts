@@ -927,6 +927,7 @@ export type Database = {
           onboarding_step: string | null
           premium_event_at: string | null
           streak_days: number
+          streak_freezes: number
           units: Database["public"]["Enums"]["unit_system"]
           updated_at: string
           user_id: string
@@ -945,6 +946,7 @@ export type Database = {
           onboarding_step?: string | null
           premium_event_at?: string | null
           streak_days?: number
+          streak_freezes?: number
           units?: Database["public"]["Enums"]["unit_system"]
           updated_at?: string
           user_id: string
@@ -963,6 +965,7 @@ export type Database = {
           onboarding_step?: string | null
           premium_event_at?: string | null
           streak_days?: number
+          streak_freezes?: number
           units?: Database["public"]["Enums"]["unit_system"]
           updated_at?: string
           user_id?: string
@@ -1025,6 +1028,30 @@ export type Database = {
           persona?: Database["public"]["Enums"]["coach_persona"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      streak_freezes: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
           updated_at?: string
           user_id?: string
         }

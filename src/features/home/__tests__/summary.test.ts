@@ -4,7 +4,7 @@ const NOW = new Date(2026, 8, 26, 15, 0); // Saturday 15:00 local
 const at = (day: number, hour: number) => new Date(2026, 8, day, hour, 0).toISOString();
 
 const base: HomeData = {
-  profile: { name: 'Olivia', xp: 40, streak_days: 2, units: 'metric' },
+  profile: { name: 'Olivia', xp: 40, streak_days: 2, streak_freezes: 0, units: 'metric' },
   plan: { daily_calories: 2000, protein_g: 150, carbs_g: 200, fat_g: 67, water_ml: 2500 },
   food: [],
   water: [],

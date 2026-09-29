@@ -1691,6 +1691,8 @@ export const en = {
     restaurant: 'Restaurant',
     subscribe: 'Subscribe',
     premiumBadge: 'Premium',
+    freezesA11y:
+      '{{count}} streak freezes: each keeps your streak going if you miss a day. You earn one every 7 days.',
     weekly: 'Weekly Adherence',
     viewAll: 'View all',
     weeklyDay: '{{day}}: {{score}}',

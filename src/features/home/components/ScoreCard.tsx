@@ -19,10 +19,13 @@ export function ScoreCard({
   score,
   streak,
   xp,
+  freezes = 0,
 }: {
   score: number | null;
   streak: number;
   xp: number;
+  /** Streak freezes held (0–2); each covers one missed day automatically. */
+  freezes?: number;
 }) {
   const lvl = levelFor(xp);
   return (
@@ -64,6 +67,16 @@ export function ScoreCard({
           <Text variant="label" className="font-bold" style={{ color: ACCENTS.amber.dark }}>
             🔥 {t('homeScreen.streak', { count: streak })}
           </Text>
+          {freezes > 0 ? (
+            <Text
+              variant="label"
+              className="font-bold"
+              style={{ color: '#7DD3FC' }}
+              accessibilityLabel={t('homeScreen.freezesA11y', { count: freezes })}
+            >
+              🧊 {freezes}
+            </Text>
+          ) : null}
           <Text variant="label" className="font-bold" style={{ color: ACCENTS.green.dark }}>
             ⚡ {t('homeScreen.level', { level: lvl.level })} · {t('homeScreen.xp', { count: xp })}
           </Text>

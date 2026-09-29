@@ -14,7 +14,7 @@ export type PlanTargets = Pick<
 >;
 
 export interface HomeData {
-  profile: Pick<Tables<'profiles'>, 'name' | 'xp' | 'streak_days' | 'units'>;
+  profile: Pick<Tables<'profiles'>, 'name' | 'xp' | 'streak_days' | 'streak_freezes' | 'units'>;
   plan: PlanTargets | null;
   food: FoodLog[];
   water: WaterLog[];

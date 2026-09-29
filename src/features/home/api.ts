@@ -7,7 +7,11 @@ import { GLASS_ML, type HomeData } from './summary';
 export async function loadHome(userId: string, now: Date): Promise<HomeData> {
   const since = addDays(startOfDay(now), -6);
   const [profile, plans, food, water, checkins] = await Promise.all([
-    supabase.from('profiles').select('name, xp, streak_days, units').eq('user_id', userId).single(),
+    supabase
+      .from('profiles')
+      .select('name, xp, streak_days, streak_freezes, units')
+      .eq('user_id', userId)
+      .single(),
     supabase
       .from('plans')
       .select('daily_calories, protein_g, carbs_g, fat_g, water_ml')

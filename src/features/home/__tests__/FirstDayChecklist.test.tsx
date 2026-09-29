@@ -19,7 +19,7 @@ jest.mock('@/lib/supabase', () => {
 
 const NOW = new Date('2026-09-29T12:00:00Z');
 const data: HomeData = {
-  profile: { name: 'Sam', xp: 0, streak_days: 0, units: 'metric' },
+  profile: { name: 'Sam', xp: 0, streak_days: 0, streak_freezes: 0, units: 'metric' },
   plan: null,
   food: [],
   water: [{ id: 'w', logged_at: NOW.toISOString(), ml: 250 }],

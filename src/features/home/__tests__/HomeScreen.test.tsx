@@ -30,7 +30,7 @@ const initialWindowMetrics = {
 };
 const now = new Date();
 const data: HomeData = {
-  profile: { name: 'Olivia', xp: 120, streak_days: 3, units: 'metric' },
+  profile: { name: 'Olivia', xp: 120, streak_days: 3, streak_freezes: 0, units: 'metric' },
   plan: { daily_calories: 2000, protein_g: 150, carbs_g: 200, fat_g: 67, water_ml: 2000 },
   food: [
     {

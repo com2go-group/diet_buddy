@@ -99,7 +99,7 @@ Until `USDA_API_KEY` is set, food search answers `not_configured` and the app po
 | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------- |
 | Profile details, goals, preferences, body metrics, food/water logs, check-ins, devices, consents, progress photos | Read and write own rows                   | Full                                           |
 | Plans                                                                                                             | Read own; insert new versions (immutable) | Full                                           |
-| `is_premium`, `xp`, `streak_days`                                                                                 | Read only                                 | Written by the RevenueCat webhook and triggers |
+| `is_premium`, `xp`, `streak_days`, `streak_freezes`                                                               | Read only                                 | Written by the RevenueCat webhook and triggers |
 | Meal plans, coach messages, AI insights, achievements unlocked, ad unlocks                                        | Read only                                 | Written by Edge Functions                      |
 | Coach conversations, notifications                                                                                | Read, delete; mark notifications read     | Full                                           |
 | Consent history (`consent_events`)                                                                                | Read only (written by trigger)            | Full                                           |
@@ -113,6 +113,7 @@ Server-side rules (database triggers):
 - Weight-loss goals must be below the current weight and at or above BMI 18.5.
 - Plans below 1,200 kcal are rejected.
 - A check-in awards +20 XP (one per day) and refreshes the streak.
+- Streak freezes: `refresh_streak` gives one freeze (max 2, `profiles.streak_freezes`) each time the streak reaches a new multiple of 7, and uses one to cover a single missed day in the last two days when the run continues before it (row in `streak_freezes`, notification). Users can only read both.
 - A check-in's `date` is the device's local date and must be within one day of the server date (covers every time zone), so check-ins can't be back- or future-dated to collect XP.
 - Check-in weight feeds the weight trend.
 - Achievements: `achievement_progress()` computes each achievement's progress from the user's data; after every food, water, check-in or weight insert, `evaluate_achievements()` unlocks the completed ones once, awards their XP and adds a notification. The app reads its own progress with the `my_achievement_progress()` RPC and cannot unlock anything itself. Rules: 12/14-day streaks; Clean Eater = 5 days within ±10% of the calorie target; Hydration Hero = 7 consecutive days at the water goal; Protein Pro = 10 days at the protein target; Scale Master = 2 kg below the active weight-loss goal's starting weight; First Bite = first food logged; Hydrated = first day at the water goal; Check-In Champ = 7 check-ins; Plan Follower = 10 food items logged from an AI meal plan; 30 Day Streak.

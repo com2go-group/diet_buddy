@@ -79,7 +79,12 @@ export function HomeScreen() {
           <FirstDayChecklist userId={userId} data={query.data} now={now} onAddGlass={addGlass} />
         ) : null}
         <PlanCheckCard now={now} />
-        <ScoreCard score={today.score} streak={profile.streak_days} xp={profile.xp} />
+        <ScoreCard
+          score={today.score}
+          streak={profile.streak_days}
+          xp={profile.xp}
+          freezes={profile.streak_freezes}
+        />
         {targets ? (
           <>
             <SectionTitle
