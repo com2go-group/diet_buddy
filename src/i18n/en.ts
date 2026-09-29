@@ -1609,6 +1609,17 @@ export const en = {
     saveFailed: 'We couldn’t save your goal. Check your connection and try again.',
     loadFailed: 'We couldn’t load your goal.',
   },
+  planCheck: {
+    title: 'Your 2-week plan check-in',
+    slower_than_planned:
+      'Over the last two weeks your weight changed about {{rate}} kg a week, slower than planned. From what you logged, your body uses about {{tdee}} kcal a day, so {{kcal}} kcal would get you back on pace.',
+    faster_than_planned:
+      'You’re losing about {{rate}} kg a week, faster than planned. From what you logged, your body uses about {{tdee}} kcal a day. Eating {{kcal}} kcal keeps your progress steady and sustainable.',
+    note: 'Based on your logged meals and weigh-ins; never below your safe minimum. You decide.',
+    update: 'Update to {{kcal}} kcal',
+    notNow: 'Not now',
+    failed: 'We couldn’t update your plan. Try again.',
+  },
   checklist: {
     title: 'Your first steps',
     doneTitle: 'All set! 🎉',

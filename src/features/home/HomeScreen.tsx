@@ -11,6 +11,7 @@ import { purchasesAvailable } from '@/lib/purchases';
 import { useTheme } from '@/theme';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { PlanCheckCard } from '../planReview/PlanCheckCard';
 import { openPaywall } from '../subscriptions/paywallRoute';
 import { usePremium } from '../subscriptions/usePremium';
 import { CheckInCard } from './components/CheckInCard';
@@ -77,6 +78,7 @@ export function HomeScreen() {
         {userId ? (
           <FirstDayChecklist userId={userId} data={query.data} now={now} onAddGlass={addGlass} />
         ) : null}
+        <PlanCheckCard now={now} />
         <ScoreCard score={today.score} streak={profile.streak_days} xp={profile.xp} />
         {targets ? (
           <>

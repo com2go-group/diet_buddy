@@ -45,3 +45,20 @@ All three prototype bugs are fixed and have regression tests: the ~7× timeline 
 15. **Edited values**: an edited body fat drives fat and lean mass, and an edited BMR drives TDEE. An edited TDEE, fat mass or lean mass stands on its own. Edited BMR/TDEE are passed to `computePlan` as overrides. The calorie floor still applies, and uses the edited BMR.
 16. **Exercise recommendation** (`exercise.ts`): weekly templates by current training frequency (0–1, 2–3, 4–5, 6+ days). Fat loss adds 10 minutes to cardio. Performance goals turn one cardio session into intervals (≤30 min). Calorie burn = MET × kg × hours (strength 5, cardio 4.3, intervals 8, active rest 2.5), rounded to 10 kcal. It is shown as an estimate only and never added to food targets.
 17. **Forecast** (`forecast.ts`): milestones at −1 kg, halfway and the goal, at the plan's actual weekly rate after safety caps. A milestone that falls in the same week as a later one is dropped. The chart is a weekly projected-weight line that never overshoots the goal.
+
+## Plan check-in (adaptive target)
+
+`src/lib/nutrition/adaptive.ts`, shown on Home every two weeks for weight-loss plans.
+
+- Data: the last 21 days of completed days (today is left out) and weigh-ins. A day counts only
+  when at least half the target was logged, so forgotten days don't make intake look low.
+- Needs at least 10 such days and weigh-ins spanning at least 10 days.
+- Weight trend: least-squares slope over the weigh-ins (kg/day), so one heavy or light morning
+  doesn't dominate.
+- Actual TDEE ≈ average logged intake − slope × 7,700 kcal/kg. Estimates outside 1,000–5,000 kcal
+  are ignored (they mean incomplete logging or a scale error).
+- Suggested target = actual TDEE + planned weekly change × 7,700 / 7, with the planned loss capped
+  at 1 % of body weight a week, the change limited to ±300 kcal per check-in, never below
+  max(sex floor, BMR), and only offered when it differs by at least 100 kcal.
+- The user chooses "Update" (new plan version, protein kept, fat 30 %, carbs the rest) or "Not now";
+  either answer silences the check-in for two weeks.

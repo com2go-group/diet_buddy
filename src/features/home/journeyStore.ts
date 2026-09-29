@@ -12,9 +12,12 @@ interface JourneyState {
   onboardedAt: Record<string, string>;
   welcomeOfferPending: Record<string, boolean>;
   checklistDismissed: Record<string, boolean>;
+  /** When the plan check-in was last answered (updated or "not now"). */
+  planReviewedAt: Record<string, string>;
   onboarded: (userId: string, at?: Date) => void;
   welcomeOfferShown: (userId: string) => void;
   dismissChecklist: (userId: string) => void;
+  planReviewed: (userId: string, at?: Date) => void;
 }
 
 export const useJourneyStore = create<JourneyState>()(
@@ -23,6 +26,7 @@ export const useJourneyStore = create<JourneyState>()(
       onboardedAt: {},
       welcomeOfferPending: {},
       checklistDismissed: {},
+      planReviewedAt: {},
       onboarded: (userId, at = new Date()) =>
         set((s) => ({
           onboardedAt: { ...s.onboardedAt, [userId]: at.toISOString() },
@@ -32,6 +36,8 @@ export const useJourneyStore = create<JourneyState>()(
         set((s) => ({ welcomeOfferPending: { ...s.welcomeOfferPending, [userId]: false } })),
       dismissChecklist: (userId) =>
         set((s) => ({ checklistDismissed: { ...s.checklistDismissed, [userId]: true } })),
+      planReviewed: (userId, at = new Date()) =>
+        set((s) => ({ planReviewedAt: { ...s.planReviewedAt, [userId]: at.toISOString() } })),
     }),
     { name: 'journey', storage: createJSONStorage(() => AsyncStorage) },
   ),

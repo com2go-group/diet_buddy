@@ -11,3 +11,4 @@ export { ageOn, isAdult } from './age';
 export * from './exercise';
 export * from './forecast';
 export * from './adherence';
+export * from './adaptive';
