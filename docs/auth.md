@@ -29,6 +29,12 @@ Do these once the project exists (see `docs/backend.md`). Items 1–2 are needed
 - **Authentication → Providers → Phone**: enable and turn on **Confirm phone**. Codes are sent by **sms.to** through the `send-sms` Edge Function (a Send SMS hook), not a built-in provider; steps in `docs/setup/email-sms.md`. Each code is a paid SMS.
 - In the app's `.env`: `EXPO_PUBLIC_AUTH_PHONE_ENABLED=true`. Until then the Email/Phone switch is hidden.
 
+### 2a. Bot protection (CAPTCHA and SMS guard)
+
+- **CAPTCHA (Cloudflare Turnstile, free):** in Cloudflare → Turnstile, add a widget (mode _Managed_) with the hostnames `dietbuddy.me` (the phone app's check runs as if on the website) and your web build's domain. Put the **site key** in `EXPO_PUBLIC_TURNSTILE_SITE_KEY` (EAS environment variables) and the **secret key** in Supabase **Authentication → Attack Protection → Enable Captcha protection** (provider Turnstile). Do both in the same release: with the secret set and an app build without the site key, password sign-in, sign-up and codes fail with "The security check didn’t finish". The check covers sign-up, password sign-in, code resends and password resets (`src/lib/captcha`); it is invisible unless Cloudflare wants an interaction. After enabling, test Apple and Google sign-in once on a real device.
+- **SMS guard (always on):** `send-sms` only texts the calling codes in `app_config.sms_guard` (EU/EEA, UK, Switzerland) and caps codes per number (3 an hour, 6 a day) and overall (300 an hour, 2,000 a day); all editable in Admin → Settings. Over a cap the app says "Too many attempts"; other countries are told to use email. The counters store an HMAC of the number (keyed with the hook secret), never the number. If the counters can't be reached, no SMS is sent (fails closed).
+- Supabase's own limits (**Authentication → Rate Limits**) still apply on top; keep _SMS sent per hour_ near the guard's hourly cap.
+
 ### 3. Sign in with Apple (iOS)
 
 - Needs an Apple Developer account. In **Certificates, Identifiers & Profiles**, enable _Sign in with Apple_ on the App ID `com.com2go.dietbuddy`.

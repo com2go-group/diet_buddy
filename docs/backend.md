@@ -131,6 +131,15 @@ $$);
 
 Without `ANTHROPIC_API_KEY` and `USDA_API_KEY` the function answers `configured: false` and does nothing.
 
+## Abuse limits and data retention
+
+- **Counters.** `rate_limit_hit(key, window seconds, max)` counts fixed-window hits in `rate_limits` (service role only; refused attempts count too). Used by `send-sms` (see `docs/auth.md` → Bot protection) and per user by `food-search` (30/min, 600/day) and `food-barcode` (20/min, 300/day) from `app_config.rate_limits`; over a cap they answer 429 `rate_limited`. If the counters are unreachable, food lookups are let through (fail open) but SMS is not (fail closed).
+- **Retention.** `purge_old_data()` deletes coach messages (24 months), notifications (6), AI usage (25), safety flags (12), AI and wellness insights (12), meal plans and grocery lists (12), push tokens not refreshed for 12 months, plus counters (8 days), the USDA cache (60 days) and batch records (90 days). Periods are in `app_config.data_retention` (Admin → Settings). The health log (food, water, check-ins, body metrics, plans, goals, photos) stays until the user deletes it or the account. Schedule it once in the SQL editor:
+
+```sql
+select cron.schedule('purge-old-data', '17 3 * * *', $$ select public.purge_old_data(); $$);
+```
+
 ## Access model
 
 | Data                                                                                                              | App (signed-in user)                      | Server (Edge Functions, service role)          |

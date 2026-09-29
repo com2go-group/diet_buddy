@@ -1,7 +1,10 @@
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import type { Admission } from '../_shared/rateLimit.ts';
 import { lookupBarcode, OffError, validBarcode } from '../_shared/openFoodFacts.ts';
 
 export interface FoodBarcodeDeps {
+  /** Per-user caps (shared USDA / Open Food Facts quotas); omitted in tests that don't need it. */
+  admit?: (req: Request) => Promise<Admission>;
   fetch: typeof fetch;
   /** Open Food Facts asks every app to identify itself: "AppName/Version (contact)". */
   userAgent: string;
@@ -15,6 +18,9 @@ export interface FoodBarcodeDeps {
 export async function handleFoodBarcode(req: Request, deps: FoodBarcodeDeps): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return fail('method_not_allowed', 405);
+  const admission = deps.admit ? await deps.admit(req) : 'ok';
+  if (admission === 'unauthorized') return fail('unauthorized', 401);
+  if (admission === 'limited') return fail('rate_limited', 429);
   const body = (await req.json().catch(() => null)) as { barcode?: unknown } | null;
   const code = validBarcode(body?.barcode);
   if (!code) return fail('invalid_barcode', 400);

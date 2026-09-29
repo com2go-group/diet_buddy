@@ -1,3 +1,4 @@
+import { CaptchaError, captchaToken } from '@/lib/captcha/captcha';
 import { pushToken, scheduleReminders } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 
@@ -12,6 +13,15 @@ export interface PendingVerification {
   purpose: 'signup' | 'recovery';
 }
 
+/** A single-use bot-check token for the next auth request (undefined while CAPTCHA is off). */
+async function captcha(): Promise<string | undefined> {
+  try {
+    return await captchaToken();
+  } catch (e) {
+    throw new AuthFailure('authErrors.captcha', e instanceof CaptchaError ? e.message : undefined);
+  }
+}
+
 const credentials = (method: AuthMethod, identifier: string, password: string) =>
   method === 'email' ? { email: identifier, password } : { phone: identifier, password };
 
@@ -22,10 +32,11 @@ export async function signUp(input: {
   name: string;
   birthDate: string;
 }): Promise<PendingVerification> {
+  const captchaToken = await captcha();
   const { data, error } = await supabase.auth.signUp({
     ...credentials(input.method, input.identifier, input.password),
     // Copied into the profile by the handle_new_user trigger; birth_date passes the 18+ gate.
-    options: { data: { name: input.name, birth_date: input.birthDate } },
+    options: { data: { name: input.name, birth_date: input.birthDate }, captchaToken },
   });
   if (error) throw toAuthFailure(error);
   // With confirmations on, Supabase hides whether the address was already registered and returns
@@ -45,9 +56,11 @@ export async function signIn(
   identifier: string,
   password: string,
 ): Promise<PendingVerification | null> {
-  const { error } = await supabase.auth.signInWithPassword(
-    credentials(method, identifier, password),
-  );
+  const captchaToken = await captcha();
+  const { error } = await supabase.auth.signInWithPassword({
+    ...credentials(method, identifier, password),
+    options: { captchaToken },
+  });
   if (!error) return null;
   if (error.code === 'email_not_confirmed' || error.code === 'phone_not_confirmed') {
     await resendCode({ method, identifier, purpose: 'signup' });
@@ -80,10 +93,19 @@ export async function resendCode(pending: PendingVerification): Promise<void> {
     await requestPasswordReset(pending.method, pending.identifier);
     return;
   }
+  const captchaToken = await captcha();
   const { error } =
     pending.method === 'email'
-      ? await supabase.auth.resend({ type: 'signup', email: pending.identifier })
-      : await supabase.auth.resend({ type: 'sms', phone: pending.identifier });
+      ? await supabase.auth.resend({
+          type: 'signup',
+          email: pending.identifier,
+          options: { captchaToken },
+        })
+      : await supabase.auth.resend({
+          type: 'sms',
+          phone: pending.identifier,
+          options: { captchaToken },
+        });
   if (error) throw toAuthFailure(error);
 }
 
@@ -92,12 +114,13 @@ export async function requestPasswordReset(
   method: AuthMethod,
   identifier: string,
 ): Promise<PendingVerification> {
+  const captchaToken = await captcha();
   const { error } =
     method === 'email'
-      ? await supabase.auth.resetPasswordForEmail(identifier)
+      ? await supabase.auth.resetPasswordForEmail(identifier, { captchaToken })
       : await supabase.auth.signInWithOtp({
           phone: identifier,
-          options: { shouldCreateUser: false },
+          options: { shouldCreateUser: false, captchaToken },
         });
   if (error) throw toAuthFailure(error);
   return { method, identifier, purpose: 'recovery' };

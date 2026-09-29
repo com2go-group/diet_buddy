@@ -2,7 +2,10 @@ import { webcrypto } from 'node:crypto';
 
 import { signPayload, verifyWebhook } from '../../functions/_shared/standardWebhooks';
 import {
+  DEFAULT_GUARD,
+  guardFrom,
   handleSendSms,
+  hmacPhone,
   otpMessage,
   smsToProvider,
   type SendSmsDeps,
@@ -30,15 +33,23 @@ async function signed(body: object, opts: { secret?: string; timestamp?: string 
 
 const payload = { user: { phone: '447700900123' }, sms: { otp: '482913' } };
 
-function setup(provider = 'smsto') {
+function setup(provider = 'smsto', guard = DEFAULT_GUARD) {
   const sent: [string, string, string][] = [];
+  const hits = new Map<string, number>();
   const deps: SendSmsDeps = {
     secret: SECRET,
     now: () => NOW,
     settings: async () => ({ provider, senderId: 'DietBuddy' }),
+    guard: async () => guard,
+    rateLimit: async (key, window, max) => {
+      const k = `${key}/${window}`;
+      hits.set(k, (hits.get(k) ?? 0) + 1);
+      return hits.get(k)! <= max;
+    },
+    hashPhone: async (p) => `h(${p})`,
     providers: { smsto: { send: async (to, msg, sender) => void sent.push([to, msg, sender]) } },
   };
-  return { deps, sent };
+  return { deps, sent, hits };
 }
 
 describe('standard webhooks', () => {
@@ -105,5 +116,60 @@ describe('sms.to provider', () => {
     await expect(
       smsToProvider('k', bad as unknown as typeof fetch).send('+1', 'x', 'y'),
     ).rejects.toThrow();
+  });
+});
+
+describe('send-sms guard (SMS pumping)', () => {
+  it('only texts allowed calling codes', async () => {
+    const { deps, sent } = setup();
+    const res = await handleSendSms(
+      await signed({ user: { phone: '8821234567' }, sms: { otp: '123456' } }),
+      deps,
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error.message).toBe('sms_country_not_supported');
+    expect(sent).toHaveLength(0);
+  });
+
+  it('caps codes per number (hashed) and overall', async () => {
+    const { deps, sent, hits } = setup('smsto', { ...DEFAULT_GUARD, perNumberHour: 2 });
+    for (let i = 0; i < 2; i++) {
+      expect((await handleSendSms(await signed(payload), deps)).status).toBe(200);
+    }
+    const third = await handleSendSms(await signed(payload), deps);
+    expect(third.status).toBe(429);
+    expect((await third.json()).error.message).toBe('sms_limit_reached');
+    expect(sent).toHaveLength(2);
+    expect([...hits.keys()]).toContain('sms:h(+447700900123)/3600');
+
+    const global = setup('smsto', { ...DEFAULT_GUARD, globalDay: 0 });
+    expect((await handleSendSms(await signed(payload), global.deps)).status).toBe(429);
+  });
+
+  it('fails closed when the counters are unavailable', async () => {
+    const { deps, sent } = setup();
+    deps.rateLimit = async () => {
+      throw new Error('db down');
+    };
+    expect((await handleSendSms(await signed(payload), deps)).status).toBe(503);
+    expect(sent).toHaveLength(0);
+  });
+
+  it('reads the admin setting, falling back field by field', () => {
+    expect(guardFrom(null)).toEqual(DEFAULT_GUARD);
+    expect(
+      guardFrom({ allowed_prefixes: ['49', 'x', '0'], global_hour: 5, per_number_day: -1 }),
+    ).toEqual({
+      ...DEFAULT_GUARD,
+      allowedPrefixes: ['49'],
+      globalHour: 5,
+    });
+  });
+
+  it('hashes numbers with the secret', async () => {
+    const a = await hmacPhone('s1', '+49123', subtle);
+    expect(a).toMatch(/^[0-9a-f]{64}$/);
+    expect(await hmacPhone('s1', '+49123', subtle)).toBe(a);
+    expect(await hmacPhone('s2', '+49123', subtle)).not.toBe(a);
   });
 });

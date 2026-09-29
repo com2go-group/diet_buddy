@@ -32,6 +32,7 @@ export const es: Translation = {
     finePrint: 'Sin tarjeta de crédito · Cancela cuando quieras',
   },
   auth: {
+    captchaTitle: 'Comprobación de seguridad rápida',
     signIn: 'Iniciar sesión',
     signUp: 'Registrarse',
     signInTitle: 'Hola de nuevo 👋',
@@ -86,6 +87,8 @@ export const es: Translation = {
     signOut: 'Cerrar sesión',
   },
   authErrors: {
+    captcha: 'La comprobación de seguridad no terminó. Revisa tu conexión e inténtalo de nuevo.',
+    smsCountry: 'Todavía no podemos enviar SMS a ese país. Regístrate con tu correo electrónico.',
     required: 'Este campo es obligatorio',
     invalidEmail: 'Introduce un correo válido',
     invalidPhone: 'Introduce tu número con el prefijo, p. ej. +34 612 345 678',

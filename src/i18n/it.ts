@@ -31,6 +31,7 @@ export const it: Translation = {
     finePrint: 'Nessuna carta di credito · Annulli quando vuoi',
   },
   auth: {
+    captchaTitle: 'Controllo di sicurezza rapido',
     signIn: 'Accedi',
     signUp: 'Registrati',
     signInTitle: 'Bentornato 👋',
@@ -85,6 +86,9 @@ export const it: Translation = {
     signOut: 'Esci',
   },
   authErrors: {
+    captcha:
+      'Il controllo di sicurezza non è stato completato. Controlla la connessione e riprova.',
+    smsCountry: 'Non possiamo ancora inviare SMS in quel paese. Registrati con l’email.',
     required: 'Campo obbligatorio',
     invalidEmail: 'Inserisci un indirizzo email valido',
     invalidPhone: 'Inserisci il numero con il prefisso, ad es. +39 312 345 6789',

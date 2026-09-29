@@ -30,6 +30,7 @@ export const en = {
     finePrint: 'No credit card required · Cancel anytime',
   },
   auth: {
+    captchaTitle: 'Quick security check',
     signIn: 'Sign In',
     signUp: 'Sign Up',
     signInTitle: 'Welcome back 👋',
@@ -104,6 +105,8 @@ export const en = {
     socialCancelled: 'Sign-in was cancelled',
     socialFailed: 'We couldn’t sign you in with that account. Try again or use email.',
     notConfigured: 'Sign-in isn’t set up yet on this build.',
+    captcha: 'The security check didn’t finish. Check your connection and try again.',
+    smsCountry: 'We can’t send texts to that country yet. Please sign up with email instead.',
     unknown: 'Something went wrong. Please try again.',
   },
   empty: {

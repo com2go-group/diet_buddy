@@ -1,6 +1,14 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-import { DEFAULT_SETTINGS, handleSendSms, smsToProvider, type SmsProvider } from './handler.ts';
+import { supabaseRateLimiter } from '../_shared/rateLimit.ts';
+import {
+  DEFAULT_SETTINGS,
+  guardFrom,
+  handleSendSms,
+  hmacPhone,
+  smsToProvider,
+  type SmsProvider,
+} from './handler.ts';
 
 const admin = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -12,10 +20,22 @@ const admin = createClient(
 const smsToKey = Deno.env.get('SMSTO_API_KEY');
 const providers: Record<string, SmsProvider> = smsToKey ? { smsto: smsToProvider(smsToKey) } : {};
 
+const secret = Deno.env.get('SEND_SMS_HOOK_SECRET')!;
+
 Deno.serve((req) =>
   handleSendSms(req, {
-    secret: Deno.env.get('SEND_SMS_HOOK_SECRET')!,
+    secret,
     providers,
+    rateLimit: supabaseRateLimiter(admin),
+    hashPhone: (phone) => hmacPhone(secret, phone),
+    async guard() {
+      const { data } = await admin
+        .from('app_config')
+        .select('value')
+        .eq('key', 'sms_guard')
+        .maybeSingle();
+      return guardFrom((data as { value: unknown } | null)?.value);
+    },
     async settings() {
       const { data } = await admin
         .from('app_config')

@@ -32,6 +32,7 @@ export const de: Translation = {
     finePrint: 'Keine Kreditkarte nötig · Jederzeit kündbar',
   },
   auth: {
+    captchaTitle: 'Kurze Sicherheitsprüfung',
     signIn: 'Anmelden',
     signUp: 'Registrieren',
     signInTitle: 'Willkommen zurück 👋',
@@ -86,6 +87,10 @@ export const de: Translation = {
     signOut: 'Abmelden',
   },
   authErrors: {
+    captcha:
+      'Die Sicherheitsprüfung wurde nicht abgeschlossen. Prüfe deine Verbindung und versuche es erneut.',
+    smsCountry:
+      'In dieses Land können wir noch keine SMS senden. Bitte registriere dich mit E-Mail.',
     required: 'Dieses Feld ist erforderlich',
     invalidEmail: 'Gib eine gültige E-Mail-Adresse ein',
     invalidPhone: 'Gib deine Nummer mit Ländervorwahl ein, z. B. +49 151 23456789',

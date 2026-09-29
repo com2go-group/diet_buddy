@@ -36,7 +36,7 @@ describe('allowance', () => {
   it('reads the database answer with safe defaults', () => {
     const a = allowanceFrom({ premium: false, spent_usd: '0.004', boosts: 1, limits: {} });
     expect(a.spentUsd).toBe(0.004);
-    expect(a.budgetUsd).toBe(0.04);
+    expect(a.budgetUsd).toBe(0.03);
     expect(a.limits.coachFree).toBe(3);
   });
 

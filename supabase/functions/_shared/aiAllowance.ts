@@ -69,7 +69,7 @@ export function allowanceFrom(row: unknown): AiAllowance {
   return {
     premium: r.premium === true,
     spentUsd: num(r.spent_usd, 0),
-    budgetUsd: num(r.budget_usd, 0.04),
+    budgetUsd: num(r.budget_usd, 0.03),
     boosts: num(r.boosts, 0),
     boostsMax: num(r.boosts_max, 3),
     limits: {

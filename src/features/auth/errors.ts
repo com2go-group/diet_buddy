@@ -29,6 +29,7 @@ const byCode: Record<string, StringKey> = {
   email_provider_disabled: 'authErrors.notConfigured',
   provider_disabled: 'authErrors.notConfigured',
   validation_failed: 'authErrors.unknown',
+  captcha_failed: 'authErrors.captcha',
 };
 
 /**
@@ -43,6 +44,9 @@ export function authErrorKey(error: AuthError): StringKey {
   // The database's age gate aborts user creation; Supabase reports it as a generic
   // "Database error saving new user". The form checks age first, so this is a fallback.
   if (/database error saving new user/i.test(error.message)) return 'authErrors.underage';
+  // The send-sms hook's guard (country allow-list, per-number and daily caps).
+  if (/sms_country_not_supported/.test(error.message)) return 'authErrors.smsCountry';
+  if (/sms_limit_reached/.test(error.message)) return 'authErrors.rateLimited';
   return 'authErrors.unknown';
 }
 

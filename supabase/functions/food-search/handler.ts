@@ -1,10 +1,13 @@
 import { corsHeaders, fail, json } from '../_shared/http.ts';
+import type { Admission } from '../_shared/rateLimit.ts';
 import { englishQuery, languageField } from '../_shared/language.ts';
 import type { LlmProvider } from '../_shared/llm.ts';
 import { parseQuery } from '../_shared/usda.ts';
 import { searchUsda, UsdaError } from '../_shared/usdaClient.ts';
 
 export interface FoodSearchDeps {
+  /** Per-user caps (shared USDA / Open Food Facts quotas); omitted in tests that don't need it. */
+  admit?: (req: Request) => Promise<Admission>;
   apiKey: string | undefined;
   fetch: typeof fetch;
   /** Turns searches typed in the app's other languages into English (USDA is English only). */
@@ -18,6 +21,9 @@ export interface FoodSearchDeps {
 export async function handleFoodSearch(req: Request, deps: FoodSearchDeps): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return fail('method_not_allowed', 405);
+  const admission = deps.admit ? await deps.admit(req) : 'ok';
+  if (admission === 'unauthorized') return fail('unauthorized', 401);
+  if (admission === 'limited') return fail('rate_limited', 429);
   if (!deps.apiKey) return fail('not_configured', 503);
 
   let body: unknown;

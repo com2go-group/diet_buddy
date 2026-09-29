@@ -98,14 +98,22 @@ describe('signIn', () => {
       identifier: 'a@b.co',
       purpose: 'signup',
     });
-    expect(auth.resend).toHaveBeenCalledWith({ type: 'signup', email: 'a@b.co' });
+    expect(auth.resend).toHaveBeenCalledWith({
+      type: 'signup',
+      email: 'a@b.co',
+      options: { captchaToken: undefined },
+    });
   });
 
   it('resends by SMS for unconfirmed phone accounts', async () => {
     auth.signInWithPassword!.mockResolvedValue({ error: apiError('phone_not_confirmed') });
     auth.resend!.mockResolvedValue({ error: null });
     await signIn('phone', '+447700900123', 'pw');
-    expect(auth.resend).toHaveBeenCalledWith({ type: 'sms', phone: '+447700900123' });
+    expect(auth.resend).toHaveBeenCalledWith({
+      type: 'sms',
+      phone: '+447700900123',
+      options: { captchaToken: undefined },
+    });
   });
 
   it('throws a friendly message for wrong credentials', async () => {
@@ -167,7 +175,7 @@ describe('password reset', () => {
   it('resending a recovery code requests a new reset', async () => {
     auth.resetPasswordForEmail!.mockResolvedValue({ error: null });
     await resendCode({ method: 'email', identifier: 'a@b.co', purpose: 'recovery' });
-    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith('a@b.co');
+    expect(auth.resetPasswordForEmail).toHaveBeenCalledWith('a@b.co', { captchaToken: undefined });
   });
 
   it('saving the new password ends recovery mode', async () => {

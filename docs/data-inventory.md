@@ -82,3 +82,7 @@ Not collected: precise location, contacts.
 Store forms built from this file: `docs/store/apple-app-privacy.md` and `docs/store/google-data-safety.md`. Update them together.
 
 Offline logging: when there is no connection, food and water entries are kept on the device (AsyncStorage key `offline-queue`) with their user ID and time, and sent to Supabase when the app is online again. Nothing else is stored; the queue is cleared on sign-out.
+
+Abuse limits: `rate_limits` holds fixed-window counters keyed by `food_search:<user id>`, `food_barcode:<user id>` or `sms:<HMAC of the phone number>` with a hit count; rows are deleted after 8 days by `purge_old_data()`. Not exported (short-lived security data). Sign-up, sign-in and code requests pass a Cloudflare Turnstile check when enabled (`EXPO_PUBLIC_TURNSTILE_SITE_KEY`); Cloudflare sees device and browser signals and the IP address; nothing from it is stored by us.
+
+Retention: see `docs/backend.md` → Abuse limits and data retention. Coach messages 24 months, notifications 6, AI usage 25, safety flags 12, AI/wellness insights 12, meal plans and grocery lists 12, stale push tokens 12; the health log is kept until deleted by the user or with the account.

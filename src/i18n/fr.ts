@@ -32,6 +32,7 @@ export const fr: Translation = {
     finePrint: 'Sans carte bancaire · Résiliable à tout moment',
   },
   auth: {
+    captchaTitle: 'Vérification de sécurité rapide',
     signIn: 'Se connecter',
     signUp: 'S’inscrire',
     signInTitle: 'Bon retour 👋',
@@ -86,6 +87,9 @@ export const fr: Translation = {
     signOut: 'Se déconnecter',
   },
   authErrors: {
+    captcha: 'La vérification de sécurité n’a pas abouti. Vérifie ta connexion et réessaie.',
+    smsCountry:
+      'Nous ne pouvons pas encore envoyer de SMS vers ce pays. Inscris-toi plutôt avec ton e-mail.',
     required: 'Ce champ est obligatoire',
     invalidEmail: 'Saisissez une adresse e-mail valide',
     invalidPhone: 'Saisissez votre numéro avec l’indicatif, p. ex. +33 6 12 34 56 78',

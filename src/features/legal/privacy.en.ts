@@ -96,6 +96,7 @@ export const PRIVACY_POLICY: LegalDoc = {
             'Google AdMob: ads on the free plan (section 6).',
             'Expo, Apple and Google: delivering push notifications (device token and message text).',
             'Brevo: sign-in and account emails. sms.to: verification codes by SMS.',
+            'Cloudflare Turnstile: a security check when you sign up, sign in or ask for a code, to keep bots out (based on our legitimate interest in protecting the service, GDPR Art. 6(1)(f)). It looks at technical signals from your device and browser, such as your IP address; it doesn’t use cookies for advertising.',
             'USDA FoodData Central and Open Food Facts: the food name you search or the barcode you scan, with nothing about you.',
           ],
         },
@@ -112,6 +113,7 @@ export const PRIVACY_POLICY: LegalDoc = {
       heading: '9. How long we keep data',
       blocks: [
         'We keep your data while you have an account. When you delete your account in Profile → Privacy & Data, your account, all your data and your photos are deleted straight away; copies in our encrypted backups are gone within 30 days. How to delete your account, including when you can’t sign in, is explained at https://dietbuddy.me/delete-account.html. You can also delete individual entries, progress photos and wellness insights at any time. Photos for the AI body scan, food photo scan and restaurant mode are never stored. Push tokens are removed when you sign out.',
+        'Some data is deleted automatically before that: coach conversations after 24 months, in-app notifications after 6 months, AI insights and wellness insights after 12 months, meal plans and grocery lists after 12 months, records of coach safety flags after 12 months, AI usage records after 25 months (needed for yearly cost accounting), and push tokens of devices that haven’t used the app for 12 months. Counters that limit how many codes or searches can be requested are kept for at most 8 days; for text-message codes they hold a keyed hash of the phone number, not the number itself. Your food, water, check-in and body logs, plans, goals and progress photos are kept until you delete them or your account, because they are your history in the app.',
       ],
     },
     {
