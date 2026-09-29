@@ -28,6 +28,7 @@ import { useHealthStore } from '../health/useHealth';
 import { usePaywall } from '../subscriptions/usePaywall';
 import { usePremium } from '../subscriptions/usePremium';
 import { useProfileOverview } from './useProfile';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 /** Profile & settings (CLAUDE.md §7.14). */
 export function ProfileScreen() {
@@ -93,7 +94,7 @@ export function ProfileScreen() {
             <Text className="mb-3 mt-1 text-[14px]" style={{ color: '#F1F5F9' }}>
               {t('profile.upgradeDesc')}
             </Text>
-            <Button label={t('profile.upgradeTitle')} onPress={() => router.push('/paywall')} />
+            <Button label={t('profile.upgradeTitle')} onPress={() => openPaywall()} />
           </View>
         ) : null}
 

@@ -140,7 +140,10 @@ describe('food photo logging', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Take photo' }));
     expect(await screen.findByText(/used today’s free photo scans/)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'foodPhotos' },
+    });
   });
 
   it('explains a denied camera and a photo that is too large', async () => {

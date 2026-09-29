@@ -159,7 +159,10 @@ describe('GroceryScreen', () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<GroceryScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'grocery' },
+    });
     expect(loadWeekPlans).not.toHaveBeenCalled();
   });
 

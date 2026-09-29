@@ -17,6 +17,7 @@ import { frameDate, frameName, TimelineStrip } from './components/TimelineStrip'
 import { TwinAvatar } from './components/TwinAvatar';
 import { frameBmi, fullness, twinFrames, type TwinFrame } from './twin';
 import { useTwin } from './useTwin';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/progress'));
 
@@ -90,7 +91,7 @@ export function TwinScreen() {
           {locked ? (
             <View className="w-full gap-3">
               <Callout emoji="⭐">{t('twin.locked')}</Callout>
-              <Button label={t('twin.upgrade')} onPress={() => router.push('/paywall')} />
+              <Button label={t('twin.upgrade')} onPress={() => openPaywall('twin')} />
             </View>
           ) : (
             <View className="items-center gap-1">

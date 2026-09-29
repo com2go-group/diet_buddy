@@ -235,7 +235,10 @@ describe('MealPlanSection', () => {
     await fireEvent.press(await screen.findByRole('button', { name: 'Another idea' }));
     expect(await screen.findByText(/You’ve used today’s other ideas/)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Get more ideas with Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'mealPlans' },
+    });
   });
 
   it('skips a meal and can undo it', async () => {

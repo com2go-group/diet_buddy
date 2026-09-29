@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Linking } from 'react-native';
 
 import {
@@ -21,9 +22,11 @@ jest.mock('@/lib/purchases', () => ({
   purchase: jest.fn(),
   restore: jest.fn(),
 }));
+const mockInvoke = jest.fn(async () => ({ data: { premium: true }, error: null }));
 jest.mock('@/lib/supabase', () => ({
   ...jest.requireActual('@/lib/supabase'),
   supabase: {
+    functions: { invoke: (...args: unknown[]) => mockInvoke(...(args as [])) },
     from: () => ({
       select: () => ({
         eq: () => ({ single: async () => ({ data: { is_premium: false }, error: null }) }),
@@ -33,6 +36,7 @@ jest.mock('@/lib/supabase', () => ({
 }));
 jest.mock('expo-router', () => ({
   router: { back: jest.fn(), replace: jest.fn(), canGoBack: () => true },
+  useLocalSearchParams: jest.fn(() => ({})),
 }));
 
 const plans: PlanOption[] = [
@@ -46,6 +50,7 @@ describe('PaywallScreen', () => {
     useStorePremium.setState({ premium: false });
     (purchasesAvailable as jest.Mock).mockReturnValue(true);
     (getPlans as jest.Mock).mockResolvedValue(plans);
+    (useLocalSearchParams as jest.Mock).mockReturnValue({});
   });
 
   it('shows store prices with the annual plan preselected and its renewal terms', async () => {
@@ -108,6 +113,32 @@ describe('PaywallScreen', () => {
     await renderScreen(<PaywallScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'Restore purchases' }));
     expect(await screen.findByText(/No previous purchases were found/)).toBeOnTheScreen();
+  });
+
+  it('leads with the feature the user came for', async () => {
+    (useLocalSearchParams as jest.Mock).mockReturnValue({ feature: 'coach' });
+    await renderScreen(<PaywallScreen />);
+    expect(
+      await screen.findByText('Unlocks with Premium: Unlimited AI coach messages'),
+    ).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Continue free' })).toBeNull();
+  });
+
+  it('offers the trial once after onboarding, with Continue free', async () => {
+    (useLocalSearchParams as jest.Mock).mockReturnValue({ welcome: '1' });
+    await renderScreen(<PaywallScreen />);
+    expect(await screen.findByText('Your plan is ready 🎉')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Continue free' }));
+    expect(router.back).toHaveBeenCalled();
+  });
+
+  it('confirms Premium with the server right after buying', async () => {
+    (purchase as jest.Mock).mockResolvedValue(true);
+    await renderScreen(<PaywallScreen />);
+    await fireEvent.press(await screen.findByRole('button', { name: 'Get Premium Annual' }));
+    await waitFor(() =>
+      expect(mockInvoke).toHaveBeenCalledWith('sync-premium', { method: 'POST' }),
+    );
   });
 
   it('explains when purchases are not switched on in this build', async () => {

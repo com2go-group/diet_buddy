@@ -21,7 +21,9 @@ import { CoachError, type Persona } from './api';
 import { MessageBubble } from './components/MessageBubble';
 import { PERSONAS, PersonaPicker } from './components/PersonaPicker';
 import { TypingIndicator } from './components/TypingIndicator';
+import { usePlanExplainer } from './planExplainer';
 import { useCoach } from './useCoach';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 const QUICK_PROMPTS = ['coach.q1', 'coach.q2', 'coach.q3', 'coach.q4', 'coach.q5'] as const;
 
@@ -36,6 +38,8 @@ export function CoachScreen() {
   const name = t(`coach.${persona}`);
 
   const thread = query.data;
+  // A new conversation with Aria starts with the user's plan explained (no AI call).
+  const explainer = usePlanExplainer(persona === 'aria' && thread?.messages.length === 0);
   const blocked = Boolean(thread && !thread.premium && thread.usedToday >= thread.limit);
   const canSend = !send.isPending && !blocked && text.trim().length > 0;
 
@@ -69,6 +73,9 @@ export function CoachScreen() {
           avatar={meta.emoji}
           speaker={name}
         />
+        {explainer && persona === 'aria' && thread.messages.length === 0 ? (
+          <MessageBubble role="assistant" content={explainer} avatar={meta.emoji} speaker={name} />
+        ) : null}
         {thread.messages.map((m) => (
           <MessageBubble
             key={m.id}
@@ -171,7 +178,7 @@ export function CoachScreen() {
             </Text>
           ) : null}
           {blocked ? (
-            <Button label={t('coach.upgrade')} size="md" onPress={() => router.push('/paywall')} />
+            <Button label={t('coach.upgrade')} size="md" onPress={() => openPaywall('coach')} />
           ) : null}
           <ScrollView
             horizontal

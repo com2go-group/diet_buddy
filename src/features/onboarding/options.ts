@@ -133,9 +133,18 @@ export function buildSteps(goals: readonly GoalType[]): StepId[] {
   ];
 }
 
+/** Rough time per question, for the "about N min left" hint (most are one tap). */
+const SECONDS_PER_STEP = 12;
+
+/** Whole minutes left from this step to the end, at least 1. */
+export function minutesLeft(index: number, total: number): number {
+  return Math.max(1, Math.ceil(((total - index) * SECONDS_PER_STEP) / 60));
+}
+
 /** Steps with a "Skip for now" link (prototype). */
 export const SKIPPABLE_STEPS: readonly StepId[] = [
   'motivation',
+  'restrictions',
   'avoidFoods',
   'allergies',
   'healthApps',

@@ -88,8 +88,23 @@ export async function premiumFromStore(): Promise<boolean> {
   return hasPremium(await Purchases.getCustomerInfo());
 }
 
-export function onCustomerInfo(listener: (premium: boolean) => void): () => void {
-  const handler = (info: CustomerInfo) => listener(hasPremium(info));
+/** When a free trial of Premium ends (it renews then unless cancelled), or null if not in one. */
+export function trialEnd(info: Pick<CustomerInfo, 'entitlements'>): Date | null {
+  const premium = info.entitlements.active[PREMIUM_ENTITLEMENT];
+  if (!premium || premium.periodType !== 'TRIAL' || !premium.expirationDate) return null;
+  if (!premium.willRenew) return null;
+  const end = new Date(premium.expirationDate);
+  return Number.isNaN(end.getTime()) ? null : end;
+}
+
+export async function trialEndFromStore(): Promise<Date | null> {
+  return trialEnd(await Purchases.getCustomerInfo());
+}
+
+export function onCustomerInfo(
+  listener: (premium: boolean, trialEndsAt: Date | null) => void,
+): () => void {
+  const handler = (info: CustomerInfo) => listener(hasPremium(info), trialEnd(info));
   Purchases.addCustomerInfoUpdateListener(handler);
   return () => Purchases.removeCustomerInfoUpdateListener(handler);
 }

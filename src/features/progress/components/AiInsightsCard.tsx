@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Button, ErrorState, SkeletonCard, Text } from '@/components';
@@ -6,6 +5,7 @@ import { t } from '@/i18n';
 
 import { usePremium } from '../../subscriptions/usePremium';
 import { AiInsightsError, useAiInsights } from '../aiInsights';
+import { openPaywall } from '../../subscriptions/paywallRoute';
 
 /** AI-written insights for Premium users; an upgrade prompt for everyone else. */
 export function AiInsightsCard() {
@@ -19,7 +19,7 @@ export function AiInsightsCard() {
           <Text tone="muted" className="text-[13px]">
             ⭐ {t('progress.aiLocked')}
           </Text>
-          <Button label={t('progress.aiUpgrade')} onPress={() => router.push('/paywall')} />
+          <Button label={t('progress.aiUpgrade')} onPress={() => openPaywall('insights')} />
         </>
       );
     }

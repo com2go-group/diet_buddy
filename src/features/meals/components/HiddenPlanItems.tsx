@@ -1,9 +1,9 @@
-import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Button, Text } from '@/components';
 import { t } from '@/i18n';
 import { adsSupported } from '@/lib/ads';
+import { openPaywall } from '../../subscriptions/paywallRoute';
 
 /**
  * Free plan: the rest of a meal is hidden until the user chooses to watch a rewarded video for
@@ -47,7 +47,7 @@ export function HiddenPlanItems({
           label={t('mealPlan.unlockPremium')}
           variant={adsSupported ? 'ghost' : 'primary'}
           size="md"
-          onPress={() => router.push('/paywall')}
+          onPress={() => openPaywall('mealPlans')}
         />
       </View>
     </View>

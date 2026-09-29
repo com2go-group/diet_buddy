@@ -95,7 +95,10 @@ describe('StoryScreen', () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<StoryScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'story' },
+    });
     expect(screen.queryByRole('button', { name: 'Share image' })).toBeNull();
   });
 

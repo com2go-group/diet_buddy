@@ -1,17 +1,18 @@
 import { Feather } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Linking, Platform, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, EmptyState, ErrorState, GradientFill, SkeletonCard, Text } from '@/components';
-import { t } from '@/i18n';
+import { t, type StringKey } from '@/i18n';
 import type { PlanOption } from '@/lib/purchases';
 import { ACCENTS, MIN_TOUCH_TARGET } from '@/theme';
 
 import { FormMessage } from '../auth/components/FormMessage';
 import { openLegal } from '../legal/legal';
 import { PlanCard } from './components/PlanCard';
+import { isPaywallFeature, orderedFeatures, type PaywallFeature } from './paywallRoute';
 import { usePaywall } from './usePaywall';
 import { usePremium } from './usePremium';
 
@@ -22,20 +23,22 @@ const MANAGE_URL = Platform.select({
   default: 'https://play.google.com/store/account/subscriptions',
 });
 
-const NOW = [
-  'featureNoAds',
-  'featureCoach',
-  'featureMealPlans',
-  'featurePhotos',
-  'featureInsights',
-  'featureGrocery',
-  'featureRestaurant',
-  'featureFoodPhotos',
-  'featureBodyScan',
-  'featureTwin',
-  'featureStory',
-  'featureSupport',
-] as const;
+const FEATURE_LABEL: Record<PaywallFeature, StringKey> = {
+  noAds: 'paywall.featureNoAds',
+  coach: 'paywall.featureCoach',
+  mealPlans: 'paywall.featureMealPlans',
+  photos: 'paywall.featurePhotos',
+  insights: 'paywall.featureInsights',
+  wellness: 'paywall.featureWellness',
+  grocery: 'paywall.featureGrocery',
+  restaurant: 'paywall.featureRestaurant',
+  foodPhotos: 'paywall.featureFoodPhotos',
+  bodyScan: 'paywall.featureBodyScan',
+  twin: 'paywall.featureTwin',
+  story: 'paywall.featureStory',
+  support: 'paywall.featureSupport',
+};
+const featureKey = (f: PaywallFeature) => FEATURE_LABEL[f];
 /** Store-required terms under the button (CLAUDE.md §12: trial terms and renewal price). */
 export function termsFor(plan: PlanOption): string {
   const period = plan.kind === 'annual' ? t('paywall.year') : t('paywall.month');
@@ -49,8 +52,15 @@ function ctaFor(plan: PlanOption): string {
   return t(plan.kind === 'annual' ? 'paywall.ctaAnnual' : 'paywall.ctaMonthly');
 }
 
-/** Paywall (CLAUDE.md §12, prototype SubscriptionsScreen). Prices come from the store. */
+/**
+ * Paywall (CLAUDE.md §12, prototype SubscriptionsScreen). Prices come from the store. Opened from a
+ * Premium gate it leads with that feature; `welcome` is the one-time trial offer after onboarding,
+ * which can always be closed with "Continue free".
+ */
 export function PaywallScreen() {
+  const params = useLocalSearchParams<{ feature?: string; welcome?: string }>();
+  const featured = isPaywallFeature(params.feature) ? params.feature : null;
+  const welcome = params.welcome === '1';
   const { premium } = usePremium();
   const { available, plans, buy, restore, cancelled } = usePaywall();
   const [selected, setSelected] = useState<string | null>(null);
@@ -144,11 +154,19 @@ export function PaywallScreen() {
             className="font-extrabold text-2xl"
             style={{ color: '#F1F5F9' }}
           >
-            {t('paywall.title')}
+            {welcome ? t('paywall.welcomeTitle') : t('paywall.title')}
           </Text>
           <Text className="mt-1 text-center text-[14px]" style={{ color: '#94A3B8' }}>
-            {t('paywall.subtitle')}
+            {welcome ? t('paywall.welcomeSubtitle') : t('paywall.subtitle')}
           </Text>
+          {featured ? (
+            <View className="mt-3 rounded-full bg-primary/20 px-3 py-1.5">
+              {/* Always on the dark header, so the light amber reads at AA. */}
+              <Text variant="caption" className="font-bold" style={{ color: '#FCD34D' }}>
+                {t('paywall.unlocks', { feature: t(featureKey(featured)) })}
+              </Text>
+            </View>
+          ) : null}
         </View>
         <View className="gap-6 px-5 pt-5">
           {body()}
@@ -156,10 +174,19 @@ export function PaywallScreen() {
             <Text variant="label" className="font-bold">
               {t('paywall.includedNow')}
             </Text>
-            {NOW.map((key) => (
-              <View key={key} className="flex-row items-center gap-2">
+            {orderedFeatures(featured).map((key) => (
+              <View
+                key={key}
+                className={
+                  key === featured
+                    ? 'flex-row items-center gap-2 rounded-xl bg-primary/10 px-2 py-1.5'
+                    : 'flex-row items-center gap-2'
+                }
+              >
                 <Feather name="check-circle" size={16} color={ACCENTS.green.light} />
-                <Text className="text-[14px]">{t(`paywall.${key}`)}</Text>
+                <Text className={key === featured ? 'font-bold text-[14px]' : 'text-[14px]'}>
+                  {t(featureKey(key))}
+                </Text>
               </View>
             ))}
           </View>
@@ -184,6 +211,9 @@ export function PaywallScreen() {
                 onPress={() => restore.mutate()}
               />
             </View>
+          ) : null}
+          {welcome && !premium ? (
+            <Button label={t('paywall.continueFree')} variant="outline" onPress={close} />
           ) : null}
           <View className="flex-row justify-center gap-6">
             <Text

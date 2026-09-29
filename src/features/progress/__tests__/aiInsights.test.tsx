@@ -76,7 +76,10 @@ describe('AiInsightsCard', () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<AiInsightsCard />);
     await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'insights' },
+    });
     expect(invoke).not.toHaveBeenCalled();
   });
 });

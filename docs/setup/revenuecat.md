@@ -87,6 +87,12 @@ EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=test_...
 3. Test Store purchases still need a development build (not the web build). The webhook works
    the same way (step 4) if you want to see `is_premium` change on the server.
 
+**Instant unlock (recommended):** also create a RevenueCat **secret** API key (Project settings →
+API keys → + New secret key, v1 permissions) and store it as a Supabase secret:
+`npx supabase secrets set REVENUECAT_SECRET_KEY=sk_...`, then
+`npx supabase functions deploy sync-premium`. The app calls it right after a purchase or restore,
+so Premium features that the server checks unlock at once instead of after the webhook.
+
 ## 5. Test with sandbox purchases
 
 1. `npx eas login`, then `npx eas build --profile development --platform ios` (and `android`). EAS asks to create certificates and a keystore; accept.

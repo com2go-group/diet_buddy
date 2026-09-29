@@ -204,3 +204,12 @@ describe('option helpers', () => {
     expect(isoToParts(null)).toEqual({ day: '', month: '', year: '' });
   });
 });
+
+describe('minutesLeft', () => {
+  it('estimates the time left from the steps still to answer', () => {
+    const { minutesLeft } = jest.requireActual('../options') as typeof import('../options');
+    expect(minutesLeft(0, 17)).toBe(4);
+    expect(minutesLeft(15, 17)).toBe(1);
+    expect(minutesLeft(16, 17)).toBe(1);
+  });
+});

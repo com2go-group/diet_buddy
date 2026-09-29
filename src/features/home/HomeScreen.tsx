@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { RefreshControl, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,9 +7,14 @@ import { ErrorState, SkeletonCard } from '@/components';
 import { AppBanner } from '@/features/ads';
 import { ActivityCard } from '@/features/health';
 import { t } from '@/i18n';
+import { purchasesAvailable } from '@/lib/purchases';
 import { useTheme } from '@/theme';
 
+import { useSessionStore } from '../auth/sessionStore';
+import { openPaywall } from '../subscriptions/paywallRoute';
+import { usePremium } from '../subscriptions/usePremium';
 import { CheckInCard } from './components/CheckInCard';
+import { FirstDayChecklist } from './components/FirstDayChecklist';
 import { HomeHeader } from './components/HomeHeader';
 import { InsightCard } from './components/InsightCard';
 import { MacroGrid } from './components/MacroGrid';
@@ -19,13 +24,31 @@ import { Shortcuts } from './components/Shortcuts';
 import { TodayMeals } from './components/TodayMeals';
 import { WaterCard } from './components/WaterCard';
 import { WeeklyAdherence } from './components/WeeklyAdherence';
+import { useJourneyStore } from './journeyStore';
 import { homeInsight, summarizeHome } from './summary';
 import { useHome } from './useHome';
+
+/**
+ * Right after onboarding, free users see the trial offer once (it can always be closed with
+ * "Continue free"); Premium users and builds without store purchases never do.
+ */
+function useWelcomeOffer(userId: string | undefined) {
+  const pending = useJourneyStore((s) => (userId ? s.welcomeOfferPending[userId] : false));
+  const shown = useJourneyStore((s) => s.welcomeOfferShown);
+  const { premium, loading } = usePremium();
+  useEffect(() => {
+    if (!userId || !pending || loading) return;
+    shown(userId);
+    if (!premium && purchasesAvailable()) openPaywall(undefined, { welcome: true });
+  }, [userId, pending, loading, premium, shown]);
+}
 
 /** Home dashboard (CLAUDE.md §7.5). */
 export function HomeScreen() {
   const { colors } = useTheme();
+  const userId = useSessionStore((s) => s.session?.user.id);
   const { query, addGlass, removeWater, waterError } = useHome();
+  useWelcomeOffer(userId);
   const now = useMemo(() => new Date(), [query.dataUpdatedAt]); // eslint-disable-line react-hooks/exhaustive-deps
   const summary = useMemo(
     () => (query.data ? summarizeHome(query.data, now) : null),
@@ -51,6 +74,9 @@ export function HomeScreen() {
     return (
       <>
         <HomeHeader name={profile.name ?? ''} now={now} />
+        {userId ? (
+          <FirstDayChecklist userId={userId} data={query.data} now={now} onAddGlass={addGlass} />
+        ) : null}
         <ScoreCard score={today.score} streak={profile.streak_days} xp={profile.xp} />
         {targets ? (
           <>

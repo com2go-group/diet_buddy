@@ -16,6 +16,7 @@ import { WellnessError } from './api';
 import { ConsentCard } from './components/ConsentCard';
 import { InsightList } from './components/InsightList';
 import { useWellness } from './useWellness';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/coach'));
 const day = (key: string) => {
@@ -40,7 +41,7 @@ export function WellnessScreen() {
   const locked = (
     <View className="gap-4">
       <Callout emoji="⭐">{t('wellness.locked')}</Callout>
-      <Button label={t('wellness.upgrade')} onPress={() => router.push('/paywall')} />
+      <Button label={t('wellness.upgrade')} onPress={() => openPaywall('wellness')} />
     </View>
   );
 

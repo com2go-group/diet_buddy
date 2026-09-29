@@ -8,10 +8,12 @@ import {
   premiumFromStore,
   purchasesAvailable,
   resetPurchases,
+  trialEndFromStore,
 } from '@/lib/purchases';
 import { optional, supabase } from '@/lib/supabase';
 
 import { useSessionStore } from '../auth/sessionStore';
+import { scheduleTrialReminder, syncPremium } from './sync';
 
 /** Premium as the store SDK reports it on this device (instant after purchase/restore). */
 export const useStorePremium = create<{ premium: boolean; set: (p: boolean) => void }>((set) => ({
@@ -54,6 +56,7 @@ export function usePurchasesSetup(): void {
     if (!userId) {
       setStore(false);
       resetPurchases().catch(() => undefined);
+      scheduleTrialReminder(null);
       return;
     }
     let cancelled = false;
@@ -61,9 +64,17 @@ export function usePurchasesSetup(): void {
     configurePurchases(userId)
       .then(async () => {
         if (cancelled) return;
-        setStore(await premiumFromStore());
-        unsubscribe = onCustomerInfo((premium) => {
-          setStore(premium);
+        const premium = await premiumFromStore();
+        setStore(premium);
+        scheduleTrialReminder(await trialEndFromStore());
+        if (premium && !(await serverPremium(userId))) {
+          // The store says Premium but the server missed it (e.g. a lost webhook): check now.
+          await syncPremium();
+          queryClient.invalidateQueries({ queryKey: ['premium'] });
+        }
+        unsubscribe = onCustomerInfo((now, trialEndsAt) => {
+          setStore(now);
+          scheduleTrialReminder(trialEndsAt);
           // The webhook updates the server shortly after; refresh what depends on it.
           queryClient.invalidateQueries({ queryKey: ['premium'] });
         });

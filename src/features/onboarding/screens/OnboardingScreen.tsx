@@ -18,7 +18,7 @@ import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
 import { signOut } from '../../auth/api';
 import { FormMessage } from '../../auth/components/FormMessage';
-import { SKIPPABLE_STEPS } from '../options';
+import { minutesLeft, SKIPPABLE_STEPS } from '../options';
 import { STEP_COMPONENTS } from '../steps';
 import type { OnboardingState } from '../api';
 import { useOnboarding, useSavedOnboarding } from '../useOnboarding';
@@ -89,9 +89,14 @@ function OnboardingFlow({ initial }: { initial: OnboardingState }) {
             ) : (
               <View style={{ width: MIN_TOUCH_TARGET }} />
             )}
-            <Text variant="label" tone="muted" accessibilityElementsHidden>
-              {t('onboarding.stepCounter', { current: c.index + 1, total: c.total })}
-            </Text>
+            <View className="items-center">
+              <Text variant="label" tone="muted" accessibilityElementsHidden>
+                {t('onboarding.stepCounter', { current: c.index + 1, total: c.total })}
+              </Text>
+              <Text variant="caption" tone="muted" className="text-[12px]">
+                {t('onboarding.timeLeft', { minutes: minutesLeft(c.index, c.total) })}
+              </Text>
+            </View>
             {early ? (
               <Pressable
                 onPress={() => signOut().catch(() => undefined)}

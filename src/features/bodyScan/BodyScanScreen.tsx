@@ -20,6 +20,7 @@ import { ModeChooser } from './components/ModeChooser';
 import { StatCard } from './components/StatCard';
 import type { MetricKey, ScanResults } from './results';
 import { useBodyScan, type ScanContext } from './useBodyScan';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 export function BodyScanScreen() {
   const saved = useSavedOnboarding();
@@ -122,9 +123,7 @@ export function BodyScan({
               premium={premium}
               onManual={() => c.setMode('manual')}
               onAi={() => c.setMode('ai')}
-              onUpgrade={() =>
-                router.push(context === 'check' ? '/paywall' : '/onboarding-premium')
-              }
+              onUpgrade={() => openPaywall('bodyScan', { onboarding: context !== 'check' })}
             />
           ) : null}
           {c.mode === 'ai' ? <AiScanPanel onMeasured={c.applyAi} /> : null}

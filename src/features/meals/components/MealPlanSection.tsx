@@ -25,6 +25,7 @@ import { useMealPlan } from '../useMealPlan';
 import { LockedMealCard } from './LockedMealCard';
 import { MealActions } from './MealActions';
 import { MealCard } from './MealCard';
+import { openPaywall } from '../../subscriptions/paywallRoute';
 
 const lower = (slot: MealSlot) => t(`homeScreen.${slot}`).toLowerCase();
 
@@ -148,7 +149,7 @@ export function MealPlanSection({
         <Button
           label={t('mealPlan.moreIdeasPremium')}
           size="md"
-          onPress={() => router.push('/paywall')}
+          onPress={() => openPaywall('mealPlans')}
         />
       ) : null}
       {state === 'current' && isAdjusted(factor) ? (

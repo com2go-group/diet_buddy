@@ -14,6 +14,7 @@ import { profileQueryKey } from '../account/useProfile';
 import { RewardGate, useShowAds } from '../ads';
 import { FormMessage } from '../auth/components/FormMessage';
 import { useSessionStore } from '../auth/sessionStore';
+import { useJourneyStore } from '../home/journeyStore';
 import { PlanWarnings } from '../onboarding/steps/PlanWarnings';
 import { completeOnboarding, loadInitialPlan, type InitialPlanData } from './api';
 import { buildInitialPlan } from './buildPlan';
@@ -74,6 +75,8 @@ function PlanView({ userId, data }: { userId: string; data: InitialPlanData }) {
     mutationFn: () => completeOnboarding(userId, built!),
     onSuccess: async () => {
       haptics.success();
+      // Home then shows the first-day checklist and, once, the trial offer.
+      useJourneyStore.getState().onboarded(userId);
       await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
       router.replace('/home');
     },

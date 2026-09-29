@@ -117,13 +117,19 @@ describe('AI body scan', () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<BodyScan initial={state} context="check" />);
     await fireEvent.press(await screen.findByRole('button', { name: /Unlock with Premium/ }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'bodyScan' },
+    });
   });
 
   it('opens the onboarding paywall from the onboarding body scan', async () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<BodyScan initial={state} />);
     await fireEvent.press(await screen.findByRole('button', { name: /Unlock with Premium/ }));
-    expect(router.push).toHaveBeenCalledWith('/onboarding-premium');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/onboarding-premium',
+      params: { feature: 'bodyScan' },
+    });
   });
 });

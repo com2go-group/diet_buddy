@@ -79,6 +79,27 @@ export async function scheduleReminders(
   }
 }
 
+/**
+ * Schedules a one-off local notification under this ID, replacing an earlier one with the same ID.
+ * Nothing is scheduled for a time that has passed or without permission (the old one is still
+ * cancelled). `at: null` just cancels.
+ */
+export async function scheduleOnce(
+  id: string,
+  at: Date | null,
+  content: { title: string; body: string; route: string },
+  now: Date = new Date(),
+) {
+  if (!pushSupported) return;
+  await Notifications.cancelScheduledNotificationAsync(id).catch(() => undefined);
+  if (!at || at.getTime() <= now.getTime() || (await permission()) !== 'granted') return;
+  await Notifications.scheduleNotificationAsync({
+    identifier: id,
+    content: { title: content.title, body: content.body, data: { route: content.route } },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at },
+  });
+}
+
 /** Calls back with the data of notifications the user taps (including the one that opened the app). */
 export function onNotificationTap(handler: (data: Record<string, unknown>) => void): () => void {
   if (Platform.OS === 'web') return () => {};

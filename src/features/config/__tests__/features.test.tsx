@@ -23,8 +23,9 @@ jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 describe('feature switches', () => {
   it('hides what an admin switched off and keeps the rest', async () => {
     await renderScreen(<Shortcuts />);
-    expect(await screen.findByRole('button', { name: 'Restaurant' })).toBeOnTheScreen();
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Grocery AI' })).toBeNull());
+    // Free users see a crown on the Premium shortcuts.
+    expect(await screen.findByRole('button', { name: 'Restaurant, Premium' })).toBeOnTheScreen();
+    await waitFor(() => expect(screen.queryByRole('button', { name: /Grocery AI/ })).toBeNull());
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeOnTheScreen();
   });
 });

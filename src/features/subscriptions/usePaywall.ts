@@ -9,6 +9,7 @@ import {
   restore,
 } from '@/lib/purchases';
 
+import { syncPremium } from './sync';
 import { useStorePremium } from './usePremium';
 
 export function usePaywall() {
@@ -22,12 +23,14 @@ export function usePaywall() {
     staleTime: 5 * 60_000,
   });
 
-  const after = (premium: boolean) => {
+  const after = async (premium: boolean) => {
     if (premium) {
       setStore(true);
       haptics.success();
     }
-    // The webhook sets the server flag; refresh the parts of the app that depend on it.
+    // Have the server confirm with RevenueCat now rather than waiting for the webhook, then
+    // refresh the parts of the app that depend on the server flag.
+    await syncPremium();
     for (const key of ['premium', 'profileOverview', 'coach']) {
       queryClient.invalidateQueries({ queryKey: [key] });
     }

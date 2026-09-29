@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { View } from 'react-native';
 
 import { Text } from '@/components';
@@ -6,6 +5,7 @@ import { t } from '@/i18n';
 import { AdBanner } from '@/lib/ads/AdBanner';
 
 import { useShowAds } from './useAds';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 /** Banner for free users on selected screens (§12); renders nothing for Premium or on web. */
 export function AppBanner() {
@@ -19,7 +19,7 @@ export function AppBanner() {
         tone="primary"
         accessibilityRole="link"
         className="mb-2 font-semibold"
-        onPress={() => router.push('/paywall')}
+        onPress={() => openPaywall('noAds')}
       >
         {t('ads.removeAds')}
       </Text>

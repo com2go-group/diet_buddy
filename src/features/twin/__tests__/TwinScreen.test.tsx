@@ -66,7 +66,7 @@ describe('TwinScreen', () => {
       screen.getByText("Your twin's timeline and goal projection are part of Premium."),
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({ pathname: '/paywall', params: { feature: 'twin' } });
   });
 
   it('saves a new look', async () => {

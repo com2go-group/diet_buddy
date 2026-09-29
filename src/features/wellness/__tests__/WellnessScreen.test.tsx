@@ -107,7 +107,10 @@ describe('WellnessScreen', () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<WellnessScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'wellness' },
+    });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

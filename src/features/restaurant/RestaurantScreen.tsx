@@ -27,6 +27,7 @@ import { useLogFood } from '../meals/useMeals';
 import { usePremium } from '../subscriptions/usePremium';
 import { analyzeMenu, currentSlot, MenuError, type Dish } from './api';
 import { DishCard } from './components/DishCard';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/home'));
 
@@ -143,7 +144,7 @@ export function RestaurantScreen() {
       return (
         <View className="gap-4">
           <Callout emoji="⭐">{t('restaurant.locked')}</Callout>
-          <Button label={t('restaurant.upgrade')} onPress={() => router.push('/paywall')} />
+          <Button label={t('restaurant.upgrade')} onPress={() => openPaywall('restaurant')} />
         </View>
       );
     }

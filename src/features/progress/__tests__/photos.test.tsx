@@ -114,7 +114,10 @@ describe('PhotosSection', () => {
   it('keeps before/after for Premium', async () => {
     await renderScreen(<PhotosSection metrics={metrics} units="metric" />);
     await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'photos' },
+    });
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
   });
 

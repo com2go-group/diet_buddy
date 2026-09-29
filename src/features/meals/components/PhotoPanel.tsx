@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
@@ -14,6 +13,7 @@ import { photoWarningText } from '../photoWarnings';
 import type { FoodPhotoResult, Macros, PhotoItem } from '../types';
 import { usePhotoScan } from '../useMeals';
 import { PhotoItemRow, type PhotoChoice } from './PhotoItemRow';
+import { openPaywall } from '../../subscriptions/paywallRoute';
 
 export interface PhotoEntry {
   item: PhotoItem;
@@ -102,7 +102,7 @@ export function PhotoPanel({
           </Callout>
         )}
         {code === 'limit_reached' ? (
-          <Button label={t('foodPhoto.upgrade')} onPress={() => router.push('/paywall')} />
+          <Button label={t('foodPhoto.upgrade')} onPress={() => openPaywall('foodPhotos')} />
         ) : code !== 'failed' && code !== 'not_configured' ? (
           <Button label={t('foodPhoto.retake')} variant="outline" onPress={() => scan.reset()} />
         ) : null}

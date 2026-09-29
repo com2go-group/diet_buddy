@@ -104,7 +104,10 @@ describe('RestaurantScreen', () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<RestaurantScreen />);
     await fireEvent.press(await screen.findByRole('button', { name: 'See Premium' }));
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'restaurant' },
+    });
   });
 
   it('picks the meal from the time of day', () => {

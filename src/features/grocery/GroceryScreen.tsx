@@ -16,6 +16,7 @@ import { GroceryError } from './api';
 import { dayName, WeekPlan } from './components/WeekPlan';
 import { ShoppingList } from './components/ShoppingList';
 import { useGrocery, WEEK } from './useGrocery';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/home'));
 
@@ -61,7 +62,7 @@ export function GroceryScreen() {
       return (
         <View className="gap-4">
           <Callout emoji="⭐">{t('grocery.locked')}</Callout>
-          <Button label={t('grocery.upgrade')} onPress={() => router.push('/paywall')} />
+          <Button label={t('grocery.upgrade')} onPress={() => openPaywall('grocery')} />
         </View>
       );
     }

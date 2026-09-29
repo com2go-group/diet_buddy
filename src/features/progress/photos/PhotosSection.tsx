@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 
@@ -16,6 +15,7 @@ import { weightNear } from './compare';
 import { PhotoCompare } from './PhotoCompare';
 import { PhotoViewer } from './PhotoViewer';
 import { usePhotos } from './usePhotos';
+import { openPaywall } from '../../subscriptions/paywallRoute';
 
 const NOTICE = {
   denied: 'progress.photosDenied',
@@ -119,7 +119,7 @@ export function PhotosSection({ metrics, units }: { metrics: MetricRow[]; units:
             <Text tone="muted" className="text-[13px]">
               ⭐ {t('progress.compareLocked')}
             </Text>
-            <Button label={t('progress.compareUpgrade')} onPress={() => router.push('/paywall')} />
+            <Button label={t('progress.compareUpgrade')} onPress={() => openPaywall('photos')} />
           </>
         ) : photos.length < 2 ? (
           <Text tone="muted" className="text-[13px]">

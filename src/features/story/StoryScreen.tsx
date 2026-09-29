@@ -26,6 +26,7 @@ import { StoryCard, storyBadgeText, storyWeightText } from './components/StoryCa
 import { shareStoryImage } from './shareImage';
 import { weekStats } from './story';
 import { useStory } from './useStory';
+import { openPaywall } from '../subscriptions/paywallRoute';
 
 const close = () => (router.canGoBack() ? router.back() : router.replace('/progress'));
 
@@ -138,7 +139,7 @@ export function StoryScreen() {
         ) : (
           <View className="gap-3">
             <Callout emoji="⭐">{t('story.locked')}</Callout>
-            <Button label={t('story.upgrade')} onPress={() => router.push('/paywall')} />
+            <Button label={t('story.upgrade')} onPress={() => openPaywall('story')} />
           </View>
         )}
         <Text variant="caption" tone="muted" className="text-center">

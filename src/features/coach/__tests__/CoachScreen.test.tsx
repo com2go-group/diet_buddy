@@ -74,7 +74,10 @@ describe('CoachScreen', () => {
       screen.getByRole('button', { name: 'Get unlimited coaching with Premium' }),
     );
     const { router } = jest.requireMock('expo-router') as { router: { push: jest.Mock } };
-    expect(router.push).toHaveBeenCalledWith('/paywall');
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/paywall',
+      params: { feature: 'coach' },
+    });
   });
 
   it('explains server errors', async () => {
