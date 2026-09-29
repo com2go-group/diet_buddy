@@ -1,0 +1,27 @@
+name: CI
+
+# Typecheck, lint and unit tests on every push and pull request, so a broken build is caught
+# before it reaches EAS / TestFlight. The pgTAP database tests need Postgres and run locally
+# (npm run db:test / db:test:plain).
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --ci
