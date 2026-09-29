@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 
 import { renderScreen } from '@/test/render';
 
@@ -34,7 +35,9 @@ jest.mock('@/lib/supabase', () => {
   };
   return { ...jest.requireActual('@/lib/supabase'), supabase: { from: () => chain } };
 });
-jest.mock('expo-router', () => ({ router: { replace: jest.fn(), back: jest.fn() } }));
+jest.mock('expo-router', () => ({
+  router: { replace: jest.fn(), back: jest.fn(), push: jest.fn() },
+}));
 
 const JPEG = btoa('\xff\xd8\xff\xdb\x00\x04qq\xff\xda\x00\x02data');
 const state = {
@@ -110,9 +113,17 @@ describe('AI body scan', () => {
     expect(await screen.findByText(/We could see a face/)).toBeOnTheScreen();
   });
 
-  it('keeps the AI scan for Premium', async () => {
+  it('keeps the AI scan for Premium and leads free users to the paywall', async () => {
     useStorePremium.setState({ premium: false });
     await renderScreen(<BodyScan initial={state} context="check" />);
-    expect(await screen.findByRole('button', { name: /Available with Premium/ })).toBeDisabled();
+    await fireEvent.press(await screen.findByRole('button', { name: /Unlock with Premium/ }));
+    expect(router.push).toHaveBeenCalledWith('/paywall');
+  });
+
+  it('opens the onboarding paywall from the onboarding body scan', async () => {
+    useStorePremium.setState({ premium: false });
+    await renderScreen(<BodyScan initial={state} />);
+    await fireEvent.press(await screen.findByRole('button', { name: /Unlock with Premium/ }));
+    expect(router.push).toHaveBeenCalledWith('/onboarding-premium');
   });
 });

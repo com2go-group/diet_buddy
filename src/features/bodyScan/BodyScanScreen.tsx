@@ -122,6 +122,9 @@ export function BodyScan({
               premium={premium}
               onManual={() => c.setMode('manual')}
               onAi={() => c.setMode('ai')}
+              onUpgrade={() =>
+                router.push(context === 'check' ? '/paywall' : '/onboarding-premium')
+              }
             />
           ) : null}
           {c.mode === 'ai' ? <AiScanPanel onMeasured={c.applyAi} /> : null}

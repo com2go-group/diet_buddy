@@ -77,7 +77,11 @@ export function PaywallScreen() {
     }
     if (!available)
       return (
-        <EmptyState emoji="📱" title={t('paywall.title')} message={t('paywall.unavailable')} />
+        <EmptyState
+          emoji="📱"
+          title={t('paywall.title')}
+          message={t(Platform.OS === 'web' ? 'paywall.unavailable' : 'paywall.unavailableBuild')}
+        />
       );
     if (plans.isPending) return <SkeletonCard lines={4} />;
     if (plans.isError)

@@ -70,6 +70,11 @@ describe('CoachScreen', () => {
     await renderScreen(<CoachScreen />);
     expect(await screen.findByText(/You’ve used today’s 5 free messages/)).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
+    await fireEvent.press(
+      screen.getByRole('button', { name: 'Get unlimited coaching with Premium' }),
+    );
+    const { router } = jest.requireMock('expo-router') as { router: { push: jest.Mock } };
+    expect(router.push).toHaveBeenCalledWith('/paywall');
   });
 
   it('explains server errors', async () => {

@@ -517,7 +517,7 @@ export const en = {
       'Point your camera at yourself for an AI-estimated body composition in under 30 seconds.',
     premium: 'Premium',
     comingSoon: 'Coming soon',
-    premiumOnly: 'Available with Premium. You can run it later from Progress → Body.',
+    premiumOnly: 'Unlock with Premium →',
     aiStart: 'Start AI scan',
     aiConsentTitle: 'Before your first scan',
     aiConsentBody:
@@ -1267,6 +1267,7 @@ export const en = {
     remaining: '{{count}} of {{limit}} free messages left today',
     remainingNone: 'You’ve used today’s {{limit}} free messages. They reset at midnight.',
     premiumNote: 'Premium includes unlimited coaching.',
+    upgrade: 'Get unlimited coaching with Premium',
     q1: 'What should I eat for dinner?',
     q2: 'Suggest a snack for what I have left today',
     q3: 'How’s my protein today?',
@@ -1432,6 +1433,8 @@ export const en = {
     purchaseFailed: 'The purchase didn’t go through. You haven’t been charged.',
     loadFailed: 'We couldn’t load the plans.',
     unavailable: 'Purchases are available in the DietBuddy app for iPhone and Android.',
+    unavailableBuild:
+      'Subscriptions aren’t switched on in this version of the app yet. Please update the app or try again later.',
     noPlans: 'No plans are available right now. Please try again later.',
     activeTitle: 'You’re Premium 👑',
     activeDesc: 'Thanks for supporting DietBuddy. Your Premium features are active.',
@@ -1522,6 +1525,7 @@ export const en = {
     watch: 'Watch a short video to reveal this meal · +15 XP',
     watching: 'Loading video…',
     unlockPremium: 'Unlock with Premium',
+    moreIdeasPremium: 'Get more ideas with Premium',
     note: 'AI-suggested; nutrition from USDA FoodData Central. Always check ingredients if you have an allergy.',
     error_not_configured: 'AI meal plans aren’t set up on this server yet.',
     error_generation_failed: 'We couldn’t build a plan that fits all your requirements. Try again.',

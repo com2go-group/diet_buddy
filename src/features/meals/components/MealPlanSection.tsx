@@ -144,6 +144,13 @@ export function MealPlanSection({
         ) : null}
       </View>
       <FormMessage message={errorText(generate.error) ?? errorText(act.error)} />
+      {!premium && act.error instanceof MealPlanError && act.error.code === 'alternative_limit' ? (
+        <Button
+          label={t('mealPlan.moreIdeasPremium')}
+          size="md"
+          onPress={() => router.push('/paywall')}
+        />
+      ) : null}
       {state === 'current' && isAdjusted(factor) ? (
         <Text variant="caption" tone="muted">
           {t('mealPlan.adjusted')}

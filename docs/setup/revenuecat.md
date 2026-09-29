@@ -98,6 +98,35 @@ EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=test_...
    - the coach no longer shows the daily limit.
 4. Restore purchases after reinstalling the app (Profile → Restore purchases).
 
+## 6. Test Premium on TestFlight (Apple sandbox)
+
+TestFlight builds always buy in Apple's **sandbox**: you sign in with your normal Apple ID, nothing
+is charged, and subscriptions renew quickly and then stop, so you can test expiry too. What the
+build needs:
+
+1. Steps 1–3 done for Apple: Paid Apps agreement **Active**, the two subscriptions created (status
+   "Ready to Submit" is enough for sandbox), RevenueCat's App Store app with its In-App Purchase
+   key, the `premium` entitlement and the default offering.
+2. The `appl_...` key in the EAS environment the `testflight` profile uses (**preview**):
+   ```
+   npx eas-cli env:create --environment preview --name EXPO_PUBLIC_REVENUECAT_IOS_KEY --value appl_... --visibility plaintext
+   ```
+   (If a `test_...` value is already there, use `env:update` instead; release builds ignore
+   `test_` keys, and the paywall then says subscriptions aren't switched on in this version.)
+3. The webhook (step 4), so server-checked Premium features (unlimited coach, extra meal ideas,
+   Grocery, Restaurant, AI insights, body scan) unlock too. Sandbox events are applied like real
+   ones, so the TestFlight account becomes Premium on the live project; that's intended for
+   testing.
+4. A new build: `npx eas-cli build --platform ios --profile testflight --auto-submit`.
+
+Then open any Premium feature (every one leads to the paywall), buy, and check the list in step
+5.3. The Apple sheet says "[Environment: Sandbox]". Cancel under Settings → Apple ID →
+Subscriptions (TestFlight subscriptions show there) or let it expire.
+
+**Quick test without buying**: in Supabase → Table editor → `profiles`, set `is_premium` to
+`true` on your row. The app treats that as Premium everywhere (server and device). A later
+webhook event for that user overwrites it.
+
 ## Store review checklist
 
 - The paywall states the price, period, trial length and that it renews automatically (done in code).

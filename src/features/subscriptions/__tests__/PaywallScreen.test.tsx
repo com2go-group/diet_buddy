@@ -110,11 +110,9 @@ describe('PaywallScreen', () => {
     expect(await screen.findByText(/No previous purchases were found/)).toBeOnTheScreen();
   });
 
-  it('explains when purchases are unavailable (web or not configured)', async () => {
+  it('explains when purchases are not switched on in this build', async () => {
     (purchasesAvailable as jest.Mock).mockReturnValue(false);
     await renderScreen(<PaywallScreen />);
-    expect(
-      screen.getByText(/available in the DietBuddy app for iPhone and Android/),
-    ).toBeOnTheScreen();
+    expect(screen.getByText(/aren’t switched on in this version/)).toBeOnTheScreen();
   });
 });

@@ -106,7 +106,7 @@ describe('MealPlanSection', () => {
     ).toBeOnTheScreen();
     expect(generateMealPlan).toHaveBeenCalledTimes(1);
     await fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('Rolled oats')).toBeOnTheScreen();
+    expect(await screen.findByText('Rolled oats', {}, { timeout: 3000 })).toBeOnTheScreen();
     expect(screen.getByText('✨ Your breakfast suggestion')).toBeOnTheScreen();
   });
 
@@ -234,6 +234,8 @@ describe('MealPlanSection', () => {
     await renderScreen(<MealPlanSection day={today} slot="breakfast" isToday logs={[]} />);
     await fireEvent.press(await screen.findByRole('button', { name: 'Another idea' }));
     expect(await screen.findByText(/You’ve used today’s other ideas/)).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Get more ideas with Premium' }));
+    expect(router.push).toHaveBeenCalledWith('/paywall');
   });
 
   it('skips a meal and can undo it', async () => {

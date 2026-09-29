@@ -5,16 +5,18 @@ import { t } from '@/i18n';
 
 /**
  * Manual entry is the free default. The AI camera scan is Premium (CLAUDE.md §7.3): Premium users
- * can start it; others see what it is and where to find it once they upgrade.
+ * can start it; others are taken to the paywall.
  */
 export function ModeChooser({
   premium,
   onManual,
   onAi,
+  onUpgrade,
 }: {
   premium: boolean;
   onManual: () => void;
   onAi: () => void;
+  onUpgrade: () => void;
 }) {
   return (
     <View className="gap-4">
@@ -23,11 +25,9 @@ export function ModeChooser({
       </Text>
       <Pressable
         accessibilityRole="button"
-        aria-disabled={!premium}
-        disabled={!premium}
-        onPress={onAi}
+        onPress={premium ? onAi : onUpgrade}
         accessibilityLabel={`${t('bodyScan.aiTitle')}, ${t('bodyScan.premium')}${premium ? '' : `, ${t('bodyScan.premiumOnly')}`}`}
-        className={`rounded-3xl border-[1.5px] border-primary/30 p-5 ${premium ? 'active:opacity-80' : 'opacity-80'}`}
+        className={`rounded-3xl border-[1.5px] border-primary/30 p-5 active:opacity-80`}
         style={{ backgroundColor: '#1A1A2E' }}
       >
         <View className="mb-4 h-14 w-14 items-center justify-center rounded-2xl bg-primary/15">

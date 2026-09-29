@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ErrorState, GradientFill, SkeletonCard, Text } from '@/components';
+import { Button, ErrorState, GradientFill, SkeletonCard, Text } from '@/components';
 import { t } from '@/i18n';
 import { MIN_TOUCH_TARGET, useTheme } from '@/theme';
 
@@ -169,6 +169,9 @@ export function CoachScreen() {
                     limit: thread.limit,
                   })}
             </Text>
+          ) : null}
+          {blocked ? (
+            <Button label={t('coach.upgrade')} size="md" onPress={() => router.push('/paywall')} />
           ) : null}
           <ScrollView
             horizontal
