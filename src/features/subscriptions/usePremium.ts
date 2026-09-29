@@ -67,8 +67,9 @@ export function usePurchasesSetup(): void {
         const premium = await premiumFromStore();
         setStore(premium);
         scheduleTrialReminder(await trialEndFromStore());
-        if (premium && !(await serverPremium(userId))) {
-          // The store says Premium but the server missed it (e.g. a lost webhook): check now.
+        if (premium !== (await serverPremium(userId))) {
+          // The store and the server disagree: a lost webhook, or Premium an admin gave that has
+          // since ended (RevenueCat promotional). The server asks RevenueCat and applies it.
           await syncPremium();
           queryClient.invalidateQueries({ queryKey: ['premium'] });
         }

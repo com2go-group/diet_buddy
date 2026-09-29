@@ -133,6 +133,17 @@ Subscriptions (TestFlight subscriptions show there) or let it expire.
 `true` on your row. The app treats that as Premium everywhere (server and device). A later
 webhook event for that user overwrites it.
 
+## 7. Give someone Premium (admin dashboard)
+
+For testers, reviewers, influencers or support cases: **Admin → Users → the user → Premium**.
+
+1. Pick how long (1 week, 1 month, 3 months, 1 year or lifetime) and type a reason.
+2. **Grant Premium.** The `admin-users` function asks RevenueCat for a promotional `premium` entitlement and applies it to the server straight away; the user sees Premium the next time the app loads it (or after **Profile → Restore purchases**).
+3. It ends by itself. When the app next opens and the device no longer has the entitlement, it asks the server to re-check with RevenueCat, which turns Premium off.
+4. **Remove granted Premium** takes back what admins gave; someone who also pays keeps Premium.
+
+Needs `REVENUECAT_SECRET_KEY` in the Edge Function secrets (the same key as the instant unlock). The same can be done by hand in RevenueCat → Customers → the user's Supabase ID → Entitlements → Grant promotional. Every grant and removal is in the audit log with its reason.
+
 ## Store review checklist
 
 - The paywall states the price, period, trial length and that it renews automatically (done in code).

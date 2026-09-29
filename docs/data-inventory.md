@@ -49,6 +49,8 @@ Wellness insights: only with the optional `coach_insights` consent (asked as a s
 
 Languages: when the app runs in German, French, Spanish, Italian or Greek, `food-search` sends the typed search text (nothing else) to Anthropic to get the English food name for USDA, and `generate-meal-plan`, `generate-insights` and `generate-wellness-insights` send their finished English texts (dish titles, descriptions, steps, ingredient names; insight titles and bodies) back to Anthropic once more to translate them. The coach and grocery prompts ask for replies in the user's language. The language itself is not stored on the server.
 
+Premium granted by admins: the admin, the target user, the duration, the reason typed by the admin and the outcome are stored in `admin_audit_log` (shown on the user's admin page); RevenueCat receives only the user ID and the duration.
+
 Grocery AI: `generate-grocery-list` sends Anthropic the week's ingredient names, their USDA descriptions and total grams. Nothing else about the user. The list and its ticks are stored in `grocery_lists`, exported and deleted with the account.
 
 Restaurant mode: `analyze-menu` sends Anthropic the menu photo (JPEG metadata removed; not stored) or the dish names the user typed. Nothing else about the user; allergies and restrictions are checked in our code. A dish the user logs is a `food_logs` row with source `restaurant`.

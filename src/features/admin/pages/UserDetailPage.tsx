@@ -10,6 +10,7 @@ import { FormMessage } from '../../auth/components/FormMessage';
 import { atLeast, loadUser, setRole, userAction, type AdminRole } from '../api';
 import { useAdmin } from '../useAdmin';
 import { PageTitle, QueryState, errorText, formatDateTime } from './common';
+import { PremiumCard } from './PremiumCard';
 
 const ROLES: (AdminRole | null)[] = [null, 'support', 'admin', 'owner'];
 
@@ -95,6 +96,7 @@ export function UserDetailPage() {
                 <Text key={tk.id} tone="muted">{`${tk.subject} · ${tk.status}`}</Text>
               ))}
             </Card>
+            <PremiumCard user={u} canAct={canAct} />
             {me.data?.role === 'owner' ? (
               <Card className="gap-2">
                 <Text variant="label">{t('admin.userRole')}</Text>

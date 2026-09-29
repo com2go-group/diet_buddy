@@ -47,11 +47,22 @@ Deno.serve((req) =>
       });
       if (error) throw new Error(error.message);
     },
-    async audit(adminId, action, target) {
+    async audit(adminId, action, target, details) {
       const { error } = await admin
         .from('admin_audit_log')
-        .insert({ admin_id: adminId, action, target, details: {} });
+        .insert({ admin_id: adminId, action, target, details: details ?? {} });
       if (error) throw new Error(error.message);
+    },
+    revenueCatKey: Deno.env.get('REVENUECAT_SECRET_KEY') || undefined,
+    fetch,
+    async applyPremium(userId, premium, at) {
+      const { data, error } = await admin.rpc('apply_premium_event', {
+        target_user: userId,
+        premium,
+        event_at: at.toISOString(),
+      });
+      if (error) throw new Error(error.message);
+      return Boolean(data);
     },
   }),
 );

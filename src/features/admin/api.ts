@@ -74,7 +74,25 @@ export interface AdminUserDetail {
   counts: Record<string, number>;
   consents: Record<string, boolean>;
   tickets: { id: string; subject: string; status: string; created_at: string }[];
+  /** Premium given or taken back by admins (audit log), newest first. */
+  premium_grants?: PremiumGrant[];
 }
+
+export interface PremiumGrant {
+  action: 'grant_premium' | 'revoke_premium';
+  details: {
+    duration?: GrantDuration;
+    reason?: string;
+    premium?: boolean;
+    expires_at?: string | null;
+  };
+  created_at: string;
+  admin_email: string | null;
+}
+
+/** RevenueCat promotional durations (admin-users `GRANT_DURATIONS`). */
+export const GRANT_DURATIONS = ['weekly', 'monthly', 'three_month', 'yearly', 'lifetime'] as const;
+export type GrantDuration = (typeof GRANT_DURATIONS)[number];
 
 export const loadUser = async (id: string) =>
   unwrap(
@@ -150,14 +168,27 @@ export const loadAudit = async () => unwrap(await supabase.rpc('admin_audit', { 
 export type UserAction = 'export' | 'delete' | 'ban' | 'unban';
 
 /** Service-role actions through the admin-users Edge Function. */
-export async function userAction(
-  action: UserAction,
+export const userAction = (action: UserAction, userId: string, confirm?: string) =>
+  adminUsers({ action, userId, confirm });
+
+/**
+ * Gives Premium for a while through RevenueCat (a promotional entitlement), or takes back what
+ * admins gave. Answers with the resulting status and when it ends (null: lifetime or none).
+ */
+export const setPremium = async (
   userId: string,
-  confirm?: string,
-): Promise<Record<string, unknown>> {
-  const { data, error } = await supabase.functions.invoke('admin-users', {
-    body: { action, userId, confirm },
-  });
+  grant: { duration: GrantDuration } | null,
+  reason: string,
+) =>
+  (await adminUsers({
+    action: grant ? 'grant_premium' : 'revoke_premium',
+    userId,
+    reason,
+    ...(grant ?? {}),
+  })) as { premium: boolean; expiresAt: string | null };
+
+async function adminUsers(body: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const { data, error } = await supabase.functions.invoke('admin-users', { body });
   if (error) {
     let code = 'failed';
     if (error instanceof FunctionsHttpError) {
