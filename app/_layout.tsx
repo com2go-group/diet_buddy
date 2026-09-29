@@ -26,7 +26,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { Button, ErrorState } from '@/components';
-import { ONBOARDING_ROUTES, useAppRoute } from '@/features/account';
+import { ONBOARDING_ROUTES, useAppRoute, useLanguageSync } from '@/features/account';
 import { UpdateRequired, useUpdateRequired } from '@/features/config';
 import { useAdsSetup } from '@/features/ads';
 import { useHealthSync } from '@/features/health';
@@ -172,5 +172,6 @@ function SignedInServices() {
   useHealthSync();
   useOfflineSync();
   useTelemetry();
+  useLanguageSync();
   return null;
 }

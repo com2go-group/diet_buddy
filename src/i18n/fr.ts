@@ -1261,7 +1261,7 @@ export const fr: Translation = {
       'Vous seul. Elles sont stockées dans l’UE, jamais vendues ni utilisées pour la publicité. Vous pouvez les exporter ou les supprimer dans Confidentialité et données.',
     faq5q: 'Pourquoi ne puis-je plus envoyer de messages au coach ?',
     faq5a:
-      'Le plan gratuit inclut 3 messages au coach par jour, et chaque courte vidéo que tu choisis de regarder en ajoute 3 (jusqu’à 3 vidéos par jour). Ils se renouvellent à minuit. Premium inclut jusqu’à 60 messages par jour.',
+      'Le plan gratuit inclut 3 messages au coach par jour, et chaque courte vidéo que tu choisis de regarder en ajoute 1 (jusqu’à 3 vidéos par jour). Ils se renouvellent à minuit. Premium inclut jusqu’à 60 messages par jour.',
   },
   privacy: {
     title: 'Confidentialité et données',

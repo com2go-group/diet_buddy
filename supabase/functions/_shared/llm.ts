@@ -77,7 +77,7 @@ export class LlmError extends Error {
  * request reject keys that aren't scoped to one unless the request names the workspace.
  * Read through globalThis so this module also loads in Jest, where Deno doesn't exist.
  */
-function workspaceFromEnv(): string | undefined {
+export function workspaceFromEnv(): string | undefined {
   const deno = (globalThis as { Deno?: { env: { get(key: string): string | undefined } } }).Deno;
   return deno?.env.get('ANTHROPIC_WORKSPACE_ID') || undefined;
 }

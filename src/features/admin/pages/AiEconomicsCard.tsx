@@ -64,6 +64,8 @@ function Body({ e }: { e: AiEconomics }) {
           rewarded: usd(a.rewarded_ecpm_usd ?? 0),
           banner: usd(a.banner_ecpm_usd ?? 0),
           impressions: formatNumber(a.banner_impressions_per_active_day ?? 0),
+          interstitial: usd(a.interstitial_ecpm_usd ?? 0),
+          interstitials: formatNumber(a.interstitials_per_active_day ?? 0),
         })}
       </Text>
     </>

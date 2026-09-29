@@ -17,7 +17,15 @@ export interface MealPlanPromptInput {
   restrictions: string[];
   allergies: string[];
   avoid: string[];
+  /**
+   * Shorter dishes for free users (cost: output tokens are most of a plan's price): a brief
+   * description, 2–4 ingredients and at most 3 steps. Same rules and checks otherwise.
+   */
+  concise?: boolean;
 }
+
+const CONCISE = `
+Keep it brief: a description of under 12 words, 2–4 ingredients per meal (1–3 for a snack), and at most 3 steps of under 15 words each.`;
 
 const list = (items: string[]) => (items.length ? items.join(', ') : 'none');
 
@@ -50,7 +58,7 @@ Targets for the day: about ${input.targets.calories} kcal and at least ${input.t
 Approximate calories per meal: breakfast ${input.slotCalories.breakfast}, lunch ${input.slotCalories.lunch}, snack ${input.slotCalories.snack}, dinner ${input.slotCalories.dinner}.
 
 ${MEAL_RULES}
-- Use different main ingredients across the day's meals.
+- Use different main ingredients across the day's meals.${input.concise ? CONCISE : ''}
 
 Reply with JSON only:
 {"meals":{"breakfast":${MEAL_JSON},"lunch":{...},"snack":{...},"dinner":{...}}}`;
@@ -69,7 +77,7 @@ ${requirements(input)}
 Aim for about ${input.slotCalories[slot]} kcal for this ${slot}; the day's protein target is ${input.targets.proteinG} g.
 It must be clearly different from these, which the user didn't want: ${list(avoidTitles)}.
 
-${MEAL_RULES}
+${MEAL_RULES}${input.concise ? CONCISE : ''}
 
 Reply with JSON only:
 {"meal":${MEAL_JSON}}`;

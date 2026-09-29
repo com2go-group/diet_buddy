@@ -52,7 +52,7 @@ select is(
 select is(
   (public.ai_allowance('11111111-1111-1111-1111-111111111111', now() - interval '1 hour',
     to_char(now(), 'YYYY-MM-DD'), false) ->> 'budget_usd')::numeric,
-  0.07, 'each counted video adds to the budget');
+  0.058, 'each counted video adds to the budget');
 select is(
   (public.ai_allowance('11111111-1111-1111-1111-111111111111', now() - interval '1 hour',
     to_char(now(), 'YYYY-MM-DD'), false) #>> '{limits,coach_free}')::int,

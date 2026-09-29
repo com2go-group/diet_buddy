@@ -16,7 +16,7 @@ export function fakeAllowance(
       coachPremium: 60,
       foodPhotoFree: 1,
       alternativesFree: 1,
-      boostCoach: 3,
+      boostCoach: 1,
       boostFoodPhoto: 1,
       boostAlternatives: 1,
       ...opts.limits,

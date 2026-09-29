@@ -164,6 +164,7 @@ export type Database = {
       }
       ai_usage: {
         Row: {
+          batch: boolean
           cache_read_tokens: number
           cache_write_tokens: number
           created_at: string
@@ -176,6 +177,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          batch?: boolean
           cache_read_tokens?: number
           cache_write_tokens?: number
           created_at?: string
@@ -188,6 +190,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          batch?: boolean
           cache_read_tokens?: number
           cache_write_tokens?: number
           created_at?: string
@@ -931,6 +934,7 @@ export type Database = {
           height_cm: number | null
           id: string
           is_premium: boolean
+          language: string | null
           name: string | null
           onboarding_completed_at: string | null
           onboarding_step: string | null
@@ -950,6 +954,7 @@ export type Database = {
           height_cm?: number | null
           id?: string
           is_premium?: boolean
+          language?: string | null
           name?: string | null
           onboarding_completed_at?: string | null
           onboarding_step?: string | null
@@ -969,6 +974,7 @@ export type Database = {
           height_cm?: number | null
           id?: string
           is_premium?: boolean
+          language?: string | null
           name?: string | null
           onboarding_completed_at?: string | null
           onboarding_step?: string | null

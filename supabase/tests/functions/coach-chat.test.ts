@@ -168,21 +168,21 @@ describe('coach-chat handler', () => {
     expect(await res.json()).toEqual({
       error: 'limit_reached',
       limit: 3,
-      adds: 3,
-      boost: { target: `${next}:1`, adds: 3 },
+      adds: 1,
+      boost: { target: `${next}:1`, adds: 1 },
     });
     expect(llm.complete).not.toHaveBeenCalled();
   });
 
   it('raises the free limit with each rewarded video, up to the daily maximum', async () => {
-    const mem = memoryStore({ used: 5 });
+    const mem = memoryStore({ used: 3 });
     const { llm } = fakeLlm(ok('Sure.'));
     const res = await handleCoachChat(
       post({ persona: 'aria', message: 'Hi' }),
       deps(mem.store, llm, fakeAllowance({ boosts: 1 })),
     );
     expect(res.status).toBe(200);
-    expect((await res.json()).remaining).toBe(0); // 3 + 3 - 5 - 1
+    expect((await res.json()).remaining).toBe(0); // 3 + 1 - 3 - 1
     const maxed = await handleCoachChat(
       post({ persona: 'aria', message: 'Hi' }),
       deps(memoryStore({ used: 12 }).store, llm, fakeAllowance({ boosts: 3 })),

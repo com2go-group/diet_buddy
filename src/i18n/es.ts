@@ -1246,7 +1246,7 @@ export const es: Translation = {
       'Solo tú. Se guardan en la UE, nunca se venden ni se usan para publicidad. Puedes exportarlos o eliminarlos en Privacidad y datos.',
     faq5q: '¿Por qué no puedo enviar más mensajes al coach?',
     faq5a:
-      'El plan gratuito incluye 3 mensajes al coach al día, y cada vídeo corto que decidas ver añade 3 más (hasta 3 vídeos al día). Se renuevan a medianoche. Premium incluye hasta 60 al día.',
+      'El plan gratuito incluye 3 mensajes al coach al día, y cada vídeo corto que decidas ver añade 1 más (hasta 3 vídeos al día). Se renuevan a medianoche. Premium incluye hasta 60 al día.',
   },
   privacy: {
     title: 'Privacidad y datos',

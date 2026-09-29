@@ -82,7 +82,7 @@ export async function loadThread(userId: string, persona: Persona): Promise<Coac
     const v = values.get(key);
     return v !== undefined && Number.isFinite(v) ? v : fallback;
   };
-  const perVideo = setting('ai_boost_coach_messages', 3);
+  const perVideo = setting('ai_boost_coach_messages', 1);
   const maxVideos = setting('ai_boosts_daily_max', 3);
   const watched = Math.min(maxVideos, (optional(videos) ?? []).length);
   return {

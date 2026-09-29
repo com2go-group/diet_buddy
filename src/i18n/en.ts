@@ -886,7 +886,7 @@ export const en = {
       '{{days}} active free user-days · {{views}} rewarded videos · AI {{cost}} · ads ≈ {{revenue}}',
     econPremium: 'Premium AI: {{cost}} for {{users}} Premium users',
     econAssumptions:
-      'Ad revenue is an estimate: rewarded {{rewarded}} and banners {{banner}} per 1,000, {{impressions}} banner impressions per active day. Change these in Settings (ad_revenue_assumptions) once AdMob reports real figures.',
+      'Ad revenue is an estimate: rewarded {{rewarded}}, banners {{banner}} and interstitials {{interstitial}} per 1,000; {{impressions}} banner impressions and {{interstitials}} interstitials per active day. Change these in Settings (ad_revenue_assumptions) once AdMob reports real figures.',
     econNoData: 'No free-user activity yet.',
     aiRow: '{{calls}} calls · {{input}} in / {{output}} out tokens · {{cost}}',
     usersSearch: 'Search by email, phone, name or user ID',
@@ -1415,7 +1415,7 @@ export const en = {
       'Only you. It is stored in the EU, never sold and never used for advertising. You can export or delete it in Privacy & Data.',
     faq5q: 'Why can’t I send more coach messages?',
     faq5a:
-      'The free plan includes 3 coach messages a day, and each short video you choose to watch adds 3 more (up to 3 videos a day). They reset at midnight. Premium includes up to 60 a day.',
+      'The free plan includes 3 coach messages a day, and each short video you choose to watch adds 1 more (up to 3 videos a day). They reset at midnight. Premium includes up to 60 a day.',
   },
   privacy: {
     title: 'Privacy & Data',

@@ -1249,7 +1249,7 @@ export const it: Translation = {
       'Solo tu. Sono conservati nell’UE, mai venduti né usati per la pubblicità. Puoi esportarli o eliminarli in Privacy e dati.',
     faq5q: 'Perché non posso inviare altri messaggi al coach?',
     faq5a:
-      'Il piano gratuito include 3 messaggi al coach al giorno, e ogni breve video che scegli di guardare ne aggiunge 3 (fino a 3 video al giorno). Si rinnovano a mezzanotte. Premium include fino a 60 messaggi al giorno.',
+      'Il piano gratuito include 3 messaggi al coach al giorno, e ogni breve video che scegli di guardare ne aggiunge 1 (fino a 3 video al giorno). Si rinnovano a mezzanotte. Premium include fino a 60 messaggi al giorno.',
   },
   privacy: {
     title: 'Privacy e dati',

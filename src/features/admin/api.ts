@@ -67,6 +67,8 @@ export interface AiEconomics {
   assumptions: {
     rewarded_ecpm_usd?: number;
     banner_ecpm_usd?: number;
+    interstitial_ecpm_usd?: number;
+    interstitials_per_active_day?: number;
     banner_impressions_per_active_day?: number;
   };
 }

@@ -142,9 +142,9 @@ type Resolved = { name: string; food: FoodResult; grams: number }[];
  * Translates what the user reads (dish title, description, steps, ingredient names) once the
  * plan has passed the diet checks in English. The English title is kept for de-duplication.
  */
-async function localize(
-  deps: MealPlanDeps,
-  llm: LlmProvider,
+export async function localize(
+  deps: { store: Pick<MealPlanStore, 'logUsage'> },
+  llm: LlmProvider | null,
   userId: string,
   meals: { dish: Dish; items: PlannedItem[] }[],
   language: Language | undefined,
@@ -184,7 +184,7 @@ async function localize(
 const englishTitle = (dish: Dish) => dish.sourceTitle ?? dish.title;
 
 /** USDA lookups for one request, remembering whether the food database itself failed. */
-function makeLookup(deps: MealPlanDeps) {
+export function makeLookup(deps: Pick<MealPlanDeps, 'searchFoods'>) {
   const cache = new Map<string, FoodResult | null>();
   const state = { error: null as unknown };
   const find = async (query: string) => {
@@ -200,7 +200,7 @@ function makeLookup(deps: MealPlanDeps) {
   };
   return { find, state };
 }
-type Lookup = ReturnType<typeof makeLookup>;
+export type Lookup = ReturnType<typeof makeLookup>;
 
 /** The dish as stored and shown: title, summary, cleaned recipe steps and time. */
 export function dishFrom(meal: AiMeal): Dish {
@@ -250,18 +250,17 @@ async function attempt<T>(
   firstMessage: string,
   lookup: Lookup,
   build: (text: string) => Promise<{ value: T } | { problems: string[] }>,
+  maxTokens: number = MAX_TOKENS.premium,
 ): Promise<{ value: T; model: string } | { response: Response }> {
   const messages: LlmMessage[] = [{ role: 'user', content: firstMessage }];
   let aiError: unknown = null;
   let aiFailures = 0;
   let lastProblemCount = 0;
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
-    const result = await deps.llm
-      .complete({ system, messages, maxTokens: 1500 })
-      .catch((e: unknown) => {
-        aiError = e;
-        return null;
-      });
+    const result = await deps.llm.complete({ system, messages, maxTokens }).catch((e: unknown) => {
+      aiError = e;
+      return null;
+    });
     if (!result) {
       aiFailures++;
       continue;
@@ -294,9 +293,75 @@ async function attempt<T>(
   return { response: fail('generation_failed', 502) };
 }
 
-function promptInput(ctx: MealPlanContext): MealPlanPromptInput {
+/**
+ * A model reply → the day's dishes with USDA numbers, portions scaled to each meal's share, or
+ * the problems to feed back (format, missing foods, anything breaking the user's diet rules).
+ * Shared by the on-demand path and the overnight batch (batch-meal-plans).
+ */
+export async function planFromReply(
+  text: string,
+  ctx: MealPlanContext,
+  input: MealPlanPromptInput,
+  lookup: Lookup,
+): Promise<
+  | { value: { slots: Record<Slot, PlannedItem[]>; dishes: Record<Slot, Dish> } }
+  | { problems: string[] }
+> {
+  const ai = aiPlanSchema.safeParse(extractJson(text));
+  if (!ai.success) return { problems: ['the JSON did not match the required format'] };
+  const problems: string[] = [];
+  const resolved = {} as Record<Slot, Resolved>;
+  for (const s of SLOTS) {
+    const meal = await resolveMeal(s, ai.data.meals[s], lookup, ctx.prefs);
+    resolved[s] = meal.resolved;
+    problems.push(...meal.problems);
+  }
+  if (problems.length) return { problems };
+  const slots = Object.fromEntries(
+    SLOTS.map((s) => [s, scaleSlot(resolved[s], input.slotCalories[s])]),
+  ) as Record<Slot, PlannedItem[]>;
+  const dishes = Object.fromEntries(SLOTS.map((s) => [s, dishFrom(ai.data.meals[s])])) as Record<
+    Slot,
+    Dish
+  >;
+  return { value: { slots, dishes } };
+}
+
+/** Translated dishes and items → the stored plan (version 2). */
+export function assemblePlan(
+  date: string,
+  local: { dish: Dish; items: PlannedItem[] }[],
+  ctx: MealPlanContext,
+  model: string,
+  now: Date,
+  alternatives = 0,
+): MealPlan {
+  const slots = Object.fromEntries(SLOTS.map((s, i) => [s, local[i]!.items])) as Record<
+    Slot,
+    PlannedItem[]
+  >;
+  const dishes = Object.fromEntries(SLOTS.map((s, i) => [s, local[i]!.dish])) as Record<Slot, Dish>;
+  return {
+    version: 2,
+    date,
+    slots,
+    dishes,
+    totals: totals(slots),
+    targets: { kcal: ctx.targets!.calories, proteinG: ctx.targets!.proteinG },
+    promptVersion: MEAL_PLAN_PROMPT_VERSION,
+    model,
+    generatedAt: now.toISOString(),
+    alternatives,
+  };
+}
+
+/** Output tokens are most of a plan's cost: free users get shorter dishes and a lower cap. */
+export const MAX_TOKENS = { free: 1000, premium: 1500 } as const;
+
+export function promptInput(ctx: MealPlanContext): MealPlanPromptInput {
   const targets = ctx.targets!;
   return {
+    concise: !ctx.premium,
     targets,
     slotCalories: Object.fromEntries(
       SLOTS.map((s) => [s, Math.round((targets.calories * SLOT_SHARE[s]) / 10) * 10]),
@@ -393,25 +458,8 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       mealPlanSystemPrompt(input),
       `Plan meals for ${date}.`,
       lookup,
-      async (text) => {
-        const ai = aiPlanSchema.safeParse(extractJson(text));
-        if (!ai.success) return { problems: ['the JSON did not match the required format'] };
-        const problems: string[] = [];
-        const resolved = {} as Record<Slot, Resolved>;
-        for (const s of SLOTS) {
-          const meal = await resolveMeal(s, ai.data.meals[s], lookup, ctx.prefs);
-          resolved[s] = meal.resolved;
-          problems.push(...meal.problems);
-        }
-        if (problems.length) return { problems };
-        const slots = Object.fromEntries(
-          SLOTS.map((s) => [s, scaleSlot(resolved[s], input.slotCalories[s])]),
-        ) as Record<Slot, PlannedItem[]>;
-        const dishes = Object.fromEntries(
-          SLOTS.map((s) => [s, dishFrom(ai.data.meals[s])]),
-        ) as Record<Slot, Dish>;
-        return { value: { slots, dishes } };
-      },
+      (text) => planFromReply(text, ctx, input, lookup),
+      ctx.premium ? MAX_TOKENS.premium : MAX_TOKENS.free,
     );
     if ('response' in result) return result.response;
 
@@ -422,27 +470,15 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       SLOTS.map((s) => ({ dish: result.value.dishes[s], items: result.value.slots[s] })),
       language,
     );
-    const slots = Object.fromEntries(SLOTS.map((s, i) => [s, local[i]!.items])) as Record<
-      Slot,
-      PlannedItem[]
-    >;
-    const dishes = Object.fromEntries(SLOTS.map((s, i) => [s, local[i]!.dish])) as Record<
-      Slot,
-      Dish
-    >;
-    const plan: MealPlan = {
-      version: 2,
+    // A new plan keeps the day's count of alternatives (cost cap).
+    const plan = assemblePlan(
       date,
-      slots,
-      dishes,
-      totals: totals(slots),
-      targets: { kcal: ctx.targets.calories, proteinG: ctx.targets.proteinG },
-      promptVersion: MEAL_PLAN_PROMPT_VERSION,
-      model: result.model,
-      generatedAt: now.toISOString(),
-      // A new plan keeps the day's count of alternatives (cost cap).
-      alternatives: existing?.plan.alternatives ?? 0,
-    };
+      local,
+      ctx,
+      result.model,
+      now,
+      existing?.plan.alternatives ?? 0,
+    );
     await store.save(userId, date, plan, existing ? existing.regenerations + 1 : 0);
     return json({ plan });
   } catch (e) {
@@ -516,6 +552,7 @@ async function alternative(
         },
       };
     },
+    ctx.premium ? MAX_TOKENS.premium : MAX_TOKENS.free,
   );
   if ('response' in result) return result.response;
 

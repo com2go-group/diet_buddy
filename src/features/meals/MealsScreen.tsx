@@ -18,6 +18,7 @@ import { TOMORROW_FROM_HOUR, TomorrowPlan } from './components/TomorrowPlan';
 import { totals } from './portion';
 import { currentSlot } from './sequence';
 import type { MealSlot } from './types';
+import { useDailyMealsAd } from './useDailyMealsAd';
 import { useMealPlanDay } from './useMealPlan';
 import { useMealsDay } from './useMeals';
 
@@ -35,6 +36,7 @@ export function slotForHour(hour: number): MealSlot {
  */
 export function MealsScreen() {
   const { colors } = useTheme();
+  useDailyMealsAd();
   const now = useMemo(() => new Date(), []);
   const today = startOfDay(now);
   const tomorrow = addDays(today, 1);

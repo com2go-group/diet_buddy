@@ -4,6 +4,7 @@ import { userIdFromRequest } from '../_shared/auth.ts';
 import { FREE_AI_MODEL_DEFAULT, supabaseAllowance } from '../_shared/aiAllowanceStore.ts';
 import { anthropicProvider } from '../_shared/llm.ts';
 import { searchUsda } from '../_shared/usdaClient.ts';
+import { cachedSearch } from '../_shared/usdaCache.ts';
 import { handleGenerateMealPlan } from './handler.ts';
 import { supabaseMealPlanStore } from './store.ts';
 
@@ -29,8 +30,9 @@ Deno.serve((req) =>
     freeLlm,
     allowance: supabaseAllowance(admin),
     getUserId: (r) => userIdFromRequest(admin, r),
-    // Generic foods only: branded products vary too much for a plan.
-    searchFoods: (q) =>
+    // Generic foods only: branded products vary too much for a plan. Shared cache (USDA's limit).
+    searchFoods: cachedSearch(admin, (q) =>
       searchUsda(q, usdaKey!, fetch, ['Foundation', 'SR Legacy', 'Survey (FNDDS)'], 10),
+    ),
   }),
 );

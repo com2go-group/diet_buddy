@@ -1262,7 +1262,7 @@ export const de: Translation = {
       'Nur du. Sie werden in der EU gespeichert, nie verkauft und nie für Werbung genutzt. Du kannst sie unter Datenschutz & Daten exportieren oder löschen.',
     faq5q: 'Warum kann ich keine weiteren Coach-Nachrichten senden?',
     faq5a:
-      'Der kostenlose Plan enthält 3 Coach-Nachrichten pro Tag, und jedes kurze Video, das du dir ansiehst, bringt 3 weitere (bis zu 3 Videos pro Tag). Sie werden um Mitternacht zurückgesetzt. Premium enthält bis zu 60 pro Tag.',
+      'Der kostenlose Plan enthält 3 Coach-Nachrichten pro Tag, und jedes kurze Video, das du dir ansiehst, bringt eine weitere (bis zu 3 Videos pro Tag). Sie werden um Mitternacht zurückgesetzt. Premium enthält bis zu 60 pro Tag.',
   },
   privacy: {
     title: 'Datenschutz & Daten',

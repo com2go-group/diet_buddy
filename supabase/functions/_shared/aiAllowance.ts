@@ -77,7 +77,7 @@ export function allowanceFrom(row: unknown): AiAllowance {
       coachPremium: num(l.coach_premium, 60),
       foodPhotoFree: num(l.food_photo_free, 1),
       alternativesFree: num(l.alternatives_free, 1),
-      boostCoach: num(l.boost_coach, 3),
+      boostCoach: num(l.boost_coach, 1),
       boostFoodPhoto: num(l.boost_food_photo, 1),
       boostAlternatives: num(l.boost_alternatives, 1),
     },

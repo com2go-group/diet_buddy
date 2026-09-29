@@ -29,6 +29,10 @@ jest.mock('../../notifications/api', () => ({
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: () => true },
   useLocalSearchParams: jest.fn(() => ({ slot: 'lunch', date: undefined })),
+  useFocusEffect: (effect: () => void) => {
+    const { useEffect } = jest.requireActual<typeof import('react')>('react');
+    useEffect(effect, [effect]);
+  },
 }));
 
 const { router } = jest.requireMock('expo-router') as {
