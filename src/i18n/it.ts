@@ -133,6 +133,37 @@ export const it: Translation = {
     terms:
       'Fino a 10 inviti premiati all’anno. Il codice di un amico si usa una volta, nei primi 14 giorni dopo l’iscrizione. Il Premium degli inviti termina da solo dopo un mese, non si rinnova mai e non ti addebita nulla.',
   },
+  mealPrefs: {
+    title: 'Preferenze del piano pasti',
+    back: 'Indietro',
+    intro:
+      'Orientano i tuoi prossimi piani pasti. Allergie, restrizioni e cibi da evitare sono sempre rispettati.',
+    time: 'Tempo di cottura',
+    time_quick: 'Veloce (15 min)',
+    time_medium: 'Fino a 30 min',
+    time_any: 'Nessun limite',
+    budget: 'Budget',
+    budget_low: 'Basso',
+    budget_medium: 'Normale',
+    budget_any: 'Nessuna preferenza',
+    cuisines: 'Cucine che ami',
+    cuisine_mediterranean: 'Mediterranea',
+    cuisine_italian: 'Italiana',
+    cuisine_greek: 'Greca',
+    cuisine_spanish: 'Spagnola',
+    cuisine_french: 'Francese',
+    cuisine_german: 'Tedesca',
+    cuisine_middle_eastern: 'Mediorientale',
+    cuisine_indian: 'Indiana',
+    cuisine_asian: 'Asiatica',
+    cuisine_mexican: 'Messicana',
+    cuisine_american: 'Americana',
+    leftovers: 'Cucina una volta, mangia due',
+    leftoversDesc: 'La cena prepara una porzione in più per il pranzo del giorno dopo.',
+    save: 'Salva preferenze',
+    saved: 'Salvato. Il prossimo piano ne terrà conto.',
+    failed: 'Non siamo riusciti a salvare. Riprova.',
+  },
   care: {
     title: 'Come stai?',
     body: 'Negli ultimi giorni hai registrato molto meno di quanto prevede il tuo piano. Mangiare abbastanza sostiene energia, umore e progressi; perdere peso più in fretta del previsto non è l’obiettivo.',
@@ -725,6 +756,8 @@ export const it: Translation = {
     macroShort: 'P: {{p}} g · C: {{c}} g · G: {{f}} g',
   },
   logFood: {
+    sourceCiqual:
+      'Valori nutrizionali: tabella di composizione Ciqual di ANSES (Licence Ouverte / Etalab).',
     favorites: 'Preferiti',
     favorite: 'Preferito',
     favoriteOn: 'Nei tuoi preferiti',
@@ -1249,6 +1282,7 @@ export const it: Translation = {
     loadFailed: 'Non siamo riusciti a caricare la conversazione.',
   },
   profile: {
+    mealPrefs: 'Preferenze del piano pasti',
     invite: 'Invita amici, ottieni Premium',
     title: 'Profilo',
     free: 'Piano gratuito',
@@ -1514,6 +1548,12 @@ export const it: Translation = {
     privacy: 'I dati sanitari non vengono mai venduti né usati per la pubblicità.',
   },
   mealPlan: {
+    preferences: 'Tempo di cottura, budget, cucine, avanzi',
+    error_swap_limit: 'Hai usato le sostituzioni di ingredienti di oggi.',
+    moreSwapsPremium: 'Più sostituzioni con Premium',
+    leftover: 'Avanzi della cena di ieri: basta scaldare',
+    swapped: '{{from}} → {{to}}',
+    swapA11y: 'Sostituisci {{name}}',
     tomorrowTitle: 'Piano di domani',
     tomorrowDesc:
       'Guarda i pasti di domani già stasera, per fare la spesa o prepararti in anticipo.',

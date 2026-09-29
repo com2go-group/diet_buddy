@@ -13,6 +13,7 @@ import {
   loadMealPlan,
   mealPlanAction,
   MealPlanError,
+  swapIngredient,
   type MealPlan,
 } from '../mealPlanApi';
 import type { FoodLog } from '../types';
@@ -22,6 +23,7 @@ jest.mock('../mealPlanApi', () => ({
   loadMealPlan: jest.fn(),
   generateMealPlan: jest.fn(),
   mealPlanAction: jest.fn(),
+  swapIngredient: jest.fn(),
 }));
 jest.mock('../api', () => ({
   ...jest.requireActual('../api'),
@@ -325,5 +327,33 @@ describe('MealTimeline', () => {
     expect(await screen.findByText(/Your AI plan suggests each meal/)).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('button', { name: 'Hide this tip' }));
     expect(screen.queryByText(/Your AI plan suggests each meal/)).toBeNull();
+  });
+
+  it('swaps one ingredient of the next meal once it is revealed', async () => {
+    useStorePremium.setState({ premium: true });
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
+    (swapIngredient as jest.Mock).mockResolvedValue({
+      ...plan,
+      slots: { ...plan.slots, breakfast: [item('Skyr', 90), ...plan.slots.breakfast.slice(1)] },
+      dishes: {
+        ...plan.dishes,
+        breakfast: {
+          ...plan.dishes!.breakfast!,
+          swapped: [{ from: 'Rolled oats', to: 'Skyr' }],
+        },
+      },
+    });
+    await timeline();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Swap Rolled oats' }));
+    await waitFor(() => expect(swapIngredient).toHaveBeenCalledWith(dayKey(today), 'breakfast', 0));
+    expect(await screen.findByText('Skyr')).toBeOnTheScreen();
+    expect(screen.getByText(/Rolled oats → Skyr/)).toBeOnTheScreen();
+  });
+
+  it('offers no swaps while the meal is locked for free users', async () => {
+    (loadMealPlan as jest.Mock).mockResolvedValue({ plan, unlockedSlots: [] });
+    await timeline();
+    await screen.findByText('Overnight oats with berries');
+    expect(screen.queryByRole('button', { name: 'Swap Rolled oats' })).toBeNull();
   });
 });

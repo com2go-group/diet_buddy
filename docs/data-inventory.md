@@ -94,3 +94,7 @@ Goal reached: `goals.reached_at` records when the user switched from weight loss
 Referrals: `referral_codes` (user's invite code) and `referrals` (referrer, referred user, status, reward date); each user can read only their own side; exported (without the other person's ID) and deleted with either account. RevenueCat receives only the user ID and the promotional duration.
 
 Store review prompt, watermark and tracking: when the store rating sheet was last requested is kept on the device only. On iOS, Apple's App Tracking Transparency answer is read by the device; personalised ads only when both Google's consent and ATT allow it.
+
+Meal plan preferences: `preferences.cooking_time`, `food_budget`, `cuisines` (favourite cuisines; could hint at cultural background, so treated like the other diet preferences and sent to Anthropic only inside the meal-plan prompt) and `leftovers`. Exported and deleted with the account. Swaps are stored inside `meal_plans.meals` (`dishes.<slot>.swapped`, `swaps`).
+
+`eu_foods`: public reference nutrition data (ANSES CIQUAL); no user data. Food searches by French users are matched against it in our own database (nothing extra leaves the server).

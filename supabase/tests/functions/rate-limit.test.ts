@@ -67,3 +67,25 @@ describe('food functions', () => {
     expect(fetchFn).not.toHaveBeenCalled();
   });
 });
+
+describe('food-search with European foods', () => {
+  const ciqual = {
+    ref: 'ciqual:13000',
+    name: 'Pomme, crue',
+    brand: null,
+    per100g: { kcal: 53, proteinG: 0.3, carbsG: 11.6, fatG: 0.2, fiberG: 1.4 },
+    servings: [],
+  };
+  it('lists CIQUAL foods first, and still answers when USDA is down', async () => {
+    const searchEu = jest.fn(async () => [ciqual]);
+    const down = jest.fn(async () => new Response('', { status: 500 }));
+    const res = await handleFoodSearch(post({ query: 'pomme', language: 'fr' }), {
+      apiKey: 'k',
+      fetch: down as unknown as typeof fetch,
+      searchEu,
+    });
+    expect(res.status).toBe(200);
+    expect((await res.json()).foods).toEqual([ciqual]);
+    expect(searchEu).toHaveBeenCalledWith('pomme', 'pomme', 'fr');
+  });
+});

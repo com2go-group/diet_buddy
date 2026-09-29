@@ -1,4 +1,4 @@
-import { mealPlanSystemPrompt } from '../_prompts/mealPlan.v3.ts';
+import { mealPlanSystemPrompt } from '../_prompts/mealPlan.v4.ts';
 import type { BatchClient, BatchRequest, BatchResult } from '../_shared/anthropicBatch.ts';
 import { fail, json } from '../_shared/http.ts';
 import { languageField } from '../_shared/language.ts';
@@ -6,14 +6,15 @@ import type { LlmProvider } from '../_shared/llm.ts';
 import type { FoodResult } from '../_shared/usda.ts';
 import {
   assemblePlan,
-  localize,
+  dayBefore,
+  localizeDay,
   makeLookup,
   MAX_TOKENS,
   planFromReply,
   promptInput,
   type MealPlanContext,
 } from '../generate-meal-plan/handler.ts';
-import { SLOTS } from '../generate-meal-plan/plan.ts';
+import { leftoverLunch, type MealPlan } from '../generate-meal-plan/plan.ts';
 
 /**
  * Tomorrow's meal plans for active free users, made overnight through Anthropic's Message
@@ -63,6 +64,10 @@ export interface BatchStore {
   finish(id: string, status: 'processed' | 'failed', counts: Counts): Promise<void>;
   context(userId: string): Promise<MealPlanContext>;
   hasPlan(userId: string, date: string): Promise<boolean>;
+  /** A stored plan (for leftovers: the day before). */
+  planFor(userId: string, date: string): Promise<MealPlan | null>;
+  /** Plans stored for these users on a date, by user. */
+  plansOn(userIds: string[], date: string): Promise<Map<string, MealPlan>>;
   /** profiles.language, kept in step by the app. */
   languageOf(userId: string): Promise<string | null>;
   save(userId: string, date: string, plan: ReturnType<typeof assemblePlan>): Promise<void>;
@@ -194,12 +199,23 @@ async function storeResult(
   if (await deps.store.hasPlan(userId, date)) return 'skipped';
   const ctx = await deps.store.context(userId);
   if (ctx.premium || !ctx.targets) return 'skipped';
-  const input = promptInput(ctx);
+  const leftover = ctx.cooking?.leftovers
+    ? leftoverLunch(
+        await deps.store.planFor(userId, dayBefore(date)),
+        promptInput(ctx).slotCalories.lunch,
+      )
+    : null;
+  const input = promptInput(
+    ctx,
+    leftover ? { leftoverLunch: leftover.dish.sourceTitle ?? leftover.dish.title } : {},
+  );
+  // The request was sent with a leftover lunch only if yesterday's dinner existed then; a
+  // placeholder lunch without a leftover now (or the reverse) fails the checks and is dropped.
   const built = await planFromReply(result.text, ctx, input, makeLookup(deps));
   // No retry here: the app makes the plan on demand, with feedback, when the user opens Meals.
   if ('problems' in built) return 'failed';
   const language = languageField.parse(await deps.store.languageOf(userId));
-  const local = await localize(
+  const local = await localizeDay(
     {
       store: {
         logUsage: (u, model, input, output) => deps.store.logUsage(u, model, input, output, false),
@@ -207,8 +223,9 @@ async function storeResult(
     },
     deps.llm,
     userId,
-    SLOTS.map((s) => ({ dish: built.value.dishes[s], items: built.value.slots[s] })),
+    built.value,
     language,
+    leftover,
   );
   if (await deps.store.hasPlan(userId, date)) return 'skipped';
   await deps.store.save(userId, date, assemblePlan(date, local, ctx, result.model, now));
@@ -227,17 +244,27 @@ async function submit(
   if (await deps.store.hasBatch(date)) return 0;
   const candidates = await deps.store.candidates(date, settings.maxUsers);
   if (!candidates.length) return 0;
-  const contexts = await deps.store.contexts(candidates.map((c) => c.userId));
+  const ids = candidates.map((c) => c.userId);
+  const contexts = await deps.store.contexts(ids);
+  // Today's plans, for users who reuse dinner as tomorrow's lunch.
+  const today = await deps.store.plansOn(ids, dayBefore(date));
   const requests: BatchRequest[] = [];
   for (const { userId } of candidates) {
     const ctx = contexts.get(userId);
     if (!ctx || ctx.premium || !ctx.targets || !UUID.test(userId)) continue;
+    const leftover = ctx.cooking?.leftovers
+      ? leftoverLunch(today.get(userId) ?? null, promptInput(ctx).slotCalories.lunch)
+      : null;
+    const input = promptInput(
+      ctx,
+      leftover ? { leftoverLunch: leftover.dish.sourceTitle ?? leftover.dish.title } : {},
+    );
     requests.push({
       custom_id: userId,
       params: {
         model: deps.model,
         max_tokens: MAX_TOKENS.free,
-        system: mealPlanSystemPrompt(promptInput(ctx)),
+        system: mealPlanSystemPrompt(input),
         messages: [{ role: 'user', content: `Plan meals for ${date}.` }],
       },
     });

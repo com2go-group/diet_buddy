@@ -1,7 +1,8 @@
 import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
 import type { MealPlanContext } from '../generate-meal-plan/handler.ts';
-import { supabaseMealPlanStore } from '../generate-meal-plan/store.ts';
+import type { MealPlan } from '../generate-meal-plan/plan.ts';
+import { cookingFrom, supabaseMealPlanStore } from '../generate-meal-plan/store.ts';
 import { DEFAULT_SETTINGS, type BatchStore, type Counts } from './handler.ts';
 
 const FUNCTION_NAME = 'batch-meal-plans';
@@ -94,7 +95,7 @@ export function supabaseBatchStore(db: SupabaseClient): BatchStore {
           db
             .from('preferences')
             .select(
-              'user_id, diet_styles, restrictions, restriction_other, allergies, allergy_other, avoid_foods',
+              'user_id, diet_styles, restrictions, restriction_other, allergies, allergy_other, avoid_foods, cooking_time, food_budget, cuisines, leftovers',
             )
             .in('user_id', ids),
           db
@@ -119,6 +120,10 @@ export function supabaseBatchStore(db: SupabaseClient): BatchStore {
               allergies: string[];
               allergy_other: string | null;
               avoid_foods: string[];
+              cooking_time?: string;
+              food_budget?: string;
+              cuisines?: string[];
+              leftovers?: boolean;
             }[]
           ).map((p) => [p.user_id, p]),
         );
@@ -145,6 +150,7 @@ export function supabaseBatchStore(db: SupabaseClient): BatchStore {
               avoidFoods: p?.avoid_foods ?? [],
             },
             targets: plan ? { calories: plan.daily_calories, proteinG: plan.protein_g } : null,
+            cooking: cookingFrom(p),
           });
         }
       }
@@ -181,6 +187,25 @@ export function supabaseBatchStore(db: SupabaseClient): BatchStore {
 
     async hasPlan(userId, date) {
       return (await meals.existing(userId, date)) !== null;
+    },
+
+    async planFor(userId, date) {
+      return (await meals.existing(userId, date))?.plan ?? null;
+    },
+
+    async plansOn(userIds, date) {
+      const out = new Map<string, MealPlan>();
+      for (let i = 0; i < userIds.length; i += CHUNK) {
+        const rows = must(
+          await db
+            .from('meal_plans')
+            .select('user_id, meals')
+            .eq('date', date)
+            .in('user_id', userIds.slice(i, i + CHUNK)),
+        ) as { user_id: string; meals: MealPlan }[] | null;
+        for (const r of rows ?? []) out.set(r.user_id, r.meals);
+      }
+      return out;
     },
 
     async languageOf(userId) {

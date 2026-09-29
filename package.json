@@ -89,7 +89,8 @@
     "db:test:plain": "node scripts/db/test-plain-postgres.mjs",
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "e2e": "maestro test .maestro",
-    "landing:legal": "node --experimental-strip-types --no-warnings scripts/landing/build-legal-pages.mjs && prettier --write landing/privacy.html landing/terms.html landing/delete-account.html"
+    "landing:legal": "node --experimental-strip-types --no-warnings scripts/landing/build-legal-pages.mjs && prettier --write landing/privacy.html landing/terms.html landing/delete-account.html",
+    "foods:ciqual": "node --experimental-strip-types --no-warnings scripts/foods/import-ciqual.mjs"
   },
   "private": true,
   "jest": {

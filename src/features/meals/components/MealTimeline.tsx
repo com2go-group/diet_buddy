@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { Button, SkeletonCard, Text } from '@/components';
@@ -112,6 +113,18 @@ export function MealTimeline({
         </View>
       ) : null}
       {isToday && plan ? <FormMessage message={errorText(generate.error)} /> : null}
+      {isToday && plan ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/meal-preferences')}
+          style={{ minHeight: MIN_TOUCH_TARGET }}
+          className="mb-2 justify-center active:opacity-60"
+        >
+          <Text variant="caption" tone="primary" className="font-semibold">
+            🍳 {t('mealPlan.preferences')}
+          </Text>
+        </Pressable>
+      ) : null}
       {isToday && plan && !hintDismissed ? (
         <View className="mb-3 flex-row items-start gap-2 rounded-2xl border border-primary/20 bg-primary/10 py-2 pl-4 pr-1">
           <Text className="flex-1 py-1 text-[14px]">💡 {t('mealPlan.howItWorks')}</Text>

@@ -60,6 +60,10 @@ export interface Dish {
   /** Short recipe steps (version 3 plans). */
   steps?: string[];
   prepMinutes?: number;
+  /** Lunch made from yesterday's dinner ("cook once, eat twice"). */
+  leftover?: boolean;
+  /** Ingredients the user swapped (display names), newest last. */
+  swapped?: { from: string; to: string }[];
 }
 
 /**
@@ -94,6 +98,8 @@ export interface MealPlan {
   rejected?: Partial<Record<Slot, string[]>>;
   /** How many "Another idea" meals were made for this day. */
   alternatives?: number;
+  /** How many ingredients were swapped this day. */
+  swaps?: number;
   totals: { kcal: number; proteinG: number; carbsG: number; fatG: number };
   targets: { kcal: number; proteinG: number };
   promptVersion: string;
@@ -138,6 +144,47 @@ export function scaleSlot(
   const kcal = items.reduce((t, i) => t + (i.food.per100g.kcal * i.grams) / 100, 0);
   const factor = kcal > 0 ? Math.max(0.6, Math.min(1.6, targetKcal / kcal)) : 1;
   return items.map((i) => itemFor(i.name, i.food, i.grams * factor));
+}
+
+/** An item with its grams scaled (numbers follow the same USDA per-gram values). */
+export function rescaleItem(item: PlannedItem, factor: number): PlannedItem {
+  const grams = Math.max(10, Math.round((item.grams * factor) / 5) * 5);
+  const f = item.grams > 0 ? grams / item.grams : 1;
+  return {
+    ...item,
+    grams,
+    kcal: Math.round(item.kcal * f),
+    proteinG: round1(item.proteinG * f),
+    carbsG: round1(item.carbsG * f),
+    fatG: round1(item.fatG * f),
+  };
+}
+
+/**
+ * Yesterday's dinner as today's lunch: same dish and ingredients, portions scaled to lunch's
+ * share (0.6–1.6), no recipe steps (it's reheated). Null when there's nothing to reuse.
+ */
+export function leftoverLunch(
+  yesterday: MealPlan | null,
+  lunchKcal: number,
+): { dish: Dish; items: PlannedItem[] } | null {
+  const dinner = yesterday?.dishes?.dinner;
+  const items = yesterday?.slots.dinner ?? [];
+  if (!dinner || !items.length || yesterday?.skipped?.includes('dinner') || dinner.leftover) {
+    return null;
+  }
+  const kcal = items.reduce((t, i) => t + i.kcal, 0);
+  const factor = kcal > 0 ? Math.max(0.6, Math.min(1.6, lunchKcal / kcal)) : 1;
+  return {
+    dish: {
+      title: dinner.title,
+      ...(dinner.sourceTitle ? { sourceTitle: dinner.sourceTitle } : {}),
+      description: dinner.description,
+      prepMinutes: 5,
+      leftover: true,
+    },
+    items: items.map((i) => rescaleItem(i, factor)),
+  };
 }
 
 export function totals(slots: Record<Slot, PlannedItem[]>): MealPlan['totals'] {

@@ -21,6 +21,8 @@ export function MealCard({
   locked,
   watching,
   onWatch,
+  onSwap,
+  swapping = null,
   children,
 }: {
   dish: Dish;
@@ -28,6 +30,10 @@ export function MealCard({
   locked: boolean;
   watching: boolean;
   onWatch: () => void;
+  /** Swap an ingredient (by position); only for the meal that's up next. */
+  onSwap?: (index: number) => void;
+  /** The ingredient being swapped right now. */
+  swapping?: number | null;
   children?: React.ReactNode;
 }) {
   const { scheme } = useTheme();
@@ -44,6 +50,11 @@ export function MealCard({
           {dish.description}
         </Text>
       ) : null}
+      {dish.leftover ? (
+        <Text variant="caption" className="font-semibold">
+          🥡 {t('mealPlan.leftover')}
+        </Text>
+      ) : null}
       {dish.prepMinutes ? (
         <Text variant="caption" tone="muted">
           ⏱ {t('mealPlan.prepTime', { minutes: dish.prepMinutes })}
@@ -57,10 +68,21 @@ export function MealCard({
         · C {formatNumber(total.carbsG)}g · F {formatNumber(total.fatG)}g
       </Text>
       <View>
-        {visible.map((item) => (
-          <PlanItemRow key={`${item.foodRef}-${item.name}`} item={item} />
+        {visible.map((item, index) => (
+          <PlanItemRow
+            key={`${item.foodRef}-${item.name}`}
+            item={item}
+            onSwap={onSwap && swapping === null ? () => onSwap(index) : undefined}
+            swapping={swapping === index}
+          />
         ))}
       </View>
+      {dish.swapped?.length ? (
+        <Text variant="caption" tone="muted">
+          🔁{' '}
+          {dish.swapped.map((s) => t('mealPlan.swapped', { from: s.from, to: s.to })).join(' · ')}
+        </Text>
+      ) : null}
       {hidden > 0 ? <HiddenPlanItems count={hidden} watching={watching} onWatch={onWatch} /> : null}
       {/* The recipe names every ingredient, so it's revealed with them. */}
       {!locked && dish.steps?.length ? <RecipeSteps steps={dish.steps} /> : null}

@@ -182,6 +182,11 @@ export function ProfileScreen() {
             }
             onPress={() => router.push('/edit-goal')}
           />
+          <SettingsRow
+            icon="🍳"
+            label={t('profile.mealPrefs')}
+            onPress={() => router.push('/meal-preferences')}
+          />
           {data.plan ? (
             <>
               <SettingsRow

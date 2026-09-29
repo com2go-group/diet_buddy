@@ -1,9 +1,25 @@
 import type { SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 
-import type { MealPlanContext, MealPlanStore } from './handler.ts';
+import type { CookingPrefs, MealPlanContext, MealPlanStore } from './handler.ts';
 import type { MealPlan } from './plan.ts';
 
 const FUNCTION_NAME = 'generate-meal-plan';
+
+/** The preferences row's cooking columns (defaults when missing or unknown). */
+export function cookingFrom(
+  p:
+    | { cooking_time?: string; food_budget?: string; cuisines?: string[]; leftovers?: boolean }
+    | undefined,
+): CookingPrefs {
+  const pick = <T extends string>(v: string | undefined, allowed: readonly T[]): T =>
+    allowed.includes(v as T) ? (v as T) : ('any' as T);
+  return {
+    time: pick(p?.cooking_time, ['quick', 'medium', 'any'] as const),
+    budget: pick(p?.food_budget, ['low', 'medium', 'any'] as const),
+    cuisines: p?.cuisines ?? [],
+    leftovers: p?.leftovers === true,
+  };
+}
 
 function must<T>(r: { data: T; error: { message: string } | null }): T {
   if (r.error) throw new Error(r.error.message);
@@ -21,7 +37,7 @@ export function supabaseMealPlanStore(db: SupabaseClient): MealPlanStore {
         db
           .from('preferences')
           .select(
-            'diet_styles, restrictions, restriction_other, allergies, allergy_other, avoid_foods',
+            'diet_styles, restrictions, restriction_other, allergies, allergy_other, avoid_foods, cooking_time, food_budget, cuisines, leftovers',
           )
           .eq('user_id', userId)
           .limit(1),
@@ -40,6 +56,10 @@ export function supabaseMealPlanStore(db: SupabaseClient): MealPlanStore {
             allergies: string[];
             allergy_other: string | null;
             avoid_foods: string[];
+            cooking_time?: string;
+            food_budget?: string;
+            cuisines?: string[];
+            leftovers?: boolean;
           }
         | undefined;
       const plan = (must(plans) as { daily_calories: number; protein_g: number }[] | null)?.[0];
@@ -54,6 +74,7 @@ export function supabaseMealPlanStore(db: SupabaseClient): MealPlanStore {
           avoidFoods: p?.avoid_foods ?? [],
         },
         targets: plan ? { calories: plan.daily_calories, proteinG: plan.protein_g } : null,
+        cooking: cookingFrom(p),
       };
     },
 

@@ -40,7 +40,7 @@ export function CurrentMeal({
   factor: number;
   onOwn: () => void;
 }) {
-  const { date, act, premium, locked, watching, watchToUnlock } = useMealPlan(day, slot);
+  const { date, act, swap, premium, locked, watching, watchToUnlock } = useMealPlan(day, slot);
   const log = useLogFood();
   const dish = dishOf(plan, slot);
   const planned = plan.slots[slot] ?? [];
@@ -68,7 +68,16 @@ export function CurrentMeal({
           {t('mealPlan.adjustedFrom', { from: formatNumber(from), to: formatNumber(to) })}
         </Callout>
       ) : null}
-      <FormMessage message={errorText(act.error) ?? errorText(log.error)} />
+      <FormMessage
+        message={errorText(act.error) ?? errorText(swap.error) ?? errorText(log.error)}
+      />
+      {!premium && swap.error instanceof MealPlanError && swap.error.code === 'swap_limit' ? (
+        <Button
+          label={t('mealPlan.moreSwapsPremium')}
+          size="md"
+          onPress={() => openPaywall('mealPlans')}
+        />
+      ) : null}
       {!premium &&
       act.error instanceof MealPlanError &&
       (act.error.code === 'alternative_limit' || act.error.code === 'ai_budget') ? (
@@ -88,6 +97,9 @@ export function CurrentMeal({
         locked={locked}
         watching={watching}
         onWatch={watchToUnlock}
+        // Leftovers are already cooked; the rest can swap once the meal is revealed.
+        onSwap={locked || dish.leftover ? undefined : (i) => swap.mutate(i)}
+        swapping={swap.isPending ? (swap.variables ?? null) : null}
       >
         <MealActions
           day={day}

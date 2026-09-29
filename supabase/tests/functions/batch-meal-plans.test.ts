@@ -109,6 +109,8 @@ function setup(
     finish: async (id, status, counts) => void finished.push({ id, status, counts }),
     context: async (id) => contexts[id] ?? ctx(),
     hasPlan: async (id) => opts.plans?.has(id) ?? false,
+    planFor: async () => null,
+    plansOn: async () => new Map(),
     languageOf: async (id) => opts.languages?.[id] ?? null,
     save: async (userId, date, plan) => void saved.push({ userId, date, plan }),
     logUsage: async (userId, _m, _i, _o, batch) => void usage.push({ userId, batch }),

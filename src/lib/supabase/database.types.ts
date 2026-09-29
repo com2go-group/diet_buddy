@@ -942,6 +942,10 @@ export type Database = {
           activity_level: Database["public"]["Enums"]["activity_level"] | null
           allergies: string[]
           allergy_other: string | null
+          cooking_time: string
+          cuisines: string[]
+          food_budget: string
+          leftovers: boolean
           avoid_foods: string[]
           created_at: string
           diet_styles: string[]
@@ -956,6 +960,10 @@ export type Database = {
           activity_level?: Database["public"]["Enums"]["activity_level"] | null
           allergies?: string[]
           allergy_other?: string | null
+          cooking_time?: string
+          cuisines?: string[]
+          food_budget?: string
+          leftovers?: boolean
           avoid_foods?: string[]
           created_at?: string
           diet_styles?: string[]
@@ -970,6 +978,10 @@ export type Database = {
           activity_level?: Database["public"]["Enums"]["activity_level"] | null
           allergies?: string[]
           allergy_other?: string | null
+          cooking_time?: string
+          cuisines?: string[]
+          food_budget?: string
+          leftovers?: boolean
           avoid_foods?: string[]
           created_at?: string
           diet_styles?: string[]

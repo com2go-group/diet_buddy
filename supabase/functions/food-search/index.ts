@@ -21,6 +21,41 @@ const admit = userRateGuard({
   limits: supabaseUserLimits(admin, 'food_search', { perMinute: 30, perDay: 600 }),
 });
 
+type EuRow = {
+  source: string;
+  code: string;
+  name: string;
+  kcal: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+  fiber_g: number;
+};
+
+/** CIQUAL (and later other EU tables): French users search French names, others English. */
+async function searchEu(typed: string, english: string, language?: string) {
+  const local = language === 'fr';
+  const { data, error } = await admin.rpc('search_eu_foods', {
+    p_query: local ? typed : english,
+    p_lang: local ? 'fr' : 'en',
+    p_limit: 10,
+  });
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as EuRow[]).map((r) => ({
+    ref: `${r.source}:${r.code}`,
+    name: r.name,
+    brand: null,
+    per100g: {
+      kcal: Number(r.kcal),
+      proteinG: Number(r.protein_g),
+      carbsG: Number(r.carbs_g),
+      fatG: Number(r.fat_g),
+      fiberG: Number(r.fiber_g),
+    },
+    servings: [],
+  }));
+}
+
 Deno.serve((req) =>
-  handleFoodSearch(req, { apiKey: Deno.env.get('USDA_API_KEY'), fetch, llm, admit }),
+  handleFoodSearch(req, { apiKey: Deno.env.get('USDA_API_KEY'), fetch, llm, admit, searchEu }),
 );

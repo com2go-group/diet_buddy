@@ -133,6 +133,37 @@ export const fr: Translation = {
     terms:
       'Jusqu’à 10 invitations récompensées par an. Le code d’un·e ami·e s’utilise une fois, dans les 14 jours suivant l’inscription. Le Premium offert se termine seul après un mois, ne se renouvelle jamais et ne te coûte rien.',
   },
+  mealPrefs: {
+    title: 'Préférences du plan repas',
+    back: 'Retour',
+    intro:
+      'Elles orientent tes prochains plans repas. Tes allergies, restrictions et aliments à éviter sont toujours respectés.',
+    time: 'Temps de cuisine',
+    time_quick: 'Rapide (15 min)',
+    time_medium: 'Jusqu’à 30 min',
+    time_any: 'Sans limite',
+    budget: 'Budget',
+    budget_low: 'Petit',
+    budget_medium: 'Courant',
+    budget_any: 'Sans préférence',
+    cuisines: 'Cuisines que tu aimes',
+    cuisine_mediterranean: 'Méditerranéenne',
+    cuisine_italian: 'Italienne',
+    cuisine_greek: 'Grecque',
+    cuisine_spanish: 'Espagnole',
+    cuisine_french: 'Française',
+    cuisine_german: 'Allemande',
+    cuisine_middle_eastern: 'Moyen-orientale',
+    cuisine_indian: 'Indienne',
+    cuisine_asian: 'Asiatique',
+    cuisine_mexican: 'Mexicaine',
+    cuisine_american: 'Américaine',
+    leftovers: 'Cuisiner une fois, manger deux fois',
+    leftoversDesc: 'Le dîner donne une portion en plus pour le déjeuner du lendemain.',
+    save: 'Enregistrer',
+    saved: 'Enregistré. Ton prochain plan en tiendra compte.',
+    failed: 'Nous n’avons pas pu enregistrer. Réessaie.',
+  },
   care: {
     title: 'Comment vas-tu ?',
     body: 'Tes derniers jours ont été enregistrés bien en dessous de ton plan. Manger suffisamment nourrit ton énergie, ton humeur et tes progrès ; perdre du poids plus vite que prévu n’est pas l’objectif.',
@@ -730,6 +761,8 @@ export const fr: Translation = {
     macroShort: 'P : {{p}} g · G : {{c}} g · L : {{f}} g',
   },
   logFood: {
+    sourceCiqual:
+      'Valeurs nutritionnelles : table de composition Ciqual de l’Anses (Licence Ouverte / Etalab).',
     favorites: 'Favoris',
     favorite: 'Favori',
     favoriteOn: 'Dans vos favoris',
@@ -1260,6 +1293,7 @@ export const fr: Translation = {
     loadFailed: 'Impossible de charger votre conversation.',
   },
   profile: {
+    mealPrefs: 'Préférences du plan repas',
     invite: 'Invite des amis, gagne Premium',
     title: 'Profil',
     free: 'Offre gratuite',
@@ -1529,6 +1563,12 @@ export const fr: Translation = {
     privacy: 'Les données de santé ne sont jamais vendues ni utilisées pour la publicité.',
   },
   mealPlan: {
+    preferences: 'Temps de cuisine, budget, cuisines, restes',
+    error_swap_limit: 'Tu as utilisé tes remplacements d’ingrédients du jour.',
+    moreSwapsPremium: 'Plus de remplacements avec Premium',
+    leftover: 'Restes du dîner d’hier : il suffit de réchauffer',
+    swapped: '{{from}} → {{to}}',
+    swapA11y: 'Remplacer {{name}}',
     tomorrowTitle: 'Plan de demain',
     tomorrowDesc:
       'Découvrez les repas de demain dès ce soir pour faire les courses ou préparer à l’avance.',

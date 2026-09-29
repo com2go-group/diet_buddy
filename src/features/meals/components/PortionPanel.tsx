@@ -118,6 +118,11 @@ export function PortionPanel({
           {t('logFood.source')}
         </Text>
       ) : null}
+      {food.kind === 'per100g' && food.ref?.startsWith('ciqual:') ? (
+        <Text variant="caption" tone="muted">
+          {t('logFood.sourceCiqual')}
+        </Text>
+      ) : null}
       {food.kind === 'per100g' && food.ref?.startsWith('off:') ? (
         <Text variant="caption" tone="muted">
           {t('logFood.sourceOff')}

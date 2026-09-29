@@ -11,6 +11,7 @@ import {
   generateMealPlan,
   loadMealPlan,
   mealPlanAction,
+  swapIngredient,
   unlockTarget,
   type MealPlan,
   type MealPlanDay,
@@ -76,6 +77,15 @@ export function useMealPlan(day: Date, slot: MealSlot) {
     },
   });
 
+  /** Swap one ingredient (by position) of this meal. */
+  const swap = useMutation({
+    mutationFn: (index: number) => swapIngredient(date, slot, index),
+    onSuccess: (plan) => {
+      track('meal_plan_action', { action: 'swap', slot });
+      store(plan);
+    },
+  });
+
   const target = unlockTarget(date, slot);
   /**
    * Opt-in rewarded video for this meal; the server records the unlock (and XP) from Google's
@@ -92,5 +102,5 @@ export function useMealPlan(day: Date, slot: MealSlot) {
 
   const locked =
     !premium && !query.data?.unlockedSlots.includes(slot) && !localUnlocks.includes(target);
-  return { date, query, act, premium, locked, watching, watchToUnlock };
+  return { date, query, act, swap, premium, locked, watching, watchToUnlock };
 }

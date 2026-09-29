@@ -29,6 +29,15 @@ Deno.serve((req) =>
     llm,
     freeLlm,
     allowance: supabaseAllowance(admin),
+    async freeSwaps() {
+      const { data } = await admin
+        .from('app_config')
+        .select('value')
+        .eq('key', 'meal_swaps_daily_free')
+        .maybeSingle();
+      const n = Number((data as { value: unknown } | null)?.value);
+      return Number.isInteger(n) && n >= 0 ? n : 3;
+    },
     getUserId: (r) => userIdFromRequest(admin, r),
     // Generic foods only: branded products vary too much for a plan. Shared cache (USDA's limit).
     searchFoods: cachedSearch(admin, (q) =>

@@ -24,6 +24,10 @@ export interface Dish {
   /** Short recipe steps, without amounts (newer plans). */
   steps?: string[];
   prepMinutes?: number;
+  /** Lunch made from yesterday's dinner ("cook once, eat twice"). */
+  leftover?: boolean;
+  /** Ingredients the user swapped. */
+  swapped?: { from: string; to: string }[];
 }
 
 export interface MealPlan {
@@ -91,6 +95,7 @@ export type MealPlanErrorCode =
   | 'alternative_limit'
   | 'ai_budget'
   | 'no_plan'
+  | 'swap_limit'
   | 'failed';
 
 export class MealPlanError extends Error {
@@ -117,6 +122,11 @@ export function mealPlanAction(
   return callMealPlan({ date, action, slot });
 }
 
+/** Replaces one ingredient of a meal in today's plan (checked on the server like any plan food). */
+export function swapIngredient(date: string, slot: MealSlot, index: number): Promise<MealPlan> {
+  return callMealPlan({ date, action: 'swap', slot, index });
+}
+
 async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
   const { data, error } = await supabase.functions.invoke('generate-meal-plan', {
     headers: aiHeaders(),
@@ -139,6 +149,7 @@ async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
         'alternative_limit',
         'ai_budget',
         'no_plan',
+        'swap_limit',
       ];
       if (known.includes(body?.error as MealPlanErrorCode)) code = body!.error as MealPlanErrorCode;
       boost = boostFrom(body);

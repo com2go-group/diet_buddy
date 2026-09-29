@@ -154,6 +154,15 @@ select cron.schedule('referral-rewards', '*/30 * * * *', $$
 $$);
 ```
 
+## European food data (CIQUAL)
+
+`food-search` lists up to 5 foods from `eu_foods` before USDA's (`search_eu_foods`: every word of the query must match; French users search the French names with what they typed, everyone else the English names with the English query). Logged as `food_ref = ciqual:<code>`, with the ANSES attribution under the numbers. If USDA is down, the European results are still returned. Load or refresh the table (ANSES publishes it under Licence Ouverte / Etalab 2.0):
+
+1. Download the English "Table Ciqual" spreadsheet from https://ciqual.anses.fr (Downloads) and save it as **CSV UTF-8** in Excel or LibreOffice.
+2. `npm run foods:ciqual -- <file.csv> --sql ciqual.sql`, then run `ciqual.sql` in the Supabase SQL editor (or with psql), **or** `SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… npm run foods:ciqual -- <file.csv> --upload`.
+
+About 3,000 foods; rows without an English name or energy value are skipped. Other national tables (NEVO, CoFID) can be added under their own `source` with a similar importer.
+
 ## Access model
 
 | Data                                                                                                              | App (signed-in user)                      | Server (Edge Functions, service role)          |

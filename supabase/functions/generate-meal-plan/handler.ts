@@ -5,8 +5,9 @@ import {
   MEAL_PLAN_PROMPT_VERSION,
   mealPlanSystemPrompt,
   retryFeedback,
+  swapIngredientSystemPrompt,
   type MealPlanPromptInput,
-} from '../_prompts/mealPlan.v3.ts';
+} from '../_prompts/mealPlan.v4.ts';
 import { findViolations, type DietPrefs } from '../_shared/dietRules.ts';
 import { dayOffset } from '../_shared/dates.ts';
 import {
@@ -30,6 +31,8 @@ import {
   aiMealSchema,
   aiPlanSchema,
   cleanSteps,
+  itemFor,
+  leftoverLunch,
   pickFood,
   scaleSlot,
   SLOT_SHARE,
@@ -42,10 +45,19 @@ import {
   type Slot,
 } from './plan.ts';
 
+export interface CookingPrefs {
+  time: 'quick' | 'medium' | 'any';
+  budget: 'low' | 'medium' | 'any';
+  cuisines: string[];
+  /** Cook once, eat twice: dinner leftovers become the next day's lunch. */
+  leftovers: boolean;
+}
+
 export interface MealPlanContext {
   premium: boolean;
   prefs: DietPrefs;
   targets: { calories: number; proteinG: number } | null;
+  cooking?: CookingPrefs;
 }
 
 export interface StoredPlan {
@@ -77,6 +89,8 @@ export interface MealPlanDeps {
   freeLlm?: LlmProvider | null;
   /** Free users' AI allowance ("another idea" limits and budget). */
   allowance(userId: string, day: ClientDay): Promise<AiAllowance>;
+  /** Free users' ingredient swaps a day (app_config meal_swaps_daily_free). */
+  freeSwaps?(): Promise<number>;
   /** USDA search (server key). */
   searchFoods(query: string): Promise<FoodResult[]>;
   now?: () => Date;
@@ -86,8 +100,10 @@ const requestSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   regenerate: z.boolean().optional(),
   /** plan (default): the day's plan. alternative: another idea for one meal. skip/unskip. */
-  action: z.enum(['plan', 'alternative', 'skip', 'unskip']).optional(),
+  action: z.enum(['plan', 'alternative', 'skip', 'unskip', 'swap']).optional(),
   slot: z.enum(SLOTS).optional(),
+  /** swap: which ingredient of the meal (position in the list). */
+  index: z.number().int().min(0).max(9).optional(),
   /** The app's language: dish text and ingredient names are translated after the checks. */
   language: languageField,
 });
@@ -97,6 +113,9 @@ export const PREMIUM_REGENERATIONS = 3;
 export const DAILY_CALL_CAP = 15;
 /** Premium's "another idea" per day (free users' limit is in app_config, raised by videos). */
 export const PREMIUM_ALTERNATIVES = 10;
+/** Ingredient swaps a day: Premium, and free users unless app_config says otherwise. */
+export const PREMIUM_SWAPS = 20;
+export const FREE_SWAPS_DEFAULT = 3;
 
 /** The model for this user: free users run on the cheaper one (decision log 2026-09-29). */
 const modelFor = (deps: MealPlanDeps, premium: boolean) =>
@@ -312,6 +331,11 @@ export async function planFromReply(
   const problems: string[] = [];
   const resolved = {} as Record<Slot, Resolved>;
   for (const s of SLOTS) {
+    // Lunch is yesterday's dinner (checked when it was planned); the reply has a placeholder.
+    if (s === 'lunch' && input.leftoverLunch) {
+      resolved[s] = [];
+      continue;
+    }
     const meal = await resolveMeal(s, ai.data.meals[s], lookup, ctx.prefs);
     resolved[s] = meal.resolved;
     problems.push(...meal.problems);
@@ -325,6 +349,34 @@ export async function planFromReply(
     Dish
   >;
   return { value: { slots, dishes } };
+}
+
+/** The day before `date` ("YYYY-MM-DD"). */
+export function dayBefore(date: string): string {
+  return new Date(Date.parse(`${date}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+}
+
+/**
+ * Translates the new meals and puts the leftover lunch (already in the user's language) in its
+ * place: the stored order is SLOTS.
+ */
+export async function localizeDay(
+  deps: { store: Pick<MealPlanStore, 'logUsage'> },
+  llm: LlmProvider | null,
+  userId: string,
+  value: { slots: Record<Slot, PlannedItem[]>; dishes: Record<Slot, Dish> },
+  language: Language | undefined,
+  leftover: { dish: Dish; items: PlannedItem[] } | null,
+): Promise<{ dish: Dish; items: PlannedItem[] }[]> {
+  const fresh = SLOTS.filter((s) => !(leftover && s === 'lunch'));
+  const local = await localize(
+    deps,
+    llm,
+    userId,
+    fresh.map((s) => ({ dish: value.dishes[s], items: value.slots[s] })),
+    language,
+  );
+  return SLOTS.map((s) => (leftover && s === 'lunch' ? leftover : local[fresh.indexOf(s)]!));
 }
 
 /** Translated dishes and items → the stored plan (version 2). */
@@ -358,10 +410,18 @@ export function assemblePlan(
 /** Output tokens are most of a plan's cost: free users get shorter dishes and a lower cap. */
 export const MAX_TOKENS = { free: 1000, premium: 1500 } as const;
 
-export function promptInput(ctx: MealPlanContext): MealPlanPromptInput {
+export function promptInput(
+  ctx: MealPlanContext,
+  extra: Pick<MealPlanPromptInput, 'leftoverLunch'> = {},
+): MealPlanPromptInput {
   const targets = ctx.targets!;
   return {
     concise: !ctx.premium,
+    cookingTime: ctx.cooking?.time ?? 'any',
+    budget: ctx.cooking?.budget ?? 'any',
+    cuisines: ctx.cooking?.cuisines ?? [],
+    cookForLeftovers: ctx.cooking?.leftovers ?? false,
+    ...extra,
     targets,
     slotCalories: Object.fromEntries(
       SLOTS.map((s) => [s, Math.round((targets.calories * SLOT_SHARE[s]) / 10) * 10]),
@@ -420,6 +480,19 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
         await store.save(userId, date, plan, existing.regenerations);
         return json({ plan });
       }
+      if (action === 'swap') {
+        return await swap(
+          deps,
+          userId,
+          date,
+          slot,
+          existing,
+          now,
+          language,
+          clientDay(req, now),
+          parsed.data.index,
+        );
+      }
       return await alternative(
         deps,
         userId,
@@ -447,7 +520,15 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       return fail('rate_limited', 429);
     }
 
-    const input = promptInput(ctx);
+    // Cook once, eat twice: yesterday's dinner becomes today's lunch.
+    const lunchKcal = promptInput(ctx).slotCalories.lunch;
+    const leftover = ctx.cooking?.leftovers
+      ? leftoverLunch((await store.existing(userId, dayBefore(date)))?.plan ?? null, lunchKcal)
+      : null;
+    const input = promptInput(
+      ctx,
+      leftover ? { leftoverLunch: leftover.dish.sourceTitle ?? leftover.dish.title } : {},
+    );
     const lookup = makeLookup(deps);
     const result = await attempt<{
       slots: Record<Slot, PlannedItem[]>;
@@ -463,13 +544,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
     );
     if ('response' in result) return result.response;
 
-    const local = await localize(
-      deps,
-      llm,
-      userId,
-      SLOTS.map((s) => ({ dish: result.value.dishes[s], items: result.value.slots[s] })),
-      language,
-    );
+    const local = await localizeDay(deps, llm, userId, result.value, language, leftover);
     // A new plan keeps the day's count of alternatives (cost cap).
     const plan = assemblePlan(
       date,
@@ -567,6 +642,114 @@ async function alternative(
     rejected: { ...rejected, [slot]: [...(rejected[slot] ?? []), englishTitle(dishes[slot])] },
     skipped: (existing.plan.skipped ?? []).filter((s) => s !== slot),
     alternatives: used + 1,
+  };
+  await deps.store.save(userId, date, plan, existing.regenerations);
+  return json({ plan });
+}
+
+/**
+ * "Swap" one ingredient of a meal in today's plan: the model names a replacement that plays the
+ * same role; it's looked up in USDA and checked against the user's diet rules like any planned
+ * food, and its grams are set to keep the meal's calories about the same. The recipe mentions
+ * are renamed where they match. Limited per day (free: app_config, Premium 20).
+ */
+async function swap(
+  deps: MealPlanDeps,
+  userId: string,
+  date: string,
+  slot: Slot,
+  existing: StoredPlan,
+  now: Date,
+  language: Language | undefined,
+  day: ClientDay,
+  index: number | undefined,
+): Promise<Response> {
+  const items = existing.plan.slots[slot] ?? [];
+  const old = index === undefined ? undefined : items[index];
+  if (!old) return fail('invalid_request', 400);
+  const ctx = await deps.store.context(userId);
+  if (!ctx.targets) return fail('no_targets', 409);
+  const llm = modelFor(deps, ctx.premium);
+  if (!llm) return fail('not_configured', 503);
+  const used = existing.plan.swaps ?? 0;
+  if (ctx.premium) {
+    if (used >= PREMIUM_SWAPS) return fail('swap_limit', 403);
+  } else {
+    const limit = (await deps.freeSwaps?.().catch(() => FREE_SWAPS_DEFAULT)) ?? FREE_SWAPS_DEFAULT;
+    if (used >= limit) return json({ error: 'swap_limit', limit, boost: null }, 429);
+    if (overBudget(await deps.allowance(userId, day))) {
+      return outOfAi('ai_budget', await deps.allowance(userId, day), day);
+    }
+  }
+  if (
+    (await deps.store.callsSince(userId, new Date(now.getTime() - 86_400_000))) >= DAILY_CALL_CAP
+  ) {
+    return fail('rate_limited', 429);
+  }
+
+  const dish = dishesOf(existing.plan)[slot];
+  // The model sees English: the USDA descriptions of the ingredients and the English title.
+  const english = items.map((i) => i.source);
+  const lookup = makeLookup(deps);
+  const replacementSchema = z.object({
+    name: z.string().trim().min(2).max(80),
+    usda_query: z.string().trim().min(2).max(80),
+  });
+  const result = await attempt<{ item: PlannedItem }>(
+    { ...deps, llm },
+    userId,
+    swapIngredientSystemPrompt(promptInput(ctx), englishTitle(dish), english, old.source),
+    `Suggest a replacement for "${old.source}".`,
+    lookup,
+    async (text) => {
+      const ai = replacementSchema.safeParse(extractJson(text));
+      if (!ai.success) return { problems: ['the JSON did not match the required format'] };
+      const food = await lookup.find(ai.data.usda_query);
+      if (!food) return { problems: [`no nutrition data found for "${ai.data.name}"`] };
+      if (items.some((i) => i.foodRef === food.ref)) {
+        return { problems: [`"${ai.data.name}" is already in the dish`] };
+      }
+      const violations = findViolations(
+        [{ slot, name: ai.data.name, source: food.name }],
+        ctx.prefs,
+      );
+      if (violations.length) {
+        return {
+          problems: violations.map((v) => `"${v.name}" breaks ${v.reason.replace(':', ' ')}`),
+        };
+      }
+      // Same calories as the ingredient it replaces (a food without energy keeps the grams).
+      const perGram = food.per100g.kcal / 100;
+      const grams = perGram > 0 ? Math.min(500, old.kcal / perGram) : old.grams;
+      return { value: { item: itemFor(ai.data.name, food, grams) } };
+    },
+    300,
+  );
+  if ('response' in result) return result.response;
+
+  const translated = await translateTexts(llm, [result.value.item.name], language);
+  if (translated.usage) {
+    const u = translated.usage;
+    await deps.store.logUsage(userId, u.model, u.inputTokens, u.outputTokens);
+  }
+  const item = { ...result.value.item, name: translated.texts[0] ?? result.value.item.name };
+  const rename = (step: string) =>
+    step.replace(new RegExp(old.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), item.name);
+  const slots = { ...existing.plan.slots, [slot]: items.map((i, n) => (n === index ? item : i)) };
+  const plan: MealPlan = {
+    ...existing.plan,
+    version: 2,
+    slots,
+    dishes: {
+      ...dishesOf(existing.plan),
+      [slot]: {
+        ...dish,
+        ...(dish.steps ? { steps: dish.steps.map(rename) } : {}),
+        swapped: [...(dish.swapped ?? []), { from: old.name, to: item.name }],
+      },
+    },
+    totals: totals(slots),
+    swaps: used + 1,
   };
   await deps.store.save(userId, date, plan, existing.regenerations);
   return json({ plan });
