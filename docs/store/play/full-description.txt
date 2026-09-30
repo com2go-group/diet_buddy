@@ -1,0 +1,48 @@
+DietBuddy turns your goals into a clear daily plan, then helps you stick to it.
+
+YOUR PERSONAL PLAN
+Tell DietBuddy about your body, goal, activity, diet style, allergies and foods you avoid. You get daily calorie, protein, carb, fat, fibre and water targets, a realistic timeline and a weekly exercise suggestion. Targets never go below safe minimums, and fast weight-loss paces come with a clear caution.
+
+EASY LOGGING
+• Search a large food database, scan a barcode, or snap a photo of your plate
+• Log water with one tap
+• Re-log recent foods in any amount
+• Nutrition numbers come from food databases (USDA FoodData Central and Open Food Facts), never invented
+
+AI MEAL PLANS
+Daily meal plans built around your targets, diet style and restrictions. Every plan is checked in code against your allergies and avoided foods before you see it.
+
+AI COACH
+Chat with three coaches: Aria (nutrition), Max (fitness) and Luna (mindset and wellbeing). They know your targets and recent days, and are built to be supportive, never extreme.
+
+PROGRESS YOU CAN SEE
+• Weight trend, weekly calories and goal projection
+• Daily score, streaks, XP, levels and achievements
+• Daily check-in for mood, energy, sleep and hunger
+• Private progress photos
+• Your Digital Twin: a cartoon avatar that follows your body composition over time
+• A shareable weekly story of your progress
+
+WORKS WITH HEALTH CONNECT
+Import weight, body fat, steps, active energy, workouts and water, and save the weight and water you log. Smart scales and watches that sync with Health Connect (including Samsung Health) work too. Health data is never used for advertising.
+
+PREMIUM
+Premium removes ads and adds:
+• Up to 60 AI coach messages a day
+• Full AI meal plans every day, planned up to 7 days ahead
+• AI body scan from two photos (the photos are not stored)
+• Restaurant mode: scan a menu and see the dishes that best fit your plan
+• Grocery AI: a weekly shopping list from your meal plans
+• AI insights and wellness insights
+• Before and after photo comparison, Digital Twin timeline and the weekly story without the DietBuddy mark
+• More food photo scans and priority support
+
+Premium is available as a monthly subscription with a 7-day free trial, or as an annual subscription. Prices are shown in the app before you buy. Payment is charged to your Google Play account. The subscription renews automatically unless cancelled before the end of the current period. Manage or cancel it in Google Play > Payments & subscriptions.
+
+YOUR DATA
+Your data is stored in the EU. You can export it or delete your account at any time in the app.
+
+DietBuddy is for adults (18+). It gives general nutrition and fitness information and is not medical advice. Talk to a doctor before starting a new diet, and DietBuddy is not suitable for people with, or recovering from, an eating disorder.
+
+Terms of Service: https://dietbuddy.me/terms.html
+Privacy Policy: https://dietbuddy.me/privacy.html
