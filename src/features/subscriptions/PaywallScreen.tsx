@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, EmptyState, ErrorState, GradientFill, SkeletonCard, Text } from '@/components';
 import { t, type StringKey } from '@/i18n';
 import type { PlanOption } from '@/lib/purchases';
+import { storeErrorCode } from '@/lib/purchases/plans';
 import { ACCENTS, MIN_TOUCH_TARGET } from '@/theme';
 import { track } from '@/lib/telemetry';
 
@@ -98,8 +99,16 @@ export function PaywallScreen() {
         />
       );
     if (plans.isPending) return <SkeletonCard lines={4} />;
-    if (plans.isError)
-      return <ErrorState message={t('paywall.loadFailed')} onRetry={() => plans.refetch()} />;
+    if (plans.isError) {
+      const code = storeErrorCode(plans.error);
+      const message = t('paywall.loadFailed');
+      return (
+        <ErrorState
+          message={code ? `${message}\n${t('paywall.errorCode', { code })}` : message}
+          onRetry={() => plans.refetch()}
+        />
+      );
+    }
     if (!plan) return <EmptyState emoji="🛒" title={t('paywall.noPlans')} />;
     return (
       <View className="gap-3">

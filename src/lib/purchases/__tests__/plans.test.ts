@@ -1,4 +1,4 @@
-import { toPlans, trialDays, type StorePackage } from '../plans';
+import { storeErrorCode, toPlans, trialDays, type StorePackage } from '../plans';
 
 const pkg = (
   packageType: string,
@@ -59,5 +59,16 @@ describe('store plans', () => {
       }),
     ).toBeNull();
     expect(trialDays(pkg('MONTHLY', 9.99).product)).toBeNull();
+  });
+});
+
+describe('storeErrorCode', () => {
+  it('prefers the readable code, falls back to the numeric one', () => {
+    expect(storeErrorCode({ code: '23', readableErrorCode: 'CONFIGURATION_ERROR' })).toBe(
+      'CONFIGURATION_ERROR',
+    );
+    expect(storeErrorCode({ code: '23' })).toBe('23');
+    expect(storeErrorCode(new Error('x'))).toBeNull();
+    expect(storeErrorCode(undefined)).toBeNull();
   });
 });

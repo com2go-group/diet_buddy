@@ -1461,6 +1461,7 @@ export const de: Translation = {
     unavailable: 'Käufe sind in der DietBuddy-App für iPhone und Android möglich.',
     unavailableBuild:
       'Abos sind in dieser Version der App noch nicht aktiviert. Bitte aktualisiere die App oder versuche es später erneut.',
+    errorCode: 'Fehlercode: {{code}}',
     noPlans: 'Gerade sind keine Pläne verfügbar. Bitte versuche es später erneut.',
     activeTitle: 'Du hast Premium 👑',
     activeDesc: 'Danke, dass du DietBuddy unterstützt. Deine Premium-Funktionen sind aktiv.',

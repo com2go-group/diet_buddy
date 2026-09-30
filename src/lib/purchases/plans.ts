@@ -69,3 +69,12 @@ export function toPlans(packages: StorePackage[]): PlanOption[] {
     })
     .sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind));
 }
+
+/** RevenueCat's readable error code (e.g. CONFIGURATION_ERROR), shown on the paywall to diagnose. */
+export function storeErrorCode(e: unknown): string | null {
+  if (!e || typeof e !== 'object') return null;
+  const { readableErrorCode, code } = e as { readableErrorCode?: unknown; code?: unknown };
+  if (typeof readableErrorCode === 'string' && readableErrorCode) return readableErrorCode;
+  if (typeof code === 'string' || typeof code === 'number') return String(code);
+  return null;
+}

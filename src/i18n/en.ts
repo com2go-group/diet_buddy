@@ -1610,6 +1610,7 @@ export const en = {
     unavailable: 'Purchases are available in the DietBuddy app for iPhone and Android.',
     unavailableBuild:
       'Subscriptions aren’t switched on in this version of the app yet. Please update the app or try again later.',
+    errorCode: 'Error code: {{code}}',
     noPlans: 'No plans are available right now. Please try again later.',
     activeTitle: 'You’re Premium 👑',
     activeDesc: 'Thanks for supporting DietBuddy. Your Premium features are active.',
