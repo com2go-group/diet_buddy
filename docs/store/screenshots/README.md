@@ -13,10 +13,11 @@ streak and a short coach chat):
 | `05-digital-twin.png` | Digital Twin at the goal weight, with the timeline                 |
 | `06-weekly-story.png` | Weekly Progress Story preview                                      |
 
-| Folder           | Size        | Use                                                     |
-| ---------------- | ----------- | ------------------------------------------------------- |
-| `iphone-6.7/`    | 1290 × 2796 | App Store, 6.7" iPhone (accepted for the 6.9" slot too) |
-| `android-phone/` | 1080 × 1920 | Google Play, phone screenshots                          |
+| Folder           | Size        | Use                                                    |
+| ---------------- | ----------- | ------------------------------------------------------ |
+| `iphone-6.7/`    | 1290 × 2796 | App Store, 6.9" iPhone slot                            |
+| `iphone-6.5/`    | 1284 × 2778 | App Store, 6.5" iPhone slot (the same images, resized) |
+| `android-phone/` | 1080 × 1920 | Google Play, phone screenshots                         |
 
 ## Before submitting
 
