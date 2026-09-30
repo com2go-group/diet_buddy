@@ -1,4 +1,21 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
+import { withGradleProperties, type ConfigPlugin } from 'expo/config-plugins';
+
+/**
+ * react-native-google-mobile-ads 17.2 crashes the Android build when app.json has no
+ * "react-native-google-mobile-ads" section (its app-json.gradle sets a misspelled property, then
+ * build.gradle reads `googleMobileAdsJson`). Setting its RNGMA_ANDROID_BACKEND property skips that
+ * lookup; "classic" is the library's default backend. Our AdMob settings come from the config
+ * plugin below.
+ */
+const withAdsAndroidBackend: ConfigPlugin = (cfg) =>
+  withGradleProperties(cfg, (c) => {
+    c.modResults = c.modResults.filter(
+      (p) => !(p.type === 'property' && p.key === 'RNGMA_ANDROID_BACKEND'),
+    );
+    c.modResults.push({ type: 'property', key: 'RNGMA_ANDROID_BACKEND', value: 'classic' });
+    return c;
+  });
 
 /**
  * Extends app.json with values that depend on the environment. Google Sign-In's config plugin
@@ -20,5 +37,5 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       delayAppMeasurementInit: true,
     },
   ]);
-  return { ...(config as ExpoConfig), plugins };
+  return withAdsAndroidBackend({ ...(config as ExpoConfig), plugins });
 };
