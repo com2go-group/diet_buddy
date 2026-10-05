@@ -6,7 +6,7 @@ window.DIETBUDDY = {
   // e.g. 'https://apps.apple.com/app/id1234567890'
   appStoreUrl: '',
   // e.g. 'https://play.google.com/store/apps/details?id=com.com2go.dietbuddy'
-  playStoreUrl: '',
+  playStoreUrl: 'https://play.google.com/store/apps/details?id=com.com2go.dietbuddy',
   // Legal pages. By default the ones in this folder (privacy.html, terms.html,
   // delete-account.html, built from the app's texts with `npm run landing:legal`).
   privacyUrl: 'privacy.html',

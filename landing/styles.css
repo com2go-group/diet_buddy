@@ -306,6 +306,38 @@ ol {
   fill: #0b0b0f;
 }
 
+/* Launch announcement above the hero headline */
+.launch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-bottom: 16px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+.launch-pill:hover {
+  transform: translateY(-1px);
+}
+.launch-pill[hidden] {
+  display: none;
+}
+.launch-pill-tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* Hero */
 .hero {
   padding: 64px 0 72px;

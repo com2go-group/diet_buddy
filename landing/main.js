@@ -8,6 +8,8 @@
     if (url) {
       a.href = url;
       a.rel = 'noopener';
+    } else if (a.hasAttribute('data-hide-unless-live')) {
+      a.hidden = true;
     } else {
       // Not live yet: keep the button, say so, and don't navigate away.
       a.classList.add('soon');
