@@ -9,6 +9,7 @@ import { accentColor, useTheme } from '@/theme';
 import { FormMessage } from '../../auth/components/FormMessage';
 import { AMOUNT_LIMITS, macrosFor } from '../portion';
 import type { Macros, PortionFood } from '../types';
+import { ServingsStepper } from './ServingsStepper';
 
 export type PortionUnit = 'g' | number | 'portion';
 
@@ -31,6 +32,7 @@ export function PortionPanel({
     food.kind === 'portion' ? 'portion' : food.servings.length ? 0 : 'g';
   const [unit, setUnit] = useState<PortionUnit>(initialUnit);
   const [amount, setAmount] = useState<number | null>(initialUnit === 'g' ? 100 : 1);
+  const [servings, setServings] = useState(1);
   const limits =
     unit === 'g'
       ? AMOUNT_LIMITS.g
@@ -38,7 +40,9 @@ export function PortionPanel({
         ? AMOUNT_LIMITS.portion
         : AMOUNT_LIMITS.serving;
   const valid = amount !== null && amount >= limits[0] && amount <= limits[1];
-  const macros = valid ? macrosFor(food, amount, unit) : null;
+  // The amount is one serving; the stepper multiplies it (2 × 100 g = 200 g).
+  const total = valid ? amount * servings : null;
+  const macros = total !== null ? macrosFor(food, total, unit) : null;
 
   const units: { value: PortionUnit; label: string }[] =
     food.kind === 'portion'
@@ -100,6 +104,21 @@ export function PortionPanel({
           />
         ))}
       </View>
+      <ServingsStepper value={servings} onChange={setServings} />
+      {total !== null && servings !== 1 ? (
+        <Text variant="caption" tone="muted">
+          {unit === 'g'
+            ? t('logFood.servingsTotalGrams', {
+                count: formatNumber(servings),
+                amount: formatDecimal(amount ?? 0, 2),
+                total: formatDecimal(total, 2),
+              })
+            : t('logFood.servingsTotal', {
+                count: formatNumber(servings),
+                total: formatDecimal(total, 2),
+              })}
+        </Text>
+      ) : null}
       <View className="flex-row justify-between rounded-2xl border border-border bg-card p-4">
         {stats.map(([label, value, accent]) => (
           <View key={label} accessible className="items-center">
@@ -133,7 +152,7 @@ export function PortionPanel({
         label={t('logFood.add', { slot: slotLabel })}
         disabled={!macros}
         loading={saving}
-        onPress={() => macros && amount !== null && onAdd(amount, unit, macros)}
+        onPress={() => macros && total !== null && onAdd(total, unit, macros)}
       />
     </View>
   );

@@ -40,7 +40,8 @@ export interface HomeSummary {
   lastWaterLogId: string | null;
 }
 
-export const GLASS_ML = 250;
+/** One tap on the water tracker logs this much (0.5 L, owner request 2026-10-05). */
+export const GLASS_ML = 500;
 
 const sum = <T>(rows: T[], pick: (r: T) => number) => rows.reduce((total, r) => total + pick(r), 0);
 
@@ -93,7 +94,7 @@ export function summarizeHome(data: HomeData, now: Date): HomeSummary {
       carbsG: sum(today.food, (f) => f.carbs_g),
       fatG: sum(today.food, (f) => f.fat_g),
       waterMl,
-      glasses: Math.floor(waterMl / GLASS_ML),
+      glasses: Math.round(waterMl / GLASS_ML),
       checkIn: today.checkIn,
       meals,
       score: scoreFor(todayKey),

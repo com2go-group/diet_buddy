@@ -155,6 +155,25 @@ describe('LogFoodScreen', () => {
     await waitFor(() => expect(router.back).toHaveBeenCalled());
   });
 
+  it('multiplies the amount by the number of servings', async () => {
+    (searchFoods as jest.Mock).mockResolvedValue([chicken]);
+    await renderScreen(<LogFoodScreen />);
+    await fireEvent.changeText(screen.getByLabelText('Search foods'), 'chicken');
+    await fireEvent.press(await screen.findByRole('button', { name: /Chicken, breast, roasted/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'grams' }));
+    // 100 g, two servings → 200 g, 330 kcal.
+    await fireEvent.press(screen.getByRole('button', { name: 'One serving more' }));
+    expect(screen.getByText('2 × 100 g = 200 g')).toBeOnTheScreen();
+    expect(screen.getByText('330')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Add to Lunch' }));
+    await waitFor(() => expect(logFood).toHaveBeenCalled());
+    expect((logFood as jest.Mock).mock.calls[0][1]).toMatchObject({
+      quantity: 200,
+      unit: 'g',
+      macros: { kcal: 330, proteinG: 62, carbsG: 0, fatG: 7.2 },
+    });
+  });
+
   it('offers recent foods before searching', async () => {
     await renderScreen(<LogFoodScreen />);
     expect(await screen.findByRole('button', { name: /Oats/ })).toBeOnTheScreen();

@@ -94,6 +94,10 @@ export function gramsFor(
 
 export const AMOUNT_LIMITS = { g: [1, 5000], serving: [0.25, 50], portion: [0.25, 20] } as const;
 
+/** How many of the chosen amount were eaten (e.g. 2 × 100 g): whole servings, 1–20. */
+export const SERVINGS_LIMITS = [1, 20] as const;
+export const SERVINGS_STEP = 1;
+
 export function totals(
   logs: Pick<FoodLog, 'calories' | 'protein_g' | 'carbs_g' | 'fat_g'>[],
 ): Macros {

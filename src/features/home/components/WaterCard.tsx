@@ -8,7 +8,7 @@ import { FormMessage } from '../../auth/components/FormMessage';
 import { GLASS_ML } from '../summary';
 
 /**
- * Hydration ring plus one button per 250 ml glass. Tapping the next empty glass logs one;
+ * Hydration ring plus one button per 0.5 L. Tapping the next empty glass logs one;
  * tapping a filled glass removes the most recent one.
  */
 export function WaterCard({
@@ -27,7 +27,7 @@ export function WaterCard({
   const { scheme } = useTheme();
   const cyan = accentColor('cyan', scheme);
   const glasses = Math.min(16, Math.ceil(targetMl / GLASS_ML));
-  const filled = Math.floor(waterMl / GLASS_ML);
+  const filled = Math.min(glasses, Math.round(waterMl / GLASS_ML));
   const litres = (ml: number) => (ml / 1000).toFixed(1);
 
   return (

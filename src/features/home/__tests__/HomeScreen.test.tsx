@@ -88,12 +88,10 @@ describe('HomeScreen', () => {
   it('adds and removes glasses of water', async () => {
     await renderScreen();
     await screen.findByText('Olivia');
-    await fireEvent.press(
-      screen.getAllByRole('button', { name: 'Add a glass of water (250 ml)' })[0]!,
-    );
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Add 0.5 L of water' })[0]!);
     await waitFor(() => expect(addGlass).toHaveBeenCalledWith('user-1', expect.any(Date)));
     await waitFor(() => expect(loadHome).toHaveBeenCalledTimes(2));
-    await fireEvent.press(screen.getByRole('button', { name: 'Remove the last glass of water' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Remove the last water entry' }));
     await waitFor(() => expect(removeWaterLog).toHaveBeenCalledWith('w1'));
   });
 
@@ -101,9 +99,7 @@ describe('HomeScreen', () => {
     (addGlass as jest.Mock).mockRejectedValue(new Error('offline'));
     await renderScreen();
     await screen.findByText('Olivia');
-    await fireEvent.press(
-      screen.getAllByRole('button', { name: 'Add a glass of water (250 ml)' })[0]!,
-    );
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Add 0.5 L of water' })[0]!);
     expect(await screen.findByText(/That didn’t save/)).toBeOnTheScreen();
     expect(screen.getByText('0.3 L of 2.0 L daily goal')).toBeOnTheScreen();
   });

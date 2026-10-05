@@ -53,7 +53,7 @@ describe('summarizeHome', () => {
       carbsG: 20,
       fatG: 10,
       waterMl: 500,
-      glasses: 2,
+      glasses: 1,
     });
     expect(s.today.meals.breakfast.map((m) => m.name)).toEqual(['oats']);
     expect(s.today.meals.dinner).toEqual([]);
