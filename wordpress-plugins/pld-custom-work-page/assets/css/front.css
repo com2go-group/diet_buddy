@@ -22,7 +22,7 @@ body.pld-project-page{background:#fff}
 .pld-c--text_image .pld-ti__col--img:first-child+.pld-ti__col--text{padding-left:48px}
 .pld-ti__col--img{min-width:0}
 .pld-ti__img img{width:100%}
-.pld-ti__title{margin:0 0 76px;font-family:inherit;font-size:var(--pld-title-size,22px);line-height:1.3;font-weight:400;color:var(--pld-label)}
+.pld-ti__title{margin:0 0 76px;font-family:inherit;font-size:var(--pld-title-size,33px);line-height:1.3;font-weight:400;color:var(--pld-label)}
 .pld-ti__title strong{font-weight:700}
 .pld-ti__body{color:var(--pld-text);font-family:inherit;font-size:var(--pld-text-size,21px);line-height:1.65}
 .pld-ti__body p{margin:0 0 5.15em;line-height:1.65}

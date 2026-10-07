@@ -30,7 +30,8 @@ class PLD_Theme {
 		return array(
 			'text'  => ! empty( $o['text'] ) ? $o['text'] : '#6b5a4d',
 			'label' => ! empty( $o['label'] ) ? $o['label'] : '#3b2f28',
-			'title' => ! empty( $o['title'] ) ? (int) $o['title'] : 22,
+			// 33px = the old 22px default + 50 %.
+			'title' => ( ! empty( $o['title'] ) && 22 !== (int) $o['title'] ) ? (int) $o['title'] : 33,
 			// 21px = the old 14px default + 50 %; a stored 14 is the old default, not a deliberate choice.
 			'size'  => ( ! empty( $o['size'] ) && 14 !== (int) $o['size'] ) ? (int) $o['size'] : 21,
 		);
@@ -164,6 +165,9 @@ class PLD_Theme {
 		$st  = self::style();
 		$css = ':root{--pld-text:' . $st['text'] . ';--pld-label:' . $st['label'] . ';--pld-text-size:' . (int) $st['size'] . 'px;--pld-title-size:' . (int) $st['title'] . 'px}';
 		if ( self::is_project() ) {
+			// Inline + !important so neither a cached stylesheet nor theme/Elementor typography can undo the size.
+			$css .= 'body .pld-project .pld-ti__body,body .pld-project .pld-ti__body p,body .pld-project .pld-ti__body li,body .pld-project .pld-narrow,body .pld-project .pld-narrow p{font-size:' . (int) $st['size'] . 'px!important;line-height:1.65!important}'
+				. 'body .pld-project .pld-ti__title{font-size:' . (int) $st['title'] . 'px!important}';
 			$css .= '.pld-project-page .site-content>.ast-container{max-width:100%;padding:0;display:block}.pld-project-page #primary{margin:0;padding:0;width:100%}';
 		}
 		if ( self::is_works_page() ) { // the heading is printed by the plugin, below the hero.
