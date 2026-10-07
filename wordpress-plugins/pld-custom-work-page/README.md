@@ -55,3 +55,7 @@ Project pages use the same full-width layout and the same Elementor header & foo
 ## v1.6
 - Works page: the "Works" heading is printed by the plugin below the hero image (the theme's title above it is hidden).
 - Project pages get the site's header/footer through Header Footer Elementor's own filters (`get_hfe_header_id` / `hfe_header_enabled` and the footer equivalents), so they use exactly the same markup, CSS and JS as your other pages. Set "Automatic" to apply the site's template to projects, or pick a template explicitly under Master Works page → "Project page header / footer".
+
+## v1.7
+- Project page: the hero starts 100px lower.
+- Body text is 50 % bigger (14px → 21px, still editable under Master Works page); paragraph gaps scale with it. The title size is unchanged (22px).

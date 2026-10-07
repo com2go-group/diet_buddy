@@ -31,7 +31,8 @@ class PLD_Theme {
 			'text'  => ! empty( $o['text'] ) ? $o['text'] : '#6b5a4d',
 			'label' => ! empty( $o['label'] ) ? $o['label'] : '#3b2f28',
 			'title' => ! empty( $o['title'] ) ? (int) $o['title'] : 22,
-			'size'  => ! empty( $o['size'] ) ? (int) $o['size'] : 14,
+			// 21px = the old 14px default + 50 %; a stored 14 is the old default, not a deliberate choice.
+			'size'  => ( ! empty( $o['size'] ) && 14 !== (int) $o['size'] ) ? (int) $o['size'] : 21,
 		);
 	}
 
