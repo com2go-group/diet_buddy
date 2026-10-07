@@ -42,3 +42,8 @@ Project pages use the same full-width layout and the same Elementor header & foo
 ## v1.3
 - Project pages now print the Elementor header & footer templates themselves (same page skeleton as your Elementor pages), no longer relying on how the theme prints its header. Pick the templates under PLD Works → Master Works page → "Project page header / footer" (Automatic = same as the site).
 - Text editor: the WordPress editor toolbar is initialised reliably; if it cannot start, a built-in B / I / Link / List / Paragraph bar is shown instead.
+
+## v1.4
+- Fonts follow the site (Garet Book 400 / Garet Heavy 700 as the bold weight, 14px base text, 22px title); text and title sizes editable under Master Works page → "Project page text colours".
+- Header/footer: project pages now carry the Elementor kit body class (`elementor-kit-N`) and load Header Footer Elementor's menu/icon CSS and JS themselves, so the menu looks identical to the site's own pages. The site's overlay behaviour (transparent header on top of the hero) is applied too.
+- Spacing measured from the sample: 72px between paragraphs, 76px under the title, 26px gutters, 34px gaps in image rows, 80px between sections.

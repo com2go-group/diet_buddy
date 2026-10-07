@@ -26,6 +26,8 @@ class PLD_Theme {
 		return array(
 			'text'  => ! empty( $o['text'] ) ? $o['text'] : '#6b5a4d',
 			'label' => ! empty( $o['label'] ) ? $o['label'] : '#3b2f28',
+			'title' => ! empty( $o['title'] ) ? (int) $o['title'] : 22,
+			'size'  => ! empty( $o['size'] ) ? (int) $o['size'] : 14,
 		);
 	}
 
@@ -112,12 +114,45 @@ class PLD_Theme {
 		if ( ! $id ) {
 			return '';
 		}
+		self::assets();
 		$html = \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $id );
 		if ( 'header' === $kind ) {
 			return '<header id="masthead" itemscope="itemscope" itemtype="https://schema.org/WPHeader"><p class="main-title bhf-hidden" itemprop="headline"><a href="'
 				. esc_url( home_url( '/' ) ) . '" rel="home">' . esc_html( get_bloginfo( 'name' ) ) . '</a></p>' . $html . '</header>';
 		}
 		return '<footer itemtype="https://schema.org/WPFooter" itemscope="itemscope" id="colophon" role="contentinfo"><div class="footer-width-fixer">' . $html . '</div></footer>';
+	}
+
+	/**
+	 * Header Footer Elementor only loads its menu/icon CSS and JS on pages matching its display rules.
+	 * Project pages print the template themselves, so make sure the same assets are present.
+	 */
+	public static function assets() {
+		static $done = false;
+		if ( $done ) {
+			return;
+		}
+		$done = true;
+		if ( defined( 'HFE_URL' ) ) {
+			$ver = defined( 'HFE_VER' ) ? HFE_VER : null;
+			wp_enqueue_style( 'hfe-widgets-style', HFE_URL . 'inc/widgets-css/frontend.css', array(), $ver );
+			wp_enqueue_style( 'hfe-style', HFE_URL . 'assets/css/header-footer-elementor.css', array(), $ver );
+			wp_enqueue_script( 'hfe-frontend-js', HFE_URL . 'inc/js/frontend.js', array( 'jquery' ), $ver, true );
+		}
+		if ( defined( 'ELEMENTOR_ASSETS_URL' ) ) {
+			wp_enqueue_style( 'hfe-elementor-icons', ELEMENTOR_ASSETS_URL . 'lib/eicons/css/elementor-icons.min.css', array(), null );
+			wp_enqueue_style( 'hfe-social-share-icons-brands', ELEMENTOR_ASSETS_URL . 'lib/font-awesome/css/brands.css', array(), null );
+			wp_enqueue_style( 'hfe-social-share-icons-fontawesome', ELEMENTOR_ASSETS_URL . 'lib/font-awesome/css/fontawesome.css', array(), null );
+			wp_enqueue_style( 'hfe-nav-menu-icons', ELEMENTOR_ASSETS_URL . 'lib/font-awesome/css/solid.css', array(), null );
+		}
+		foreach ( array( 'elementor-frontend' ) as $h ) {
+			if ( wp_style_is( $h, 'registered' ) ) {
+				wp_enqueue_style( $h );
+			}
+			if ( wp_script_is( $h, 'registered' ) ) {
+				wp_enqueue_script( $h );
+			}
+		}
 	}
 
 	public static function body_class( $classes ) {
@@ -127,6 +162,12 @@ class PLD_Theme {
 		$classes = array_diff( $classes, array( 'ast-right-sidebar', 'ast-left-sidebar', 'ast-separate-container', 'ast-two-container' ) );
 		$classes = array_merge( $classes, array( 'ast-page-builder-template', 'ast-no-sidebar', 'pld-project-page' ) );
 		if ( self::canvas() ) {
+			$classes[] = 'elementor-default';
+			$classes[] = 'elementor-template-full-width';
+			$kit       = (int) get_option( 'elementor_active_kit' );
+			if ( $kit ) {
+				$classes[] = 'elementor-kit-' . $kit; // Elementor global fonts/colours are scoped to this class.
+			}
 			$classes[] = 'ehf-header';
 			$classes[] = 'ehf-template-' . get_template();
 			$classes[] = 'ehf-stylesheet-' . get_stylesheet();
@@ -143,6 +184,13 @@ class PLD_Theme {
 		}
 		$st  = self::style();
 		$css = ':root{--pld-text:' . $st['text'] . ';--pld-label:' . $st['label'] . '}.pld-project-page .site-content>.ast-container{max-width:100%;padding:0;display:block}.pld-project-page #primary{margin:0;padding:0;width:100%}';
+		$css .= ':root{--pld-text-size:' . (int) $st['size'] . 'px;--pld-title-size:' . (int) $st['title'] . 'px}';
+		if ( self::canvas() ) { // same header/footer behaviour as the site's own pages
+			$css .= '.pld-project-page header#masthead{position:absolute!important;top:0;left:0;width:100%;z-index:999;background:transparent}'
+				. '.pld-project-page footer#colophon{position:absolute;bottom:0;left:0;width:100%;background:transparent}'
+				. '.pld-project-page ul.hfe-nav-menu li{display:flex!important;justify-content:center!important;background:transparent!important}'
+				. '.pld-project-page header ul.hfe-nav-menu li a{background:transparent!important}';
+		}
 		echo '<style id="pld-theme-fix">' . $css . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 }

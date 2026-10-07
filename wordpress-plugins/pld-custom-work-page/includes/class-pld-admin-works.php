@@ -146,6 +146,8 @@ class PLD_Admin_Works {
 				<div class="pld-style-box">
 					<strong><?php esc_html_e( 'Project page text colours', 'pld-work' ); ?></strong>
 					<label><?php esc_html_e( 'Text', 'pld-work' ); ?> <input type="color" name="pld_text_color" value="<?php echo esc_attr( $style['text'] ); ?>"></label>
+					<label><?php esc_html_e( 'Text size (px)', 'pld-work' ); ?> <input type="number" min="10" max="30" name="pld_text_size" value="<?php echo esc_attr( $style['size'] ); ?>" class="small-text"></label>
+					<label><?php esc_html_e( 'Title size (px)', 'pld-work' ); ?> <input type="number" min="12" max="60" name="pld_title_size" value="<?php echo esc_attr( $style['title'] ); ?>" class="small-text"></label>
 					<label><?php esc_html_e( 'Bold labels / title', 'pld-work' ); ?> <input type="color" name="pld_label_color" value="<?php echo esc_attr( $style['label'] ); ?>"></label>
 				</div>
 				<p>
@@ -189,7 +191,12 @@ class PLD_Admin_Works {
 			$hf[ $k ] = ( 'auto' === $v || 'theme' === $v || ctype_digit( $v ) ) ? $v : 'auto';
 		}
 		update_option( PLD_Theme::OPT_HF, $hf, false );
-		update_option( 'pld_style', array( 'text' => $text, 'label' => $label ), false );
+		update_option( 'pld_style', array(
+			'text'  => $text,
+			'label' => $label,
+			'size'  => isset( $_POST['pld_text_size'] ) ? min( 30, max( 10, absint( $_POST['pld_text_size'] ) ) ) : 14,
+			'title' => isset( $_POST['pld_title_size'] ) ? min( 60, max( 12, absint( $_POST['pld_title_size'] ) ) ) : 22,
+		), false );
 
 		wp_safe_redirect( admin_url( 'edit.php?post_type=' . PLD_CPT . '&page=' . self::SLUG . '&saved=1' ) );
 		exit;

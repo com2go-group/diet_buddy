@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       PLD custom work page
  * Description:       Build project pages from components (hero, text, images, gallery, video, quote…) with scroll animations, and arrange a master "Works" page (3 projects per row) with lazy loading.
- * Version:           1.3.0
+ * Version:           1.4.0
  * Author:            easyDigital
  * Author URI:        https://easydigital.gr
  * License:           GPL-2.0-or-later
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PLD_VERSION', '1.3.0' );
+define( 'PLD_VERSION', '1.4.0' );
 define( 'PLD_FILE', __FILE__ );
 define( 'PLD_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PLD_URL', plugin_dir_url( __FILE__ ) );
