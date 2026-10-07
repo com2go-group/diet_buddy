@@ -47,3 +47,7 @@ Project pages use the same full-width layout and the same Elementor header & foo
 - Fonts follow the site (Garet Book 400 / Garet Heavy 700 as the bold weight, 14px base text, 22px title); text and title sizes editable under Master Works page → "Project page text colours".
 - Header/footer: project pages now carry the Elementor kit body class (`elementor-kit-N`) and load Header Footer Elementor's menu/icon CSS and JS themselves, so the menu looks identical to the site's own pages. The site's overlay behaviour (transparent header on top of the hero) is applied too.
 - Spacing measured from the sample: 72px between paragraphs, 76px under the title, 26px gutters, 34px gaps in image rows, 80px between sections.
+
+## v1.5
+- Works page: optional hero image / fading slideshow above the projects (set under Master Works page → "Works page hero image").
+- Master project cards are 350 × 500 (portrait, cropped from the featured image, image size `pld-card`). Existing images need their sizes regenerated once (e.g. the "Regenerate Thumbnails" plugin); until then the full image is used, cropped by CSS to the same shape.

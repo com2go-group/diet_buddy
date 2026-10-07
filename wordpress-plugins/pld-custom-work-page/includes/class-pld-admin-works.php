@@ -52,6 +52,7 @@ class PLD_Admin_Works {
 		if ( false === strpos( $hook, self::SLUG ) ) {
 			return;
 		}
+		wp_enqueue_media();
 		wp_enqueue_style( 'pld-admin', PLD_URL . 'assets/css/admin.css', array(), PLD_VERSION );
 		wp_enqueue_script( 'pld-works-admin', PLD_URL . 'assets/js/works-admin.js', array( 'jquery', 'jquery-ui-sortable' ), PLD_VERSION, true );
 		wp_localize_script(
@@ -110,6 +111,29 @@ class PLD_Admin_Works {
 				<input type="hidden" name="action" value="pld_save_works">
 				<?php wp_nonce_field( 'pld_save_works' ); ?>
 				<input type="hidden" name="pld_order" id="pld-order-input" value="">
+
+				<?php $hero = PLD_Works::hero(); ?>
+				<div class="pld-style-box" id="pld-hero-box">
+					<strong><?php esc_html_e( 'Works page hero image', 'pld-work' ); ?></strong>
+					<span id="pld-hero-thumbs">
+						<?php foreach ( $hero['images'] as $hid ) : ?>
+							<?php echo wp_get_attachment_image( $hid, 'thumbnail', false, array( 'style' => 'width:70px;height:70px;object-fit:cover' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+						<?php endforeach; ?>
+					</span>
+					<input type="hidden" name="pld_hero_ids" id="pld-hero-ids" value="<?php echo esc_attr( implode( ',', $hero['images'] ) ); ?>">
+					<button type="button" class="button" id="pld-hero-pick"><?php esc_html_e( 'Choose image(s)', 'pld-work' ); ?></button>
+					<button type="button" class="button-link" id="pld-hero-clear"><?php esc_html_e( 'Remove', 'pld-work' ); ?></button>
+					<label><?php esc_html_e( 'Height', 'pld-work' ); ?>
+						<select name="pld_hero_height">
+							<?php
+							foreach ( array( '25vw' => __( 'Banner (25% of page width)', 'pld-work' ), '40vw' => __( 'Wide (40% of page width)', 'pld-work' ), '60vh' => __( '60% of screen', 'pld-work' ), '100vh' => __( 'Full screen', 'pld-work' ) ) as $v => $l ) {
+								echo '<option value="' . esc_attr( $v ) . '"' . selected( $hero['height'], $v, false ) . '>' . esc_html( $l ) . '</option>';
+							}
+							?>
+						</select>
+					</label>
+					<span class="description"><?php esc_html_e( 'Several images fade as a slideshow. Shown above the projects.', 'pld-work' ); ?></span>
+				</div>
 
 				<div class="pld-works-cols">
 					<div class="pld-avail">
@@ -191,6 +215,10 @@ class PLD_Admin_Works {
 			$hf[ $k ] = ( 'auto' === $v || 'theme' === $v || ctype_digit( $v ) ) ? $v : 'auto';
 		}
 		update_option( PLD_Theme::OPT_HF, $hf, false );
+
+		$ids = isset( $_POST['pld_hero_ids'] ) ? array_values( array_filter( array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_POST['pld_hero_ids'] ) ) ) ) ) ) : array();
+		$ht  = isset( $_POST['pld_hero_height'] ) ? sanitize_text_field( wp_unslash( $_POST['pld_hero_height'] ) ) : '25vw';
+		update_option( PLD_Works::OPT_HERO, array( 'images' => $ids, 'height' => in_array( $ht, array( '25vw', '40vw', '60vh', '100vh' ), true ) ? $ht : '25vw' ), false );
 		update_option( 'pld_style', array(
 			'text'  => $text,
 			'label' => $label,

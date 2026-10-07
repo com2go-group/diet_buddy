@@ -81,5 +81,25 @@
 		}
 	});
 
+	// Works page hero image picker
+	var $ids = $('#pld-hero-ids'), $th = $('#pld-hero-thumbs');
+	$('#pld-hero-pick').on('click', function () {
+		var frame = wp.media({ title: 'Hero image', library: { type: 'image' }, multiple: 'add' });
+		frame.on('open', function () {
+			var sel = frame.state().get('selection');
+			($ids.val() || '').split(',').filter(Boolean).forEach(function (id) { sel.add(wp.media.attachment(id)); });
+		});
+		frame.on('select', function () {
+			var items = frame.state().get('selection').toJSON();
+			$ids.val(items.map(function (a) { return a.id; }).join(','));
+			$th.html(items.map(function (a) {
+				var u = a.sizes && a.sizes.thumbnail ? a.sizes.thumbnail.url : a.url;
+				return '<img src="' + u + '" style="width:70px;height:70px;object-fit:cover" alt="">';
+			}).join(''));
+		});
+		frame.open();
+	});
+	$('#pld-hero-clear').on('click', function () { $ids.val(''); $th.empty(); });
+
 	render();
 })(jQuery);

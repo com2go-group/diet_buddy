@@ -6,7 +6,10 @@ defined( 'ABSPATH' ) || exit;
  */
 class PLD_Works {
 
+	const OPT_HERO = 'pld_works_hero'; // array( 'images' => int[], 'height' => '25vw' )
+
 	public static function init() {
+		add_image_size( 'pld-card', 350, 500, true ); // master project image: 350 x 500, cropped.
 		add_shortcode( 'pld_works', array( __CLASS__, 'shortcode' ) );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest' ) );
 	}
@@ -39,7 +42,7 @@ class PLD_Works {
 		$img   = $thumb
 			? wp_get_attachment_image(
 				$thumb,
-				'large',
+				'pld-card',
 				false,
 				array(
 					'loading'  => $eager ? 'eager' : 'lazy',
@@ -63,17 +66,35 @@ class PLD_Works {
 		return $html;
 	}
 
+	public static function hero() {
+		$o = get_option( self::OPT_HERO, array() );
+		return array(
+			'images' => ! empty( $o['images'] ) && is_array( $o['images'] ) ? array_values( array_map( 'absint', $o['images'] ) ) : array(),
+			'height' => ! empty( $o['height'] ) ? $o['height'] : '25vw',
+		);
+	}
+
+	private static function hero_html() {
+		$h = self::hero();
+		if ( ! $h['images'] ) {
+			return '';
+		}
+		return '<div class="pld-works-hero">' . PLD_Components::render(
+			array( 'type' => 'hero', 'images' => $h['images'], 'height' => $h['height'], 'duration' => '5', 'title' => '' )
+		) . '</div>';
+	}
+
 	public static function shortcode() {
 		PLD_Project::enqueue_front();
 		$ids   = self::visible_ids();
 		$batch = self::batch_size();
 		if ( ! $ids ) {
-			return '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p>';
+			return self::hero_html() . '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p>';
 		}
 		$first = array_slice( $ids, 0, $batch );
 		$more  = count( $ids ) > $batch;
 
-		return '<div class="pld-works" data-offset="' . (int) count( $first ) . '" data-done="' . ( $more ? '0' : '1' ) . '">'
+		return self::hero_html() . '<div class="pld-works" data-offset="' . (int) count( $first ) . '" data-done="' . ( $more ? '0' : '1' ) . '">'
 			. '<div class="pld-grid">' . self::cards( $first, 3 ) . '</div>'
 			. ( $more ? '<div class="pld-sentinel" aria-hidden="true"><span class="pld-spinner"></span></div>'
 				. '<noscript><style>.pld-sentinel{display:none}</style></noscript>' : '' )
