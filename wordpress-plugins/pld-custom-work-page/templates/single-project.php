@@ -8,15 +8,9 @@ get_header();
 
 while ( have_posts() ) :
 	the_post();
-	$components = PLD_Components::get( get_the_ID() );
-	$has_hero   = $components && 'hero' === $components[0]['type'];
 	?>
 	<main id="pld-main" class="pld-project">
-		<?php if ( ! $has_hero ) : ?>
-			<header class="pld-c pld-c--title" data-pld-anim="fade-up">
-				<div class="pld-inner"><h1><?php the_title(); ?></h1></div>
-			</header>
-		<?php endif; ?>
+		<h1 class="screen-reader-text"><?php the_title(); ?></h1>
 
 		<?php echo PLD_Components::render_all( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 

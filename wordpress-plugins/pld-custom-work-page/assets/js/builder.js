@@ -28,7 +28,7 @@
 
 	function fieldHtml(f, val) {
 		var h = '<div class="pld-f pld-f--' + f.type + '"><label>' + esc(f.label) + '</label>';
-		if (f.type === 'text') {
+		if (f.type === 'text' || f.type === 'inline') {
 			h += '<input type="text" class="widefat" data-k="' + f.key + '" value="' + esc(val) + '">';
 		} else if (f.type === 'textarea') {
 			h += '<textarea class="widefat" rows="5" data-k="' + f.key + '">' + esc(val) + '</textarea>';

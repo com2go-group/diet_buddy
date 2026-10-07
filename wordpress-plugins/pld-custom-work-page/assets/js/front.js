@@ -1,14 +1,10 @@
-/* Front-end: scroll animations, hero parallax, lazy loaded works grid. */
+/* Front-end: entrance animations, hero slideshow, lazy loaded works grid. */
 (function () {
 	'use strict';
-	var root = document.documentElement;
-	var hasIO = 'IntersectionObserver' in window;
-	if (!hasIO) { return; } // Without IO everything stays visible (CSS only hides under .pld-js).
-	root.classList.add('pld-js');
+	if (!('IntersectionObserver' in window)) { return; } // Without IO everything stays visible.
+	document.documentElement.classList.add('pld-js');
 
-	var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-	/* ---------- reveal on scroll ---------- */
+	/* ---------- entrance animations (trigger once, when ~10% is on screen) ---------- */
 	var revealIO = new IntersectionObserver(function (entries) {
 		entries.forEach(function (e) {
 			if (e.isIntersecting) {
@@ -16,7 +12,7 @@
 				revealIO.unobserve(e.target);
 			}
 		});
-	}, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+	}, { threshold: 0.1, rootMargin: '0px 0px -5% 0px' });
 
 	function watch(scope) {
 		(scope || document).querySelectorAll('[data-pld-anim]:not(.is-in), .pld-card:not(.is-in)').forEach(function (el) {
@@ -24,23 +20,23 @@
 		});
 	}
 
-	/* ---------- hero parallax ---------- */
-	var parallax = document.querySelectorAll('[data-pld-parallax]');
-	if (parallax.length && !reduce) {
-		var ticking = false;
-		var update = function () {
-			ticking = false;
-			parallax.forEach(function (el) {
-				var r = el.parentNode.getBoundingClientRect();
-				if (r.bottom < 0 || r.top > window.innerHeight) { return; }
-				el.style.transform = 'translate3d(0,' + (-r.top * 0.18).toFixed(1) + 'px,0)';
-			});
+	/* ---------- hero slideshow: cross-fade, loops ---------- */
+	document.querySelectorAll('[data-pld-slideshow]').forEach(function (hero) {
+		var slides = hero.querySelectorAll('.pld-slide');
+		if (slides.length < 2) { return; }
+		var i = 0, ms = parseInt(hero.getAttribute('data-duration'), 10) || 5000, timer;
+		var next = function () {
+			slides[i].classList.remove('is-active');
+			i = (i + 1) % slides.length;
+			slides[i].classList.add('is-active');
 		};
-		window.addEventListener('scroll', function () {
-			if (!ticking) { ticking = true; requestAnimationFrame(update); }
-		}, { passive: true });
-		update();
-	}
+		var start = function () { timer = setInterval(next, ms); };
+		start();
+		document.addEventListener('visibilitychange', function () {
+			clearInterval(timer);
+			if (!document.hidden) { start(); }
+		});
+	});
 
 	/* ---------- image fade-in once loaded ---------- */
 	function imgs(scope) {
@@ -85,8 +81,7 @@
 		var lazyIO = new IntersectionObserver(function (entries) {
 			if (entries.some(function (e) { return e.isIntersecting; })) {
 				load();
-				// Keep filling if the sentinel is still on screen after the batch.
-				setTimeout(function () {
+				setTimeout(function () { // keep filling if the sentinel is still visible
 					var r = sentinel.getBoundingClientRect();
 					if (!done && r.top < window.innerHeight + 300) { load(); }
 				}, 400);
