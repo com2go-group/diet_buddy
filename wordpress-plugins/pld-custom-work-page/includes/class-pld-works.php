@@ -88,13 +88,14 @@ class PLD_Works {
 		PLD_Project::enqueue_front();
 		$ids   = self::visible_ids();
 		$batch = self::batch_size();
+		$heading = '<h1 class="pld-works-title">' . esc_html( get_the_title() ) . '</h1>';
 		if ( ! $ids ) {
-			return self::hero_html() . '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p>';
+			return self::hero_html() . '<div class="pld-works">' . $heading . '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p></div>';
 		}
 		$first = array_slice( $ids, 0, $batch );
 		$more  = count( $ids ) > $batch;
 
-		return self::hero_html() . '<div class="pld-works" data-offset="' . (int) count( $first ) . '" data-done="' . ( $more ? '0' : '1' ) . '">'
+		return self::hero_html() . '<div class="pld-works" data-offset="' . (int) count( $first ) . '" data-done="' . ( $more ? '0' : '1' ) . '">' . $heading
 			. '<div class="pld-grid">' . self::cards( $first, 3 ) . '</div>'
 			. ( $more ? '<div class="pld-sentinel" aria-hidden="true"><span class="pld-spinner"></span></div>'
 				. '<noscript><style>.pld-sentinel{display:none}</style></noscript>' : '' )

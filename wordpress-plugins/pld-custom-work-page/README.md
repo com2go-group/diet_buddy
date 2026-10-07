@@ -51,3 +51,7 @@ Project pages use the same full-width layout and the same Elementor header & foo
 ## v1.5
 - Works page: optional hero image / fading slideshow above the projects (set under Master Works page → "Works page hero image").
 - Master project cards are 350 × 500 (portrait, cropped from the featured image, image size `pld-card`). Existing images need their sizes regenerated once (e.g. the "Regenerate Thumbnails" plugin); until then the full image is used, cropped by CSS to the same shape.
+
+## v1.6
+- Works page: the "Works" heading is printed by the plugin below the hero image (the theme's title above it is hidden).
+- Project pages get the site's header/footer through Header Footer Elementor's own filters (`get_hfe_header_id` / `hfe_header_enabled` and the footer equivalents), so they use exactly the same markup, CSS and JS as your other pages. Set "Automatic" to apply the site's template to projects, or pick a template explicitly under Master Works page → "Project page header / footer".

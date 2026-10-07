@@ -78,6 +78,7 @@ body.pld-project-page{background:#fff}
 
 /* ---- Works grid (3 per row) ---- */
 .pld-works{max-width:var(--pld-max);margin:0 auto;padding:0 var(--pld-gap)}
+.pld-works-title{margin:0 0 48px;font-family:inherit;font-size:clamp(28px,3vw,40px);line-height:1.2;font-weight:400;color:var(--pld-label,#3b2f28)}
 .pld-works-hero{width:100vw;margin-left:calc(50% - 50vw);margin-bottom:53px}
 .pld-works-hero .pld-c--hero{margin-bottom:0}
 .pld-grid{display:grid;grid-template-columns:repeat(3,minmax(0,350px));justify-content:space-between;gap:48px var(--pld-gap)}
