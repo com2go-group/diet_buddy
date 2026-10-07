@@ -1576,6 +1576,8 @@ export const en = {
     monthly: 'Monthly',
     annual: 'Annual',
     perMonthSuffix: '/mo',
+    perYearSuffix: '/yr',
+    perMonthEquivalent: 'about {{price}}/mo',
     perYear: '{{price}} per year',
     trialBadge: '{{days}}-day free trial',
     saveBadge: 'Save {{pct}}%',

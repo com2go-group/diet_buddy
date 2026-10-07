@@ -1409,6 +1409,8 @@ export const es: Translation = {
     monthly: 'Mensual',
     annual: 'Anual',
     perMonthSuffix: '/mes',
+    perYearSuffix: '/año',
+    perMonthEquivalent: 'unos {{price}}/mes',
     perYear: '{{price}} al año',
     trialBadge: 'Prueba gratis de {{days}} días',
     saveBadge: 'Ahorra un {{pct}} %',

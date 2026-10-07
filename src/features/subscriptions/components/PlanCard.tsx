@@ -21,9 +21,14 @@ export function PlanCard({
       : plan.savingPct !== null
         ? t('paywall.saveBadge', { pct: plan.savingPct })
         : null;
-  const main = plan.kind === 'annual' && plan.perMonth ? plan.perMonth : plan.price;
-  const suffix = t('paywall.perMonthSuffix');
-  const sub = plan.kind === 'annual' ? t('paywall.perYear', { price: plan.price }) : null;
+  // The billed amount is the most prominent price (App Store guideline 3.1.2(c)); a monthly
+  // equivalent and the badges stay smaller.
+  const main = plan.price;
+  const suffix = t(plan.kind === 'annual' ? 'paywall.perYearSuffix' : 'paywall.perMonthSuffix');
+  const sub =
+    plan.kind === 'annual' && plan.perMonth
+      ? t('paywall.perMonthEquivalent', { price: plan.perMonth })
+      : null;
   return (
     <Pressable
       accessibilityRole="radio"
@@ -63,7 +68,7 @@ export function PlanCard({
             </Text>
           </View>
         ) : null}
-        <Text className="font-extrabold text-base">
+        <Text className="font-extrabold text-xl">
           {main}
           <Text variant="caption" tone="muted">
             {suffix}

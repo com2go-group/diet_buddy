@@ -1429,6 +1429,8 @@ export const de: Translation = {
     monthly: 'Monatlich',
     annual: 'Jährlich',
     perMonthSuffix: '/Monat',
+    perYearSuffix: '/Jahr',
+    perMonthEquivalent: 'ca. {{price}}/Monat',
     perYear: '{{price}} pro Jahr',
     trialBadge: '{{days}} Tage kostenlos testen',
     saveBadge: '{{pct}} % sparen',

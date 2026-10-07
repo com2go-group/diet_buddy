@@ -56,7 +56,7 @@ describe('PaywallScreen', () => {
   it('shows store prices with the annual plan preselected and its renewal terms', async () => {
     await renderScreen(<PaywallScreen />);
     expect(
-      await screen.findByRole('radio', { name: /Annual, \$5.99\/mo, \$71.88 per year, Save 40%/ }),
+      await screen.findByRole('radio', { name: /Annual, \$71.88\/yr, about \$5.99\/mo, Save 40%/ }),
     ).toBeChecked();
     expect(screen.getByRole('button', { name: 'Get Premium Annual' })).toBeOnTheScreen();
     expect(

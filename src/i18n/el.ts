@@ -1433,6 +1433,8 @@ export const el: Translation = {
     monthly: 'Μηνιαίο',
     annual: 'Ετήσιο',
     perMonthSuffix: '/μήνα',
+    perYearSuffix: '/έτος',
+    perMonthEquivalent: 'περίπου {{price}}/μήνα',
     perYear: '{{price}} τον χρόνο',
     trialBadge: 'Δωρεάν δοκιμή {{days}} ημερών',
     saveBadge: 'Εξοικονόμηση {{pct}}%',
