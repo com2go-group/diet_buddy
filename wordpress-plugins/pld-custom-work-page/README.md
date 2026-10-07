@@ -38,3 +38,7 @@ Project pages use the same full-width layout and the same Elementor header & foo
 ## v1.2
 - Text boxes (Text + image, Text, Quote) now have the WordPress editor toolbar (Visual / Text tabs, bold, italic, lists, links…); title fields have B / I buttons.
 - Look & feel matched to the sample: banner hero (default 25% of page width, other heights selectable), small title with heavy first word, brown text with bold labels, wide paragraph spacing, 27px side gutters and wider gaps in image rows. Text / label colours can be changed under PLD Works → Master Works page.
+
+## v1.3
+- Project pages now print the Elementor header & footer templates themselves (same page skeleton as your Elementor pages), no longer relying on how the theme prints its header. Pick the templates under PLD Works → Master Works page → "Project page header / footer" (Automatic = same as the site).
+- Text editor: the WordPress editor toolbar is initialised reliably; if it cannot start, a built-in B / I / Link / List / Paragraph bar is shown instead.

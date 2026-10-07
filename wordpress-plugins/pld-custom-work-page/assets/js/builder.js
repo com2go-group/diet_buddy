@@ -63,10 +63,37 @@
 		$root.find('textarea.pld-rte').each(function () { try { wp.editor.remove(this.id); } catch (e) {} });
 	}
 
+	// Own mini toolbar (bold, italic, list, link, paragraph) used if the WordPress editor can't start.
+	function fallbackBar($t) {
+		if ($t.prev('.pld-bar').length) { return; }
+		var tags = [['strong', '<b>B</b>', 'Bold'], ['em', '<i>I</i>', 'Italic'], ['a', 'Link', 'Link'], ['ul', '&bull; List', 'Bulleted list'], ['p', '&para;', 'Paragraph']];
+		var $bar = $('<div class="pld-bar pld-mini"></div>');
+		tags.forEach(function (t) { $bar.append('<button type="button" class="button button-small" data-t="' + t[0] + '" title="' + t[2] + '">' + t[1] + '</button>'); });
+		$bar.insertBefore($t);
+		$bar.on('click', 'button', function () {
+			var el = $t[0], t = $(this).data('t'), a = el.selectionStart, b = el.selectionEnd, v = el.value, sel = v.slice(a, b), out;
+			if (t === 'a') {
+				var url = window.prompt('URL', 'https://');
+				if (!url) { return; }
+				out = '<a href="' + url + '">' + (sel || url) + '</a>';
+			} else if (t === 'ul') {
+				out = '<ul>\n' + (sel || 'Item').split('\n').map(function (l) { return '<li>' + l + '</li>'; }).join('\n') + '\n</ul>';
+			} else {
+				out = '<' + t + '>' + sel + '</' + t + '>';
+			}
+			el.value = v.slice(0, a) + out + v.slice(b);
+			$t.trigger('input');
+		});
+	}
+
 	function initEditors() {
-		if (!(window.wp && wp.editor && wp.editor.initialize)) { return; }
+		var can = window.wp && wp.editor && wp.editor.initialize && window.tinymce;
+		if (!can) { $root.find('textarea.pld-rte').each(function () { fallbackBar($(this)); }); return; }
 		$root.find('textarea.pld-rte').each(function () {
 			var $t = $(this), id = this.id, ci = idx($t), key = $t.data('k');
+			setTimeout(function () { // if TinyMCE did not take over the box, give it the fallback bar
+				if (!(window.tinymce && tinymce.get(id)) && $t.is(':visible')) { fallbackBar($t); }
+			}, 1500);
 			var push = function (ed) { if (state[ci]) { state[ci][key] = ed.getContent(); sync(); } };
 			wp.editor.initialize(id, {
 				tinymce: {

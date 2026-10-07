@@ -124,7 +124,25 @@ class PLD_Admin_Works {
 					</div>
 				</div>
 
-				<?php $style = PLD_Theme::style(); ?>
+				<?php
+				$style = PLD_Theme::style();
+				$sel   = static function ( $kind ) {
+					$cur  = PLD_Theme::setting( $kind );
+					$html = '<select name="pld_hf_' . esc_attr( $kind ) . '"><option value="auto"' . selected( $cur, 'auto', false ) . '>' . esc_html__( 'Automatic (same as the site)', 'pld-work' ) . '</option>';
+					foreach ( PLD_Theme::templates( $kind ) as $id => $title ) {
+						$html .= '<option value="' . (int) $id . '"' . selected( (string) $cur, (string) $id, false ) . '>' . esc_html( $title ) . '</option>';
+					}
+					return $html . '<option value="theme"' . selected( $cur, 'theme', false ) . '>' . esc_html__( 'Theme default', 'pld-work' ) . '</option></select>';
+				};
+				?>
+				<div class="pld-style-box">
+					<strong><?php esc_html_e( 'Project page header / footer', 'pld-work' ); ?></strong>
+					<label><?php esc_html_e( 'Header', 'pld-work' ); ?> <?php echo $sel( 'header' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></label>
+					<label><?php esc_html_e( 'Footer', 'pld-work' ); ?> <?php echo $sel( 'footer' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></label>
+					<?php if ( ! PLD_Theme::available() ) : ?>
+						<span class="description"><?php esc_html_e( 'Header Footer Elementor not detected: the theme header/footer is used.', 'pld-work' ); ?></span>
+					<?php endif; ?>
+				</div>
 				<div class="pld-style-box">
 					<strong><?php esc_html_e( 'Project page text colours', 'pld-work' ); ?></strong>
 					<label><?php esc_html_e( 'Text', 'pld-work' ); ?> <input type="color" name="pld_text_color" value="<?php echo esc_attr( $style['text'] ); ?>"></label>
@@ -165,6 +183,12 @@ class PLD_Admin_Works {
 		}
 		$text  = isset( $_POST['pld_text_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['pld_text_color'] ) ) : '';
 		$label = isset( $_POST['pld_label_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['pld_label_color'] ) ) : '';
+		$hf = array();
+		foreach ( array( 'header', 'footer' ) as $k ) {
+			$v          = isset( $_POST[ 'pld_hf_' . $k ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'pld_hf_' . $k ] ) ) : 'auto';
+			$hf[ $k ] = ( 'auto' === $v || 'theme' === $v || ctype_digit( $v ) ) ? $v : 'auto';
+		}
+		update_option( PLD_Theme::OPT_HF, $hf, false );
 		update_option( 'pld_style', array( 'text' => $text, 'label' => $label ), false );
 
 		wp_safe_redirect( admin_url( 'edit.php?post_type=' . PLD_CPT . '&page=' . self::SLUG . '&saved=1' ) );

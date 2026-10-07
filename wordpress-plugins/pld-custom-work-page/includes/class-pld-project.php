@@ -51,6 +51,11 @@ class PLD_Project {
 		echo '<p class="description">' . esc_html__( 'Add components, drag them (or use the arrows) to reorder. The master photo of the project is the featured image on the right.', 'pld-work' ) . '</p>';
 		echo '<div id="pld-builder"></div>';
 		echo '<input type="hidden" name="pld_components" id="pld-components-input" value="">';
+		// Printing one (hidden) editor makes WordPress output the TinyMCE / Quicktags settings that
+		// the builder's dynamically created editors reuse.
+		echo '<div style="display:none">';
+		wp_editor( '', 'pld_template_editor', array( 'media_buttons' => false, 'textarea_name' => 'pld_template_editor_unused', 'teeny' => false ) );
+		echo '</div>';
 	}
 
 	public static function admin_assets( $hook ) {
