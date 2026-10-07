@@ -124,6 +124,12 @@ class PLD_Admin_Works {
 					</div>
 				</div>
 
+				<?php $style = PLD_Theme::style(); ?>
+				<div class="pld-style-box">
+					<strong><?php esc_html_e( 'Project page text colours', 'pld-work' ); ?></strong>
+					<label><?php esc_html_e( 'Text', 'pld-work' ); ?> <input type="color" name="pld_text_color" value="<?php echo esc_attr( $style['text'] ); ?>"></label>
+					<label><?php esc_html_e( 'Bold labels / title', 'pld-work' ); ?> <input type="color" name="pld_label_color" value="<?php echo esc_attr( $style['label'] ); ?>"></label>
+				</div>
 				<p>
 					<label>
 						<?php esc_html_e( 'Projects loaded per batch (lazy loading):', 'pld-work' ); ?>
@@ -157,6 +163,10 @@ class PLD_Admin_Works {
 		if ( isset( $_POST['pld_batch'] ) ) {
 			update_option( PLD_OPT_BATCH, min( 30, max( 3, absint( $_POST['pld_batch'] ) ) ), false );
 		}
+		$text  = isset( $_POST['pld_text_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['pld_text_color'] ) ) : '';
+		$label = isset( $_POST['pld_label_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['pld_label_color'] ) ) : '';
+		update_option( 'pld_style', array( 'text' => $text, 'label' => $label ), false );
+
 		wp_safe_redirect( admin_url( 'edit.php?post_type=' . PLD_CPT . '&page=' . self::SLUG . '&saved=1' ) );
 		exit;
 	}

@@ -26,10 +26,17 @@
 		return thumbs[id] ? '<img src="' + esc(thumbs[id]) + '" alt="">' : '';
 	}
 
-	function fieldHtml(f, val) {
+	function fieldHtml(f, val, i) {
 		var h = '<div class="pld-f pld-f--' + f.type + '"><label>' + esc(f.label) + '</label>';
-		if (f.type === 'text' || f.type === 'inline') {
+		if (f.type === 'text') {
 			h += '<input type="text" class="widefat" data-k="' + f.key + '" value="' + esc(val) + '">';
+		} else if (f.type === 'inline') {
+			h += '<div class="pld-inline"><div class="pld-mini">' +
+				'<button type="button" class="button button-small" data-tag="strong" title="Bold"><b>B</b></button>' +
+				'<button type="button" class="button button-small" data-tag="em" title="Italic"><i>I</i></button></div>' +
+				'<input type="text" class="widefat" data-k="' + f.key + '" value="' + esc(val) + '"></div>';
+		} else if (f.type === 'rich') {
+			h += '<textarea class="widefat pld-rte" rows="8" id="pld-rte-' + i + '-' + f.key + '" data-k="' + f.key + '">' + esc(val) + '</textarea>';
 		} else if (f.type === 'textarea') {
 			h += '<textarea class="widefat" rows="5" data-k="' + f.key + '">' + esc(val) + '</textarea>';
 		} else if (f.type === 'select') {
@@ -51,7 +58,32 @@
 		return h + '</div>';
 	}
 
+	function destroyEditors() {
+		if (!(window.wp && wp.editor)) { return; }
+		$root.find('textarea.pld-rte').each(function () { try { wp.editor.remove(this.id); } catch (e) {} });
+	}
+
+	function initEditors() {
+		if (!(window.wp && wp.editor && wp.editor.initialize)) { return; }
+		$root.find('textarea.pld-rte').each(function () {
+			var $t = $(this), id = this.id, ci = idx($t), key = $t.data('k');
+			var push = function (ed) { if (state[ci]) { state[ci][key] = ed.getContent(); sync(); } };
+			wp.editor.initialize(id, {
+				tinymce: {
+					wpautop: true,
+					height: 240,
+					toolbar1: 'formatselect,bold,italic,underline,blockquote,bullist,numlist,alignleft,aligncenter,alignright,link,unlink,removeformat,undo,redo',
+					toolbar2: '',
+					setup: function (ed) { ed.on('change keyup input undo redo', function () { push(ed); }); }
+				},
+				quicktags: { buttons: 'strong,em,link,block,ul,ol,li,close' },
+				mediaButtons: false
+			});
+		});
+	}
+
 	function render() {
+		destroyEditors();
 		$root.empty();
 		var $list = $('<div class="pld-list"></div>').appendTo($root);
 		if (!state.length) { $list.append('<p class="pld-none">' + esc(C.i18n.empty) + '</p>'); }
@@ -65,7 +97,7 @@
 				'<button type="button" class="button-link pld-down" title="' + esc(C.i18n.down) + '">&darr;</button>' +
 				'<button type="button" class="button-link button-link-delete pld-del">' + esc(C.i18n.remove) + '</button></span></div>';
 			var body = '<div class="pld-comp__body">' +
-				def.fields.map(function (f) { return fieldHtml(f, comp[f.key]); }).join('') + '</div>';
+				def.fields.map(function (f) { return fieldHtml(f, comp[f.key], i); }).join('') + '</div>';
 			$c.html(head + body).appendTo($list);
 		});
 
@@ -88,6 +120,7 @@
 				render();
 			}
 		});
+		initEditors();
 		sync();
 	}
 
@@ -104,6 +137,13 @@
 		if ($t.hasClass('pld-media')) { return; }
 		state[idx($t)][$t.data('k')] = $t.val();
 		sync();
+	});
+
+	$root.on('click', '.pld-mini button', function () {
+		var $in = $(this).closest('.pld-inline').find('input'), el = $in[0], tag = $(this).data('tag');
+		var a = el.selectionStart, b = el.selectionEnd, v = el.value;
+		el.value = v.slice(0, a) + '<' + tag + '>' + v.slice(a, b) + '</' + tag + '>' + v.slice(b);
+		$in.trigger('input');
 	});
 
 	$root.on('click', '.pld-up', function () { var i = idx($(this)); move(i, i - 1); });

@@ -34,3 +34,7 @@ Project pages use the same full-width layout and the same Elementor header & foo
 (Astra + Header Footer Elementor). If your header/footer template isn't picked automatically, force one with
 `add_filter('pld_header_template_id', fn() => 8);` and `add_filter('pld_footer_template_id', fn() => 28);`
 (the numbers are the IDs of the header/footer posts under Appearance → Elementor Header & Footer Builder).
+
+## v1.2
+- Text boxes (Text + image, Text, Quote) now have the WordPress editor toolbar (Visual / Text tabs, bold, italic, lists, links…); title fields have B / I buttons.
+- Look & feel matched to the sample: banner hero (default 25% of page width, other heights selectable), small title with heavy first word, brown text with bold labels, wide paragraph spacing, 27px side gutters and wider gaps in image rows. Text / label colours can be changed under PLD Works → Master Works page.

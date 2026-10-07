@@ -5,3 +5,4 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 delete_option( 'pld_works_order' );
 delete_option( 'pld_works_page_id' );
 delete_option( 'pld_works_batch' );
+delete_option( 'pld_style' );

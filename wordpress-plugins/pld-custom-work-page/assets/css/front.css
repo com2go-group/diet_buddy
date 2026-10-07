@@ -1,11 +1,11 @@
-:root{--pld-max:1200px;--pld-gap:clamp(16px,2.4vw,32px);--pld-ease:cubic-bezier(.2,.7,.2,1)}
+:root{--pld-max:1200px;--pld-gap:clamp(16px,2.4vw,32px);--pld-gutter:27px;--pld-ease:cubic-bezier(.2,.7,.2,1);--pld-text:#6b5a4d;--pld-label:#3b2f28}
+body.pld-project-page{background:#fff}
 .pld-project{overflow-x:clip}
 .pld-project img{max-width:100%;height:auto;display:block}
-.pld-c{margin:0}
+.pld-c{margin:0 0 50px}
 
 /* ---- Hero: full-height fading slideshow ---- */
-.pld-c--hero{position:relative;overflow:hidden;background:#111;display:flex;align-items:flex-end;color:#fff}
-.pld-hero--h100{min-height:100vh}.pld-hero--h85{min-height:85vh}.pld-hero--h70{min-height:70vh}.pld-hero--h50{min-height:50vh}
+.pld-c--hero{position:relative;overflow:hidden;background:#111;display:flex;align-items:flex-end;color:#fff;margin-bottom:34px}
 .pld-slides,.pld-slide{position:absolute;inset:0}
 .pld-slide{opacity:0;transition:opacity .5s ease}
 .pld-slide.is-active{opacity:1}
@@ -13,21 +13,22 @@
 .pld-hero__txt{position:relative;z-index:1;padding:var(--pld-gap)}
 .pld-hero__title{color:inherit;font-size:clamp(34px,6vw,84px);line-height:1.05;margin:0}
 
-/* ---- Text + image (2/3 · 1/3, no column gap) ---- */
-.pld-c--text_image{display:grid;grid-template-columns:2fr 1fr;align-items:start}
+/* ---- Text + image (2/3 · 1/3) ---- */
+.pld-c--text_image{display:grid;grid-template-columns:2fr 1fr;align-items:start;padding:0 var(--pld-gutter)}
 .pld-c--text_image.pld-ratio-1-1{grid-template-columns:1fr 1fr}
-.pld-ti__col--text{padding:clamp(24px,6vw,90px) clamp(20px,6vw,100px)}
+.pld-ti__col--text{padding:12px 40px 12px 27px;color:var(--pld-text)}
 .pld-ti__col--img{min-width:0}
 .pld-ti__img img{width:100%}
-.pld-ti__title{margin:0 0 1.2em;font-size:clamp(26px,3.4vw,48px);line-height:1.15;font-weight:300}
+.pld-ti__title{margin:0 0 3.4em;font-size:24px;line-height:1.3;font-weight:400;color:var(--pld-label)}
 .pld-ti__title strong{font-weight:700}
-.pld-ti__body p{margin:0 0 1.3em;line-height:1.7}
-.pld-ti__body strong{font-weight:700}
-/* image on the left: swap proportions so the image stays the narrow column */
+.pld-ti__body{color:var(--pld-text);font-size:1rem}
+.pld-ti__body p{margin:0 0 3.4em;line-height:1.65}
+.pld-ti__body p:last-child{margin-bottom:0}
+.pld-ti__body strong,.pld-ti__body b{font-weight:700;color:var(--pld-label)}
 .pld-c--text_image:not(.pld-ratio-1-1):has(.pld-ti__col--img:first-child){grid-template-columns:1fr 2fr}
 
 /* ---- Image row ---- */
-.pld-c--image_row{display:grid;gap:10px;padding:10px 0}
+.pld-c--image_row{display:grid;gap:34px;padding:12px var(--pld-gutter)}
 .pld-cols-1{grid-template-columns:1fr}.pld-cols-2{grid-template-columns:repeat(2,1fr)}
 .pld-cols-3{grid-template-columns:repeat(3,1fr)}.pld-cols-4{grid-template-columns:repeat(4,1fr)}
 .pld-row__item{min-width:0}
@@ -35,7 +36,9 @@
 
 /* ---- Text / image / video / quote ---- */
 .pld-narrow{max-width:760px;margin:0 auto;padding:clamp(24px,5vw,70px) var(--pld-gap)}
-.pld-narrow p{line-height:1.7}
+.pld-narrow{color:var(--pld-text)}
+.pld-narrow p{line-height:1.65;margin:0 0 2em}
+.pld-narrow strong{color:var(--pld-label)}
 .pld-align-center{text-align:center}
 .pld-fig{margin:0}.pld-fig img{width:100%}
 .pld-fig figcaption,.pld-cap{font-size:13px;opacity:.65;margin-top:8px;text-align:center}
@@ -91,6 +94,8 @@
 	.pld-cols-4{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:767px){
+	.pld-ti__col--text{padding:12px 4px}
+	.pld-c--image_row{gap:20px}
 	.pld-c--text_image,.pld-c--text_image.pld-ratio-1-1,.pld-c--text_image:not(.pld-ratio-1-1):has(.pld-ti__col--img:first-child){grid-template-columns:1fr}
 	.pld-cols-3{grid-template-columns:1fr}
 	.pld-grid{grid-template-columns:1fr}

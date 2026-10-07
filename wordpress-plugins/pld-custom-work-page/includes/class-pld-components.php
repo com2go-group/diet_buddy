@@ -35,7 +35,7 @@ class PLD_Components {
 	}
 
 	/**
-	 * Field types: text, inline (text + <strong>/<em>/<br>), textarea, select, image (attachment id), gallery (ids).
+	 * Field types: text, rich (visual editor), inline (text + <strong>/<em>/<br>), textarea, select, image (attachment id), gallery (ids).
 	 */
 	public static function schema() {
 		return array(
@@ -47,8 +47,8 @@ class PLD_Components {
 						'key'     => 'height',
 						'type'    => 'select',
 						'label'   => __( 'Height', 'pld-work' ),
-						'options' => array( '100' => '100% of screen', '85' => '85% of screen', '70' => '70% of screen', '50' => '50% of screen' ),
-						'default' => '100',
+						'options' => array( '25vw' => __( 'Banner (25% of page width)', 'pld-work' ), '40vw' => __( 'Wide (40% of page width)', 'pld-work' ), '60vh' => __( '60% of screen', 'pld-work' ), '100vh' => __( 'Full screen', 'pld-work' ) ),
+						'default' => '25vw',
 					),
 					array(
 						'key'     => 'duration',
@@ -64,7 +64,7 @@ class PLD_Components {
 				'label'  => __( 'Text + image (2/3 · 1/3)', 'pld-work' ),
 				'fields' => array(
 					array( 'key' => 'title', 'type' => 'inline', 'label' => __( 'Title (use <strong>Bold</strong> for the highlighted word)', 'pld-work' ) ),
-					array( 'key' => 'body', 'type' => 'textarea', 'label' => __( 'Text — blank line = new paragraph. Basic HTML allowed, e.g. <strong>Scope of work</strong> …', 'pld-work' ) ),
+					array( 'key' => 'body', 'type' => 'rich', 'label' => __( 'Text — select a label and press B for the bold labels (e.g. Scope of work)', 'pld-work' ) ),
 					array( 'key' => 'image', 'type' => 'image', 'label' => __( 'Image', 'pld-work' ) ),
 					array(
 						'key'     => 'side',
@@ -103,7 +103,7 @@ class PLD_Components {
 				'label'  => __( 'Text', 'pld-work' ),
 				'fields' => array(
 					array( 'key' => 'title', 'type' => 'inline', 'label' => __( 'Heading', 'pld-work' ) ),
-					array( 'key' => 'body', 'type' => 'textarea', 'label' => __( 'Text (basic HTML allowed)', 'pld-work' ) ),
+					array( 'key' => 'body', 'type' => 'rich', 'label' => __( 'Text', 'pld-work' ) ),
 					array(
 						'key'     => 'align',
 						'type'    => 'select',
@@ -133,7 +133,7 @@ class PLD_Components {
 			'quote'      => array(
 				'label'  => __( 'Quote', 'pld-work' ),
 				'fields' => array(
-					array( 'key' => 'quote', 'type' => 'textarea', 'label' => __( 'Quote', 'pld-work' ) ),
+					array( 'key' => 'quote', 'type' => 'rich', 'label' => __( 'Quote', 'pld-work' ) ),
 					array( 'key' => 'author', 'type' => 'text', 'label' => __( 'Author', 'pld-work' ) ),
 					self::anim( 'animation', __( 'Animation', 'pld-work' ), 'fade-up' ),
 				),
@@ -179,6 +179,7 @@ class PLD_Components {
 				$v = isset( $comp[ $f['key'] ] ) ? $comp[ $f['key'] ] : '';
 				switch ( $f['type'] ) {
 					case 'textarea':
+					case 'rich':
 						$v = wp_kses_post( (string) $v );
 						break;
 					case 'inline':
@@ -251,8 +252,8 @@ class PLD_Components {
 				}
 				$title = $comp['title'] ? '<div class="pld-hero__txt"><h1 class="pld-hero__title">' . $comp['title'] . '</h1></div>' : '';
 				return sprintf(
-					'<section class="pld-c pld-c--hero pld-hero--h%1$d" data-pld-slideshow data-duration="%2$d"><div class="pld-slides">%3$s</div>%4$s</section>',
-					(int) $comp['height'],
+					'<section class="pld-c pld-c--hero" style="height:%1$s;min-height:240px" data-pld-slideshow data-duration="%2$d"><div class="pld-slides">%3$s</div>%4$s</section>',
+					esc_attr( $comp['height'] ),
 					max( 1, (int) $comp['duration'] ) * 1000,
 					$slides,
 					$title

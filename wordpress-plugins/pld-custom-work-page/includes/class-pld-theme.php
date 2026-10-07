@@ -19,6 +19,14 @@ class PLD_Theme {
 		add_action( 'wp_head', array( __CLASS__, 'css' ), 99 );
 	}
 
+	public static function style() {
+		$o = get_option( 'pld_style', array() );
+		return array(
+			'text'  => ! empty( $o['text'] ) ? $o['text'] : '#6b5a4d',
+			'label' => ! empty( $o['label'] ) ? $o['label'] : '#3b2f28',
+		);
+	}
+
 	private static function is_project() {
 		return is_singular( PLD_CPT );
 	}
@@ -112,7 +120,8 @@ class PLD_Theme {
 		if ( ! self::is_project() ) {
 			return;
 		}
-		$css = '.pld-project-page .site-content>.ast-container{max-width:100%;padding:0;display:block}.pld-project-page #primary{margin:0;padding:0;width:100%}';
+		$st  = self::style();
+		$css = ':root{--pld-text:' . $st['text'] . ';--pld-label:' . $st['label'] . '}.pld-project-page .site-content>.ast-container{max-width:100%;padding:0;display:block}.pld-project-page #primary{margin:0;padding:0;width:100%}';
 		if ( self::$hfe_header ) {
 			$css .= '.pld-project-page #ast-desktop-header,.pld-project-page #ast-mobile-header{display:none!important}';
 		}

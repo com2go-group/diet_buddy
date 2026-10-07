@@ -59,9 +59,10 @@ class PLD_Project {
 			return;
 		}
 		wp_enqueue_media();
+		wp_enqueue_editor();
 		wp_enqueue_script( 'jquery-ui-sortable' );
 		wp_enqueue_style( 'pld-admin', PLD_URL . 'assets/css/admin.css', array(), PLD_VERSION );
-		wp_enqueue_script( 'pld-builder', PLD_URL . 'assets/js/builder.js', array( 'jquery', 'jquery-ui-sortable' ), PLD_VERSION, true );
+		wp_enqueue_script( 'pld-builder', PLD_URL . 'assets/js/builder.js', array( 'jquery', 'jquery-ui-sortable', 'editor' ), PLD_VERSION, true );
 
 		$components = PLD_Components::get( get_the_ID() );
 		$thumbs     = array();

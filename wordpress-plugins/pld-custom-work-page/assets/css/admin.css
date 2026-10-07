@@ -6,13 +6,19 @@
 #pld-builder .pld-comp__actions .button-link{font-size:16px;text-decoration:none}
 #pld-builder .pld-comp__actions .pld-del{font-size:13px}
 #pld-builder .pld-comp__body{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-#pld-builder .pld-f--textarea,#pld-builder .pld-f--image,#pld-builder .pld-f--gallery{grid-column:1/-1}
+#pld-builder .pld-f--rich,#pld-builder .pld-f--textarea,#pld-builder .pld-f--image,#pld-builder .pld-f--gallery{grid-column:1/-1}
 #pld-builder .pld-f label{display:block;font-weight:600;margin-bottom:4px}
 #pld-builder .pld-thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
 #pld-builder .pld-thumbs img{width:80px;height:80px;object-fit:cover;border-radius:3px;border:1px solid #dcdcde}
 #pld-builder .pld-add{padding:12px;background:#f0f6fc;border:1px dashed #2271b1;border-radius:4px}
 #pld-builder .pld-none{color:#787c82;font-style:italic}
 .ui-sortable-helper{box-shadow:0 6px 18px rgba(0,0,0,.15)}
+
+#pld-builder .pld-mini{display:flex;gap:4px;margin-bottom:4px}
+#pld-builder .pld-mini .button{min-width:30px}
+#pld-builder .wp-editor-wrap{background:#fff}
+#pld-builder .pld-f--rich .wp-editor-container{border:1px solid #c3c4c7}
+.pld-style-box{background:#fff;border:1px solid #c3c4c7;border-radius:4px;padding:10px 14px;margin:16px 0;display:flex;gap:24px;flex-wrap:wrap;align-items:center}
 
 /* Master Works page */
 .pld-page-box{background:#fff;border:1px solid #c3c4c7;padding:10px 14px;margin:12px 0;border-radius:4px}
