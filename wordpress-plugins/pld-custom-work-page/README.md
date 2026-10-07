@@ -28,3 +28,9 @@ The page shows 3 projects per row (2 on tablet, 1 on phone) with master photo an
 (REST `/wp-json/pld/v1/works`), images use `loading="lazy"` and fade in. Batch size is configurable.
 
 Fonts, colours and header/footer come from your theme (the reference site uses Astra + Garet Book).
+
+## Header / footer (v1.1)
+Project pages use the same full-width layout and the same Elementor header & footer templates as your normal pages
+(Astra + Header Footer Elementor). If your header/footer template isn't picked automatically, force one with
+`add_filter('pld_header_template_id', fn() => 8);` and `add_filter('pld_footer_template_id', fn() => 28);`
+(the numbers are the IDs of the header/footer posts under Appearance → Elementor Header & Footer Builder).
