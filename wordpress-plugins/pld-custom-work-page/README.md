@@ -74,3 +74,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.2.1
 - Master Works page → Works grid: new **Project image width** (200–600px, default 350) next to the height. Widths above 350px use the "large" image size so photos stay sharp.
+
+## v2.2.2
+- Works grid sizing fix: the grid now takes the full width of the page content (it could shrink inside Astra's flex container), and project images are positioned inside their box with `object-fit: cover` so theme image rules (`height:auto`, `max-width`) can't change the size.

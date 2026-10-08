@@ -77,14 +77,14 @@ body.pld-project-page{background:#fff}
 @keyframes pldZoomIn{from{opacity:0;transform:scale3d(.3,.3,.3)}50%{opacity:1}to{transform:none}}
 
 /* ---- Works grid (3 per row) ---- */
-.pld-works{max-width:var(--pld-max);margin:0 auto;padding:0 var(--pld-gap)}
+.pld-works{width:100%;box-sizing:border-box;flex:1 1 100%;max-width:var(--pld-max);margin:0 auto;padding:0 var(--pld-gap)}
 .pld-works-title{margin:0 0 48px;font-family:inherit;font-size:clamp(28px,3vw,40px);line-height:1.2;font-weight:400;color:var(--pld-label,#3b2f28)}
-.pld-works-hero{width:100vw;margin-left:calc(50% - 50vw);margin-bottom:53px}
+.pld-works-hero{width:100vw;max-width:100vw;margin-left:calc(50% - 50vw);margin-bottom:53px}
 .pld-works-hero .pld-c--hero{margin-bottom:0}
 .pld-grid{display:grid;grid-template-columns:repeat(3,minmax(0,var(--pld-card-w,350px)));justify-content:space-between;gap:48px var(--pld-gap)}
 .pld-card a{display:block;text-decoration:none;color:inherit}
-.pld-card__img{display:block;aspect-ratio:var(--pld-card-ar,350/500);overflow:hidden;background:#e8e8e8}
-.pld-card__img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--pld-ease),opacity .6s}
+.pld-card__img{display:block;position:relative;width:100%;aspect-ratio:var(--pld-card-ar,350/500);overflow:hidden;background:#e8e8e8}
+.pld-card__img img{position:absolute;inset:0;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover;display:block;margin:0;transition:transform .8s var(--pld-ease),opacity .6s}
 .pld-card:hover .pld-card__img img{transform:scale(1.06)}
 .pld-card__title{margin:.7em 0 0;font-size:1.05em;font-weight:500}
 .pld-js .pld-card__img img:not(.is-loaded){opacity:0}
@@ -129,3 +129,6 @@ body.pld-project-page{background:#fff}
 .pld-btn{display:inline-block;min-width:150px;box-sizing:border-box;text-align:center;padding:15px 34px;background:var(--pld-text,#6b5a4d);color:#fff!important;font-size:14px;line-height:1;text-decoration:none!important;transition:opacity .2s}
 .pld-btn:hover{opacity:.85}
 .pld-btn.is-off{visibility:hidden}
+
+.pld-grid{width:100%;box-sizing:border-box}
+.pld-card{min-width:0}
