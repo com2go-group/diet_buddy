@@ -83,3 +83,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.1
 - Project page: the bottom navigation (Previous project · All works · Next project) is now a full-width bar of three brown buttons with white lettering, the same style as the Works page Next / Previous buttons (stacked on phones).
+
+## v2.3.2
+- Project page: a 75px full-width spacer in the same brown as the navigation buttons sits below the bottom navigation.
