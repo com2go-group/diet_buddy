@@ -228,6 +228,22 @@ class PLD_Components {
 		return $html;
 	}
 
+	/**
+	 * Text boxes use line breaks instead of paragraphs: <p> / </p> become <br>
+	 * (a paragraph break becomes one <br>; plain new lines become <br> too).
+	 */
+	public static function brs( $html ) {
+		$html = (string) $html;
+		$html = preg_replace( '#\s*</p>\s*<p[^>]*>\s*#i', '<br>', $html );
+		$html = preg_replace( '#^\s*<p[^>]*>|</p>\s*$#i', '', $html );
+		$html = preg_replace( '#</?p[^>]*>#i', '<br>', $html );
+		$html = trim( $html );
+		if ( ! preg_match( '#<(ul|ol|li|blockquote|h[1-6])\b#i', $html ) ) {
+			$html = nl2br( $html, false ); // new lines typed in the Text tab
+		}
+		return $html;
+	}
+
 	private static function img( $id, $eager = false, $size = 'full', $extra = array() ) {
 		if ( ! $id ) {
 			return '';
@@ -269,7 +285,7 @@ class PLD_Components {
 			case 'text_image':
 				$text  = '';
 				$text .= $comp['title'] ? '<h2 class="pld-ti__title"' . self::a( $comp, 'title_anim' ) . '>' . $comp['title'] . '</h2>' : '';
-				$text .= $comp['body'] ? '<div class="pld-ti__body"' . self::a( $comp, 'text_anim' ) . '>' . wpautop( $comp['body'] ) . '</div>' : '';
+				$text .= $comp['body'] ? '<div class="pld-ti__body"' . self::a( $comp, 'text_anim' ) . '>' . self::brs( $comp['body'] ) . '</div>' : '';
 				$img   = $comp['image'] ? '<div class="pld-ti__img"' . self::a( $comp, 'image_anim' ) . '>' . self::img( $comp['image'] ) . '</div>' : '';
 				if ( 'left' === $comp['side'] ) {
 					$inner = '<div class="pld-ti__col pld-ti__col--img">' . $img . '</div><div class="pld-ti__col pld-ti__col--text">' . $text . '</div>';
@@ -287,7 +303,7 @@ class PLD_Components {
 				return $items ? '<section class="pld-c pld-c--image_row pld-cols-' . (int) $comp['columns'] . '">' . $items . '</section>' : '';
 
 			case 'text':
-				$inner = ( $comp['title'] ? '<h2>' . $comp['title'] . '</h2>' : '' ) . wpautop( $comp['body'] );
+				$inner = ( $comp['title'] ? '<h2>' . $comp['title'] . '</h2>' : '' ) . '<div class="pld-text-br">' . self::brs( $comp['body'] ) . '</div>';
 				return '<section class="pld-c pld-c--text pld-align-' . esc_attr( $comp['align'] ) . '"><div class="pld-narrow"' . self::a( $comp ) . '>' . $inner . '</div></section>';
 
 			case 'image':

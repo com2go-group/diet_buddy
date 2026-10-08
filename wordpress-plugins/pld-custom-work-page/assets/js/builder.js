@@ -97,7 +97,10 @@
 			var push = function (ed) { if (state[ci]) { state[ci][key] = ed.getContent(); sync(); } };
 			wp.editor.initialize(id, {
 				tinymce: {
-					wpautop: true,
+					wpautop: false,
+					forced_root_block: false, // Enter inserts <br> instead of a new <p>
+					force_br_newlines: true,
+					convert_newlines_to_brs: false,
 					height: 240,
 					toolbar1: 'formatselect,bold,italic,underline,blockquote,bullist,numlist,alignleft,aligncenter,alignright,link,unlink,removeformat,undo,redo',
 					toolbar2: '',

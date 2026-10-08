@@ -101,3 +101,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.7
 - Project page → "Text + image" component: new **Text vertical alignment** (Top / Middle / Bottom) to place the text beside the image. Existing projects keep Top.
+
+## v2.3.8
+- Project text boxes use line breaks instead of paragraphs: pressing Enter in the editor inserts `<br>` (not `<p>`), and existing text is converted on output (`</p><p>` → `<br>`, empty paragraphs → blank lines, new lines typed in the Text tab → `<br>`). Lists and quotes keep their own structure.
