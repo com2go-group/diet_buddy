@@ -136,3 +136,7 @@ body.pld-project-page{background:#fff}
 
 /* one column stays one column on every screen */
 .pld-works[data-cols="1"] .pld-grid{grid-template-columns:minmax(0,var(--pld-card-w,350px))}
+
+/* 75px brown band below the project navigation and below the Works grid */
+.pld-bottom-spacer{height:75px;width:100%;background:var(--pld-text,#6b5a4d)}
+.pld-bottom-spacer--works{width:100vw;max-width:100vw;margin-left:calc(50% - 50vw)}

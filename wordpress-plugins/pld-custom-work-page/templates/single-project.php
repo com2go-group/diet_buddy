@@ -34,6 +34,7 @@ while ( have_posts() ) :
 				<?php else : ?><span></span><?php endif; ?>
 			</nav>
 		<?php endif; ?>
+		<div class="pld-bottom-spacer" aria-hidden="true"></div>
 	</main>
 	<?php
 endwhile;
