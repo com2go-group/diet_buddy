@@ -74,6 +74,13 @@ class PLD_Components {
 						'default' => 'right',
 					),
 					array(
+						'key'     => 'valign',
+						'type'    => 'select',
+						'label'   => __( 'Text vertical alignment', 'pld-work' ),
+						'options' => array( 'top' => __( 'Top', 'pld-work' ), 'middle' => __( 'Middle', 'pld-work' ), 'bottom' => __( 'Bottom', 'pld-work' ) ),
+						'default' => 'top',
+					),
+					array(
 						'key'     => 'ratio',
 						'type'    => 'select',
 						'label'   => __( 'Column ratio', 'pld-work' ),
@@ -269,7 +276,8 @@ class PLD_Components {
 				} else {
 					$inner = '<div class="pld-ti__col pld-ti__col--text">' . $text . '</div><div class="pld-ti__col pld-ti__col--img">' . $img . '</div>';
 				}
-				return '<section class="pld-c pld-c--text_image pld-ratio-' . esc_attr( $comp['ratio'] ) . '">' . $inner . '</section>';
+				$va = isset( $comp['valign'] ) ? $comp['valign'] : 'top'; // older saved projects have no value
+				return '<section class="pld-c pld-c--text_image pld-ratio-' . esc_attr( $comp['ratio'] ) . ' pld-va-' . esc_attr( $va ) . '">' . $inner . '</section>';
 
 			case 'image_row':
 				$items = '';

@@ -98,3 +98,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.6
 - Project text is 20px (was 21px). Applied once on update; you can still change it under Master Works page → "Text size".
+
+## v2.3.7
+- Project page → "Text + image" component: new **Text vertical alignment** (Top / Middle / Bottom) to place the text beside the image. Existing projects keep Top.

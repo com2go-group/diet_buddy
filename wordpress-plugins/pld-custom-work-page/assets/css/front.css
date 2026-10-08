@@ -139,3 +139,9 @@ body.pld-project-page{background:#fff}
 
 /* 75px brown band below the project navigation */
 .pld-bottom-spacer{height:75px;width:100%;background:var(--pld-text,#6b5a4d)}
+
+/* Text vertical alignment next to the image (Text + image component) */
+.pld-c--text_image .pld-ti__col--text{align-self:start}
+.pld-c--text_image.pld-va-middle .pld-ti__col--text{align-self:center}
+.pld-c--text_image.pld-va-bottom .pld-ti__col--text{align-self:end;padding-bottom:20px}
+@media(max-width:767px){.pld-c--text_image .pld-ti__col--text{align-self:start!important}}
