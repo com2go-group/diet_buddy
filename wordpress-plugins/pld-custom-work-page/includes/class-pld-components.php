@@ -145,7 +145,7 @@ class PLD_Components {
 						'key'     => 'height',
 						'type'    => 'select',
 						'label'   => __( 'Height', 'pld-work' ),
-						'options' => array( '40' => '40px', '80' => '80px', '120' => '120px', '200' => '200px', '300' => '300px' ),
+						'options' => array( '20' => '20px', '30' => '30px', '40' => '40px', '80' => '80px', '120' => '120px', '200' => '200px', '300' => '300px' ),
 						'default' => '120',
 					),
 				),

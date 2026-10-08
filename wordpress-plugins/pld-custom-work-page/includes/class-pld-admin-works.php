@@ -132,6 +132,15 @@ class PLD_Admin_Works {
 							?>
 						</select>
 					</label>
+					<label><?php esc_html_e( 'Spacer above the hero', 'pld-work' ); ?>
+						<select name="pld_hero_spacer">
+							<?php
+							foreach ( array( 0, 20, 30, 40, 60, 80, 100, 150, 200 ) as $px ) {
+								echo '<option value="' . (int) $px . '"' . selected( (int) $hero['spacer'], $px, false ) . '>' . ( $px ? (int) $px . 'px' : esc_html__( 'None', 'pld-work' ) ) . '</option>';
+							}
+							?>
+						</select>
+					</label>
 					<span class="description"><?php esc_html_e( 'Several images fade as a slideshow. Shown above the projects.', 'pld-work' ); ?></span>
 				</div>
 
@@ -218,7 +227,8 @@ class PLD_Admin_Works {
 
 		$ids = isset( $_POST['pld_hero_ids'] ) ? array_values( array_filter( array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_POST['pld_hero_ids'] ) ) ) ) ) ) : array();
 		$ht  = isset( $_POST['pld_hero_height'] ) ? sanitize_text_field( wp_unslash( $_POST['pld_hero_height'] ) ) : '25vw';
-		update_option( PLD_Works::OPT_HERO, array( 'images' => $ids, 'height' => in_array( $ht, array( '25vw', '40vw', '60vh', '100vh' ), true ) ? $ht : '25vw' ), false );
+		$sp = isset( $_POST['pld_hero_spacer'] ) ? min( 300, absint( $_POST['pld_hero_spacer'] ) ) : 0;
+		update_option( PLD_Works::OPT_HERO, array( 'images' => $ids, 'height' => in_array( $ht, array( '25vw', '40vw', '60vh', '100vh' ), true ) ? $ht : '25vw', 'spacer' => $sp ), false );
 		update_option( 'pld_style', array(
 			'text'  => $text,
 			'label' => $label,

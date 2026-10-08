@@ -71,15 +71,17 @@ class PLD_Works {
 		return array(
 			'images' => ! empty( $o['images'] ) && is_array( $o['images'] ) ? array_values( array_map( 'absint', $o['images'] ) ) : array(),
 			'height' => ! empty( $o['height'] ) ? $o['height'] : '25vw',
+			'spacer' => isset( $o['spacer'] ) ? absint( $o['spacer'] ) : 0, // px of empty space above the hero
 		);
 	}
 
 	private static function hero_html() {
-		$h = self::hero();
+		$h      = self::hero();
+		$spacer = $h['spacer'] ? '<div class="pld-works-spacer" style="height:' . (int) $h['spacer'] . 'px" aria-hidden="true"></div>' : '';
 		if ( ! $h['images'] ) {
-			return '';
+			return $spacer;
 		}
-		return '<div class="pld-works-hero">' . PLD_Components::render(
+		return $spacer . '<div class="pld-works-hero">' . PLD_Components::render(
 			array( 'type' => 'hero', 'images' => $h['images'], 'height' => $h['height'], 'duration' => '5', 'title' => '' )
 		) . '</div>';
 	}

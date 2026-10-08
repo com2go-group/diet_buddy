@@ -62,3 +62,7 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v1.8
 - Text size is now printed inline with `!important` (cannot be overridden by theme/Elementor typography or a cached stylesheet): body text 21px, title 33px (both +50 %). Adjust under Master Works page → "Project page text colours".
+
+## v2.1.1
+- Master Works page: optional spacer above the hero image (None / 20 / 30 / 40 / 60 / 80 / 100 / 150 / 200 px), set in the "Works page hero image" box.
+- Project page Spacer component: new 20px and 30px options.
