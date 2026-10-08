@@ -80,3 +80,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.0
 - Works grid now keeps your exact image size: width/height up to 2000px (any value 100–2000), the grid breaks out of the theme's content width (like the hero) so columns are no longer squeezed, and a new **Columns** option (1–4; use 1 for wide images such as 1000 × 500) sits next to Rows per page. On small screens the cards still shrink to fit (2 columns on tablets, 1 on phones).
+
+## v2.3.1
+- Project page: the bottom navigation (Previous project · All works · Next project) is now a full-width bar of three brown buttons with white lettering, the same style as the Works page Next / Previous buttons (stacked on phones).

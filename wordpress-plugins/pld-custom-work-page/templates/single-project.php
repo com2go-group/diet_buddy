@@ -24,13 +24,13 @@ while ( have_posts() ) :
 			?>
 			<nav class="pld-pager" aria-label="<?php esc_attr_e( 'Projects', 'pld-work' ); ?>">
 				<?php if ( $prev ) : ?>
-					<a class="pld-pager__prev" href="<?php echo esc_url( get_permalink( $prev ) ); ?>">&larr; <?php echo esc_html( get_the_title( $prev ) ); ?></a>
+					<a class="pld-btn pld-pager__prev" href="<?php echo esc_url( get_permalink( $prev ) ); ?>">&larr; <?php echo esc_html( get_the_title( $prev ) ); ?></a>
 				<?php else : ?><span></span><?php endif; ?>
 				<?php if ( $works_page && 'publish' === get_post_status( $works_page ) ) : ?>
-					<a class="pld-pager__all" href="<?php echo esc_url( get_permalink( $works_page ) ); ?>"><?php esc_html_e( 'All works', 'pld-work' ); ?></a>
+					<a class="pld-btn pld-pager__all" href="<?php echo esc_url( get_permalink( $works_page ) ); ?>"><?php esc_html_e( 'All works', 'pld-work' ); ?></a>
 				<?php else : ?><span></span><?php endif; ?>
 				<?php if ( $next ) : ?>
-					<a class="pld-pager__next" href="<?php echo esc_url( get_permalink( $next ) ); ?>"><?php echo esc_html( get_the_title( $next ) ); ?> &rarr;</a>
+					<a class="pld-btn pld-pager__next" href="<?php echo esc_url( get_permalink( $next ) ); ?>"><?php echo esc_html( get_the_title( $next ) ); ?> &rarr;</a>
 				<?php else : ?><span></span><?php endif; ?>
 			</nav>
 		<?php endif; ?>
