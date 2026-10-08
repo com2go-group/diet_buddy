@@ -77,11 +77,12 @@ body.pld-project-page{background:#fff}
 @keyframes pldZoomIn{from{opacity:0;transform:scale3d(.3,.3,.3)}50%{opacity:1}to{transform:none}}
 
 /* ---- Works grid (3 per row) ---- */
-.pld-works{width:100%;box-sizing:border-box;flex:1 1 100%;max-width:var(--pld-max);margin:0 auto;padding:0 var(--pld-gap)}
+.pld-works{width:100vw;max-width:100vw;margin-left:calc(50% - 50vw);padding:0 var(--pld-gutter,26px);box-sizing:border-box}
+.pld-works__inner{width:calc(var(--pld-cols,3) * var(--pld-card-w,350px) + (var(--pld-cols,3) - 1) * 32px);max-width:100%;margin:0 auto}
 .pld-works-title{margin:0 0 48px;font-family:inherit;font-size:clamp(28px,3vw,40px);line-height:1.2;font-weight:400;color:var(--pld-label,#3b2f28)}
 .pld-works-hero{width:100vw;max-width:100vw;margin-left:calc(50% - 50vw);margin-bottom:53px}
 .pld-works-hero .pld-c--hero{margin-bottom:0}
-.pld-grid{display:grid;grid-template-columns:repeat(3,minmax(0,var(--pld-card-w,350px)));justify-content:space-between;gap:48px var(--pld-gap)}
+.pld-grid{display:grid;grid-template-columns:repeat(var(--pld-cols,3),minmax(0,var(--pld-card-w,350px)));column-gap:32px;row-gap:48px;justify-content:center}
 .pld-card a{display:block;text-decoration:none;color:inherit}
 .pld-card__img{display:block;position:relative;width:100%;aspect-ratio:var(--pld-card-ar,350/500);overflow:hidden;background:#e8e8e8}
 .pld-card__img img{position:absolute;inset:0;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover;display:block;margin:0;transition:transform .8s var(--pld-ease),opacity .6s}
@@ -91,6 +92,7 @@ body.pld-project-page{background:#fff}
 
 @media(max-width:900px){
 	.pld-grid{grid-template-columns:repeat(2,minmax(0,var(--pld-card-w,350px)))}
+	.pld-works__inner{width:100%}
 	.pld-cols-4{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:767px){
@@ -130,5 +132,7 @@ body.pld-project-page{background:#fff}
 .pld-btn:hover{opacity:.85}
 .pld-btn.is-off{visibility:hidden}
 
-.pld-grid{width:100%;box-sizing:border-box}
 .pld-card{min-width:0}
+
+/* one column stays one column on every screen */
+.pld-works[data-cols="1"] .pld-grid{grid-template-columns:minmax(0,var(--pld-card-w,350px))}

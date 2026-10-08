@@ -77,3 +77,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.2.2
 - Works grid sizing fix: the grid now takes the full width of the page content (it could shrink inside Astra's flex container), and project images are positioned inside their box with `object-fit: cover` so theme image rules (`height:auto`, `max-width`) can't change the size.
+
+## v2.3.0
+- Works grid now keeps your exact image size: width/height up to 2000px (any value 100–2000), the grid breaks out of the theme's content width (like the hero) so columns are no longer squeezed, and a new **Columns** option (1–4; use 1 for wide images such as 1000 × 500) sits next to Rows per page. On small screens the cards still shrink to fit (2 columns on tablets, 1 on phones).

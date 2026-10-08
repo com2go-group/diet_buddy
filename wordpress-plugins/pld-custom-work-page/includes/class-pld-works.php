@@ -24,7 +24,7 @@ class PLD_Works {
 
 	/** Projects per page: rows x 3 (default 5 x 3 = 15). */
 	public static function per_page() {
-		return self::rows() * self::COLS;
+		return self::rows() * self::grid()['cols'];
 	}
 
 	public static function animations() {
@@ -42,8 +42,9 @@ class PLD_Works {
 		$o    = get_option( self::OPT_GRID, array() );
 		$anim = isset( $o['anim'] ) ? $o['anim'] : 'fade-up';
 		return array(
-			'width'  => min( 600, max( 200, ! empty( $o['width'] ) ? (int) $o['width'] : 350 ) ),
-			'height' => min( 1000, max( 200, ! empty( $o['height'] ) ? (int) $o['height'] : 500 ) ),
+			'width'  => min( 2000, max( 100, ! empty( $o['width'] ) ? (int) $o['width'] : 350 ) ),
+			'height' => min( 2000, max( 100, ! empty( $o['height'] ) ? (int) $o['height'] : 500 ) ),
+			'cols'   => min( 4, max( 1, ! empty( $o['cols'] ) ? (int) $o['cols'] : 3 ) ),
 			'anim'   => isset( self::animations()[ $anim ] ) ? $anim : 'fade-up',
 		);
 	}
@@ -69,7 +70,7 @@ class PLD_Works {
 	public static function card( $id, $eager = false, $i = 0 ) {
 		$thumb = get_post_thumbnail_id( $id );
 		$g     = self::grid();
-		$size  = $g['width'] > 350 ? 'large' : 'pld-card'; // the 350x500 crop would be upscaled for wider cards
+		$size  = $g['width'] > 1024 ? 'full' : ( $g['width'] > 350 ? 'large' : 'pld-card' ); // never upscale the 350x500 crop
 		$img   = $thumb
 			? wp_get_attachment_image(
 				$thumb,
@@ -155,11 +156,13 @@ class PLD_Works {
 		$slice = array_slice( $ids, ( $page - 1 ) * $per, $per );
 
 		return self::hero_html()
-			. '<div class="pld-works" data-anim="' . esc_attr( $g['anim'] ) . '" data-page="' . (int) $page . '" data-pages="' . (int) $pages . '" style="--pld-card-w:' . (int) $g['width'] . 'px;--pld-card-ar:' . (int) $g['width'] . '/' . (int) $g['height'] . '">'
+			. '<div class="pld-works" data-anim="' . esc_attr( $g['anim'] ) . '" data-cols="' . (int) $g['cols'] . '" data-page="' . (int) $page . '" data-pages="' . (int) $pages . '"'
+			. ' style="--pld-cols:' . (int) $g['cols'] . ';--pld-card-w:' . (int) $g['width'] . 'px;--pld-card-ar:' . (int) $g['width'] . '/' . (int) $g['height'] . '">'
+			. '<div class="pld-works__inner">'
 			. $heading
-			. '<div class="pld-grid">' . self::cards( $slice, self::COLS ) . '</div>'
+			. '<div class="pld-grid">' . self::cards( $slice, $g['cols'] ) . '</div>'
 			. self::pager_html( $page, $pages )
-			. '</div>';
+			. '</div></div>';
 	}
 
 	public static function register_rest() {
