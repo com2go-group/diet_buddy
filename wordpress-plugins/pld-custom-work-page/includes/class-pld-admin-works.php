@@ -186,7 +186,9 @@ class PLD_Admin_Works {
 				</div>
 				<div class="pld-style-box">
 					<strong><?php esc_html_e( 'Works grid', 'pld-work' ); ?></strong>
-					<label><?php esc_html_e( 'Project image height (px, width 350)', 'pld-work' ); ?>
+					<label><?php esc_html_e( 'Project image width (px)', 'pld-work' ); ?>
+						<input type="number" name="pld_card_width" min="200" max="600" step="10" value="<?php echo esc_attr( $grid['width'] ); ?>" class="small-text"></label>
+					<label><?php esc_html_e( 'Project image height (px)', 'pld-work' ); ?>
 						<input type="number" name="pld_card_height" min="200" max="1000" step="10" value="<?php echo esc_attr( $grid['height'] ); ?>" class="small-text"></label>
 					<label><?php esc_html_e( 'Rows per page (3 projects per row)', 'pld-work' ); ?>
 						<input type="number" name="pld_rows" min="1" max="10" value="<?php echo esc_attr( $rows ); ?>" class="small-text"></label>
@@ -226,6 +228,7 @@ class PLD_Admin_Works {
 		update_option(
 			PLD_Works::OPT_GRID,
 			array(
+				'width'  => isset( $_POST['pld_card_width'] ) ? min( 600, max( 200, absint( $_POST['pld_card_width'] ) ) ) : 350,
 				'height' => isset( $_POST['pld_card_height'] ) ? min( 1000, max( 200, absint( $_POST['pld_card_height'] ) ) ) : 500,
 				'anim'   => isset( PLD_Works::animations()[ $anim ] ) ? $anim : 'fade-up',
 			),

@@ -42,6 +42,7 @@ class PLD_Works {
 		$o    = get_option( self::OPT_GRID, array() );
 		$anim = isset( $o['anim'] ) ? $o['anim'] : 'fade-up';
 		return array(
+			'width'  => min( 600, max( 200, ! empty( $o['width'] ) ? (int) $o['width'] : 350 ) ),
 			'height' => min( 1000, max( 200, ! empty( $o['height'] ) ? (int) $o['height'] : 500 ) ),
 			'anim'   => isset( self::animations()[ $anim ] ) ? $anim : 'fade-up',
 		);
@@ -67,10 +68,12 @@ class PLD_Works {
 
 	public static function card( $id, $eager = false, $i = 0 ) {
 		$thumb = get_post_thumbnail_id( $id );
+		$g     = self::grid();
+		$size  = $g['width'] > 350 ? 'large' : 'pld-card'; // the 350x500 crop would be upscaled for wider cards
 		$img   = $thumb
 			? wp_get_attachment_image(
 				$thumb,
-				'pld-card',
+				$size,
 				false,
 				array(
 					'loading'  => $eager ? 'eager' : 'lazy',
@@ -152,7 +155,7 @@ class PLD_Works {
 		$slice = array_slice( $ids, ( $page - 1 ) * $per, $per );
 
 		return self::hero_html()
-			. '<div class="pld-works" data-anim="' . esc_attr( $g['anim'] ) . '" data-page="' . (int) $page . '" data-pages="' . (int) $pages . '" style="--pld-card-ar:350/' . (int) $g['height'] . '">'
+			. '<div class="pld-works" data-anim="' . esc_attr( $g['anim'] ) . '" data-page="' . (int) $page . '" data-pages="' . (int) $pages . '" style="--pld-card-w:' . (int) $g['width'] . 'px;--pld-card-ar:' . (int) $g['width'] . '/' . (int) $g['height'] . '">'
 			. $heading
 			. '<div class="pld-grid">' . self::cards( $slice, self::COLS ) . '</div>'
 			. self::pager_html( $page, $pages )

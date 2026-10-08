@@ -71,3 +71,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 - Master Works page now shows **5 rows × 3 columns (15 projects) per page** with **Previous (bottom left)** and **Next (bottom right)** buttons; paging happens without a reload and the URL gets `?works_page=N` (plain links work without JavaScript). Rows per page is adjustable.
 - **Project image height** is adjustable (200–1000px, width stays 350) under Master Works page → "Works grid".
 - **Project images animate on scroll** (fade up / slide in from right / zoom in / reveal, staggered per column; or none), chosen in the same box. Images still use native lazy loading.
+
+## v2.2.1
+- Master Works page → Works grid: new **Project image width** (200–600px, default 350) next to the height. Widths above 350px use the "large" image size so photos stay sharp.
