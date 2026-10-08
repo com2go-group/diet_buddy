@@ -95,3 +95,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.5
 - Project page: bold text (labels such as "Scope of work", the bold word in the title) is set in Roboto 700. Roboto is loaded from Google Fonts on project pages (the site already loads it for the menu).
+
+## v2.3.6
+- Project text is 20px (was 21px). Applied once on update; you can still change it under Master Works page → "Text size".

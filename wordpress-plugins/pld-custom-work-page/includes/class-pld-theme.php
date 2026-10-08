@@ -13,6 +13,7 @@ class PLD_Theme {
 	const OPT_HF = 'pld_hf'; // array( 'header' => 'auto'|'theme'|<id>, 'footer' => ... )
 
 	public static function init() {
+		self::migrate();
 		add_filter( 'astra_page_layout', array( __CLASS__, 'layout' ), 99 );
 		add_filter( 'astra_get_content_layout', array( __CLASS__, 'content_layout' ), 99 );
 		add_filter( 'body_class', array( __CLASS__, 'body_class' ), 99 );
@@ -25,6 +26,18 @@ class PLD_Theme {
 		add_filter( 'hfe_footer_enabled', array( __CLASS__, 'footer_enabled' ), 99 );
 	}
 
+	/** One-time: project text size is 20px (earlier saved values of 21 / 14 are replaced once). */
+	private static function migrate() {
+		if ( version_compare( (string) get_option( 'pld_migrated', '0' ), '2.3.6', '>=' ) ) {
+			return;
+		}
+		$o         = get_option( 'pld_style', array() );
+		$o         = is_array( $o ) ? $o : array();
+		$o['size'] = 20;
+		update_option( 'pld_style', $o, false );
+		update_option( 'pld_migrated', '2.3.6', false );
+	}
+
 	public static function style() {
 		$o = get_option( 'pld_style', array() );
 		return array(
@@ -32,8 +45,7 @@ class PLD_Theme {
 			'label' => ! empty( $o['label'] ) ? $o['label'] : '#3b2f28',
 			// 33px = the old 22px default + 50 %.
 			'title' => ( ! empty( $o['title'] ) && 22 !== (int) $o['title'] ) ? (int) $o['title'] : 33,
-			// 21px = the old 14px default + 50 %; a stored 14 is the old default, not a deliberate choice.
-			'size'  => ( ! empty( $o['size'] ) && 14 !== (int) $o['size'] ) ? (int) $o['size'] : 21,
+			'size'  => ( ! empty( $o['size'] ) && 14 !== (int) $o['size'] ) ? (int) $o['size'] : 20,
 		);
 	}
 

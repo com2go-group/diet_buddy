@@ -253,7 +253,7 @@ class PLD_Admin_Works {
 		update_option( 'pld_style', array(
 			'text'  => $text,
 			'label' => $label,
-			'size'  => isset( $_POST['pld_text_size'] ) ? min( 48, max( 10, absint( $_POST['pld_text_size'] ) ) ) : 21,
+			'size'  => isset( $_POST['pld_text_size'] ) ? min( 48, max( 10, absint( $_POST['pld_text_size'] ) ) ) : 20,
 			'title' => isset( $_POST['pld_title_size'] ) ? min( 80, max( 12, absint( $_POST['pld_title_size'] ) ) ) : 33,
 		), false );
 

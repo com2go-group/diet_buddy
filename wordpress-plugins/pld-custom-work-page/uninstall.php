@@ -10,3 +10,4 @@ delete_option( 'pld_works_rows' );
 delete_option( 'pld_works_grid' );
 delete_option( 'pld_works_hero' );
 delete_option( 'pld_hf' );
+delete_option( 'pld_migrated' );
