@@ -92,3 +92,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.4
 - Works page: the brown spacer is removed; the site footer now has the same brown background (and sits in the page flow instead of overlaying the first screen). Project pages keep their 75px brown band.
+
+## v2.3.5
+- Project page: bold text (labels such as "Scope of work", the bold word in the title) is set in Roboto 700. Roboto is loaded from Google Fonts on project pages (the site already loads it for the menu).

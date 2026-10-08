@@ -139,6 +139,7 @@ class PLD_Project {
 			array( 'rest' => esc_url_raw( rest_url( 'pld/v1/works' ) ) )
 		);
 		if ( is_singular( PLD_CPT ) ) {
+			wp_enqueue_style( 'pld-roboto', 'https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap', array(), null ); // bold font
 			self::enqueue_front();
 		}
 	}

@@ -168,6 +168,8 @@ class PLD_Theme {
 			// Inline + !important so neither a cached stylesheet nor theme/Elementor typography can undo the size.
 			$css .= 'body .pld-project .pld-ti__body,body .pld-project .pld-ti__body p,body .pld-project .pld-ti__body li,body .pld-project .pld-narrow,body .pld-project .pld-narrow p{font-size:' . (int) $st['size'] . 'px!important;line-height:1.65!important}'
 				. 'body .pld-project .pld-ti__title{font-size:' . (int) $st['title'] . 'px!important}';
+			// Bold text (labels, the highlighted title word) is set in Roboto.
+			$css .= 'body .pld-project strong,body .pld-project b,body .pld-project .pld-ti__title strong{font-family:Roboto,Helvetica,Arial,sans-serif!important;font-weight:700!important}';
 			$css .= '.pld-project-page .site-content>.ast-container{max-width:100%;padding:0;display:block}.pld-project-page #primary{margin:0;padding:0;width:100%}';
 		}
 		if ( self::is_works_page() ) { // the heading is printed by the plugin, below the hero.
