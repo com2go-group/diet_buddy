@@ -14,9 +14,37 @@ class PLD_Works {
 		add_action( 'rest_api_init', array( __CLASS__, 'register_rest' ) );
 	}
 
-	public static function batch_size() {
-		$n = (int) get_option( PLD_OPT_BATCH, 6 );
-		return min( 30, max( 3, $n ) );
+	const COLS     = 3;
+	const OPT_ROWS = 'pld_works_rows'; // rows per page (3 projects per row)
+	const OPT_GRID = 'pld_works_grid'; // array( 'height' => px, 'anim' => key )
+
+	public static function rows() {
+		return min( 10, max( 1, (int) get_option( self::OPT_ROWS, 5 ) ) );
+	}
+
+	/** Projects per page: rows x 3 (default 5 x 3 = 15). */
+	public static function per_page() {
+		return self::rows() * self::COLS;
+	}
+
+	public static function animations() {
+		return array(
+			'fade-up'     => __( 'Fade in up', 'pld-work' ),
+			'slide-right' => __( 'Slide in from right', 'pld-work' ),
+			'zoom-in'     => __( 'Zoom in', 'pld-work' ),
+			'reveal'      => __( 'Reveal (wipe up)', 'pld-work' ),
+			'none'        => __( 'None', 'pld-work' ),
+		);
+	}
+
+	/** Project image height (px; width stays 350) and the scroll animation of the project images. */
+	public static function grid() {
+		$o    = get_option( self::OPT_GRID, array() );
+		$anim = isset( $o['anim'] ) ? $o['anim'] : 'fade-up';
+		return array(
+			'height' => min( 1000, max( 200, ! empty( $o['height'] ) ? (int) $o['height'] : 500 ) ),
+			'anim'   => isset( self::animations()[ $anim ] ) ? $anim : 'fade-up',
+		);
 	}
 
 	/** Ordered list of project IDs chosen for the master page. */
@@ -37,7 +65,7 @@ class PLD_Works {
 		);
 	}
 
-	public static function card( $id, $eager = false ) {
+	public static function card( $id, $eager = false, $i = 0 ) {
 		$thumb = get_post_thumbnail_id( $id );
 		$img   = $thumb
 			? wp_get_attachment_image(
@@ -51,7 +79,7 @@ class PLD_Works {
 			)
 			: '<span class="pld-card__noimg"></span>';
 		return sprintf(
-			'<article class="pld-card"><a href="%1$s"><span class="pld-card__img">%2$s</span><h3 class="pld-card__title">%3$s</h3></a></article>',
+			'<article class="pld-card" style="--i:' . (int) $i . '"><a href="%1$s"><span class="pld-card__img">%2$s</span><h3 class="pld-card__title">%3$s</h3></a></article>',
 			esc_url( get_permalink( $id ) ),
 			$img,
 			esc_html( get_the_title( $id ) )
@@ -61,7 +89,7 @@ class PLD_Works {
 	public static function cards( $ids, $first_eager = 0 ) {
 		$html = '';
 		foreach ( $ids as $i => $id ) {
-			$html .= self::card( $id, $i < $first_eager );
+			$html .= self::card( $id, $i < $first_eager, $i );
 		}
 		return $html;
 	}
@@ -86,21 +114,48 @@ class PLD_Works {
 		) . '</div>';
 	}
 
+	public static function current_page( $pages ) {
+		$p = isset( $_GET['works_page'] ) ? absint( $_GET['works_page'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification
+		return min( max( 1, $p ), max( 1, $pages ) );
+	}
+
+	private static function page_url( $n ) {
+		$base = get_permalink();
+		return $n > 1 ? add_query_arg( 'works_page', $n, $base ) : $base;
+	}
+
+	/** Previous (left) / Next (right) buttons at the bottom of the grid. */
+	private static function pager_html( $page, $pages ) {
+		if ( $pages < 2 ) {
+			return '';
+		}
+		$prev = $page > 1;
+		$next = $page < $pages;
+		return '<nav class="pld-pager-works" aria-label="' . esc_attr__( 'Projects pages', 'pld-work' ) . '">'
+			. '<a class="pld-btn pld-btn--prev' . ( $prev ? '' : ' is-off' ) . '" rel="prev" data-page="' . ( $prev ? $page - 1 : 0 ) . '" href="' . esc_url( self::page_url( max( 1, $page - 1 ) ) ) . '">' . esc_html__( 'Previous', 'pld-work' ) . '</a>'
+			. '<span class="pld-pager-works__info">' . (int) $page . ' / ' . (int) $pages . '</span>'
+			. '<a class="pld-btn pld-btn--next' . ( $next ? '' : ' is-off' ) . '" rel="next" data-page="' . ( $next ? $page + 1 : 0 ) . '" href="' . esc_url( self::page_url( min( $pages, $page + 1 ) ) ) . '">' . esc_html__( 'Next', 'pld-work' ) . '</a>'
+			. '</nav>';
+	}
+
 	public static function shortcode() {
 		PLD_Project::enqueue_front();
-		$ids   = self::visible_ids();
-		$batch = self::batch_size();
+		$ids     = self::visible_ids();
+		$g       = self::grid();
 		$heading = '<h1 class="pld-works-title">' . esc_html( get_the_title() ) . '</h1>';
 		if ( ! $ids ) {
 			return self::hero_html() . '<div class="pld-works">' . $heading . '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p></div>';
 		}
-		$first = array_slice( $ids, 0, $batch );
-		$more  = count( $ids ) > $batch;
+		$per   = self::per_page();
+		$pages = (int) ceil( count( $ids ) / $per );
+		$page  = self::current_page( $pages );
+		$slice = array_slice( $ids, ( $page - 1 ) * $per, $per );
 
-		return self::hero_html() . '<div class="pld-works" data-offset="' . (int) count( $first ) . '" data-done="' . ( $more ? '0' : '1' ) . '">' . $heading
-			. '<div class="pld-grid">' . self::cards( $first, 3 ) . '</div>'
-			. ( $more ? '<div class="pld-sentinel" aria-hidden="true"><span class="pld-spinner"></span></div>'
-				. '<noscript><style>.pld-sentinel{display:none}</style></noscript>' : '' )
+		return self::hero_html()
+			. '<div class="pld-works" data-anim="' . esc_attr( $g['anim'] ) . '" data-page="' . (int) $page . '" data-pages="' . (int) $pages . '" style="--pld-card-ar:350/' . (int) $g['height'] . '">'
+			. $heading
+			. '<div class="pld-grid">' . self::cards( $slice, self::COLS ) . '</div>'
+			. self::pager_html( $page, $pages )
 			. '</div>';
 	}
 
@@ -113,22 +168,22 @@ class PLD_Works {
 				'permission_callback' => '__return_true',
 				'callback'            => array( __CLASS__, 'rest_works' ),
 				'args'                => array(
-					'offset' => array( 'sanitize_callback' => 'absint', 'default' => 0 ),
+					'page' => array( 'sanitize_callback' => 'absint', 'default' => 1 ),
 				),
 			)
 		);
 	}
 
 	public static function rest_works( WP_REST_Request $req ) {
-		$ids    = self::visible_ids();
-		$offset = (int) $req->get_param( 'offset' );
-		$slice  = array_slice( $ids, $offset, self::batch_size() );
-		$next   = $offset + count( $slice );
+		$ids   = self::visible_ids();
+		$per   = self::per_page();
+		$pages = max( 1, (int) ceil( count( $ids ) / $per ) );
+		$page  = min( max( 1, (int) $req->get_param( 'page' ) ), $pages );
 		return rest_ensure_response(
 			array(
-				'html'   => self::cards( $slice ),
-				'offset' => $next,
-				'done'   => $next >= count( $ids ),
+				'html'  => self::cards( array_slice( $ids, ( $page - 1 ) * $per, $per ) ),
+				'page'  => $page,
+				'pages' => $pages,
 			)
 		);
 	}

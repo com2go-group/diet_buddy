@@ -66,3 +66,8 @@ Project pages use the same full-width layout and the same Elementor header & foo
 ## v2.1.1
 - Master Works page: optional spacer above the hero image (None / 20 / 30 / 40 / 60 / 80 / 100 / 150 / 200 px), set in the "Works page hero image" box.
 - Project page Spacer component: new 20px and 30px options.
+
+## v2.2.0
+- Master Works page now shows **5 rows × 3 columns (15 projects) per page** with **Previous (bottom left)** and **Next (bottom right)** buttons; paging happens without a reload and the URL gets `?works_page=N` (plain links work without JavaScript). Rows per page is adjustable.
+- **Project image height** is adjustable (200–1000px, width stays 350) under Master Works page → "Works grid".
+- **Project images animate on scroll** (fade up / slide in from right / zoom in / reveal, staggered per column; or none), chosen in the same box. Images still use native lazy loading.

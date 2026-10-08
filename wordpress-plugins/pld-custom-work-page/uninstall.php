@@ -6,3 +6,7 @@ delete_option( 'pld_works_order' );
 delete_option( 'pld_works_page_id' );
 delete_option( 'pld_works_batch' );
 delete_option( 'pld_style' );
+delete_option( 'pld_works_rows' );
+delete_option( 'pld_works_grid' );
+delete_option( 'pld_works_hero' );
+delete_option( 'pld_hf' );

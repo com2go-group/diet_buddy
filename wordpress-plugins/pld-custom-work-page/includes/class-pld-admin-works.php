@@ -82,7 +82,8 @@ class PLD_Admin_Works {
 		}
 		$page_id = (int) get_option( PLD_OPT_PAGE );
 		$page    = $page_id ? get_post( $page_id ) : null;
-		$batch   = PLD_Works::batch_size();
+		$grid    = PLD_Works::grid();
+		$rows    = PLD_Works::rows();
 		?>
 		<div class="wrap pld-works-admin">
 			<h1><?php esc_html_e( 'Master Works page', 'pld-work' ); ?></h1>
@@ -183,12 +184,19 @@ class PLD_Admin_Works {
 					<label><?php esc_html_e( 'Title size (px)', 'pld-work' ); ?> <input type="number" min="12" max="80" name="pld_title_size" value="<?php echo esc_attr( $style['title'] ); ?>" class="small-text"></label>
 					<label><?php esc_html_e( 'Bold labels / title', 'pld-work' ); ?> <input type="color" name="pld_label_color" value="<?php echo esc_attr( $style['label'] ); ?>"></label>
 				</div>
-				<p>
-					<label>
-						<?php esc_html_e( 'Projects loaded per batch (lazy loading):', 'pld-work' ); ?>
-						<input type="number" name="pld_batch" min="3" max="30" value="<?php echo esc_attr( $batch ); ?>" class="small-text">
-					</label>
-				</p>
+				<div class="pld-style-box">
+					<strong><?php esc_html_e( 'Works grid', 'pld-work' ); ?></strong>
+					<label><?php esc_html_e( 'Project image height (px, width 350)', 'pld-work' ); ?>
+						<input type="number" name="pld_card_height" min="200" max="1000" step="10" value="<?php echo esc_attr( $grid['height'] ); ?>" class="small-text"></label>
+					<label><?php esc_html_e( 'Rows per page (3 projects per row)', 'pld-work' ); ?>
+						<input type="number" name="pld_rows" min="1" max="10" value="<?php echo esc_attr( $rows ); ?>" class="small-text"></label>
+					<label><?php esc_html_e( 'Image animation on scroll', 'pld-work' ); ?>
+						<select name="pld_card_anim">
+							<?php foreach ( PLD_Works::animations() as $k => $l ) : ?>
+								<option value="<?php echo esc_attr( $k ); ?>"<?php selected( $grid['anim'], $k ); ?>><?php echo esc_html( $l ); ?></option>
+							<?php endforeach; ?>
+						</select></label>
+				</div>
 				<?php submit_button( __( 'Save Works page', 'pld-work' ) ); ?>
 			</form>
 		</div>
@@ -213,9 +221,16 @@ class PLD_Admin_Works {
 		);
 		update_option( PLD_OPT_ORDER, $ids, false );
 
-		if ( isset( $_POST['pld_batch'] ) ) {
-			update_option( PLD_OPT_BATCH, min( 30, max( 3, absint( $_POST['pld_batch'] ) ) ), false );
-		}
+		update_option( PLD_Works::OPT_ROWS, isset( $_POST['pld_rows'] ) ? min( 10, max( 1, absint( $_POST['pld_rows'] ) ) ) : 5, false );
+		$anim = isset( $_POST['pld_card_anim'] ) ? sanitize_key( wp_unslash( $_POST['pld_card_anim'] ) ) : 'fade-up';
+		update_option(
+			PLD_Works::OPT_GRID,
+			array(
+				'height' => isset( $_POST['pld_card_height'] ) ? min( 1000, max( 200, absint( $_POST['pld_card_height'] ) ) ) : 500,
+				'anim'   => isset( PLD_Works::animations()[ $anim ] ) ? $anim : 'fade-up',
+			),
+			false
+		);
 		$text  = isset( $_POST['pld_text_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['pld_text_color'] ) ) : '';
 		$label = isset( $_POST['pld_label_color'] ) ? sanitize_hex_color( wp_unslash( $_POST['pld_label_color'] ) ) : '';
 		$hf = array();

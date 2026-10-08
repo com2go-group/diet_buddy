@@ -83,17 +83,11 @@ body.pld-project-page{background:#fff}
 .pld-works-hero .pld-c--hero{margin-bottom:0}
 .pld-grid{display:grid;grid-template-columns:repeat(3,minmax(0,350px));justify-content:space-between;gap:48px var(--pld-gap)}
 .pld-card a{display:block;text-decoration:none;color:inherit}
-.pld-card__img{display:block;aspect-ratio:350/500;overflow:hidden;background:#e8e8e8}
+.pld-card__img{display:block;aspect-ratio:var(--pld-card-ar,350/500);overflow:hidden;background:#e8e8e8}
 .pld-card__img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--pld-ease),opacity .6s}
 .pld-card:hover .pld-card__img img{transform:scale(1.06)}
 .pld-card__title{margin:.7em 0 0;font-size:1.05em;font-weight:500}
-.pld-js .pld-card{opacity:0;transform:translateY(24px);transition:opacity .7s var(--pld-ease),transform .7s var(--pld-ease)}
-.pld-js .pld-card.is-in{opacity:1;transform:none}
 .pld-js .pld-card__img img:not(.is-loaded){opacity:0}
-.pld-sentinel{display:flex;justify-content:center;padding:40px 0}
-.pld-spinner{width:28px;height:28px;border:3px solid rgba(128,128,128,.3);border-top-color:currentColor;border-radius:50%;animation:pldSpin .8s linear infinite}
-@keyframes pldSpin{to{transform:rotate(360deg)}}
-.pld-works[data-done="1"] .pld-sentinel{display:none}
 
 @media(max-width:900px){
 	.pld-grid{grid-template-columns:repeat(2,minmax(0,350px))}
@@ -109,9 +103,29 @@ body.pld-project-page{background:#fff}
 }
 @media(prefers-reduced-motion:reduce){
 	.pld-js [data-pld-anim]{visibility:visible!important;animation:none!important}
-	.pld-js .pld-card{transition:none!important;opacity:1!important;transform:none!important}
+	.pld-js .pld-card,.pld-js .pld-card__img{animation:none!important;opacity:1!important;transform:none!important;clip-path:none!important}
 	.pld-slide{transition:none}
 }
 
 /* Project page: the hero starts 100px lower (below the overlay header) */
 .pld-project .pld-c--hero{margin-top:100px}
+
+/* ---- Project images: entrance animation on scroll (set under Master Works page → Works grid) ---- */
+.pld-js .pld-works:not([data-anim=none]):not([data-anim=reveal]) .pld-card{opacity:0}
+.pld-js .pld-works .pld-card.is-in{opacity:1;animation-duration:1s;animation-fill-mode:both;animation-timing-function:cubic-bezier(.2,.7,.2,1);animation-delay:calc(var(--i,0) * 120ms)}
+.pld-js .pld-works[data-anim=fade-up] .pld-card.is-in{animation-name:pldCardUp}
+.pld-js .pld-works[data-anim=slide-right] .pld-card.is-in{animation-name:pldCardRight}
+.pld-js .pld-works[data-anim=zoom-in] .pld-card.is-in{animation-name:pldCardZoom}
+.pld-js .pld-works[data-anim=reveal] .pld-card__img{clip-path:inset(100% 0 0 0)}
+.pld-js .pld-works[data-anim=reveal] .pld-card.is-in .pld-card__img{animation:pldCardReveal 1.1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 120ms)}
+@keyframes pldCardUp{from{opacity:0;transform:translateY(70px)}to{opacity:1;transform:none}}
+@keyframes pldCardRight{from{opacity:0;transform:translateX(90px)}to{opacity:1;transform:none}}
+@keyframes pldCardZoom{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:none}}
+@keyframes pldCardReveal{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+/* ---- Pagination: Previous (bottom left) / Next (bottom right) ---- */
+.pld-pager-works{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:64px 0 80px}
+.pld-pager-works__info{font-size:13px;opacity:.6}
+.pld-btn{display:inline-block;min-width:150px;box-sizing:border-box;text-align:center;padding:15px 34px;background:var(--pld-text,#6b5a4d);color:#fff!important;font-size:14px;line-height:1;text-decoration:none!important;transition:opacity .2s}
+.pld-btn:hover{opacity:.85}
+.pld-btn.is-off{visibility:hidden}
