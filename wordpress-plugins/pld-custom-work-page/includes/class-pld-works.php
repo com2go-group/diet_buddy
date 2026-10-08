@@ -148,7 +148,7 @@ class PLD_Works {
 		$g       = self::grid();
 		$heading = '<h1 class="pld-works-title">' . esc_html( get_the_title() ) . '</h1>';
 		if ( ! $ids ) {
-			return self::hero_html() . '<div class="pld-works">' . $heading . '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p></div>' . '<div class="pld-bottom-spacer pld-bottom-spacer--works" aria-hidden="true"></div>';
+			return self::hero_html() . '<div class="pld-works">' . $heading . '<p class="pld-empty">' . esc_html__( 'No projects yet.', 'pld-work' ) . '</p></div>';
 		}
 		$per   = self::per_page();
 		$pages = (int) ceil( count( $ids ) / $per );
@@ -162,8 +162,7 @@ class PLD_Works {
 			. $heading
 			. '<div class="pld-grid">' . self::cards( $slice, $g['cols'] ) . '</div>'
 			. self::pager_html( $page, $pages )
-			. '</div></div>'
-			. '<div class="pld-bottom-spacer pld-bottom-spacer--works" aria-hidden="true"></div>';
+			. '</div></div>';
 	}
 
 	public static function register_rest() {

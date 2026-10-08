@@ -89,3 +89,6 @@ Project pages use the same full-width layout and the same Elementor header & foo
 
 ## v2.3.3
 - A 75px full-width spacer in the same brown as the navigation buttons now sits at the bottom of both the project pages (below the navigation bar) and the Works page (below the grid and Next / Previous buttons).
+
+## v2.3.4
+- Works page: the brown spacer is removed; the site footer now has the same brown background (and sits in the page flow instead of overlaying the first screen). Project pages keep their 75px brown band.

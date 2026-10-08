@@ -172,6 +172,8 @@ class PLD_Theme {
 		}
 		if ( self::is_works_page() ) { // the heading is printed by the plugin, below the hero.
 			$css .= '.pld-works-page .entry-header,.pld-works-page .ast-single-entry-banner,.pld-works-page .page-title{display:none}';
+			// Footer with a brown background; in the page flow (the site CSS makes it an overlay on the first screen).
+			$css .= 'body.pld-works-page footer#colophon{position:relative!important;bottom:auto!important;background:var(--pld-text,#6b5a4d)!important}';
 		}
 		echo '<style id="pld-theme-fix">' . $css . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
