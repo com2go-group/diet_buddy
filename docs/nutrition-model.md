@@ -7,7 +7,7 @@ How `src/lib/nutrition` turns a profile into targets. CLAUDE.md §8–9 is the s
 | Rule               | Implementation                                                                 |
 | ------------------ | ------------------------------------------------------------------------------ |
 | BMR                | Mifflin-St Jeor (`energy.ts`)                                                  |
-| TDEE               | BMR × 1.2 / 1.375 / 1.55 / 1.725                                               |
+| TDEE               | BMR × 1.15 / 1.225 / 1.375 / 1.5 (see choice 18)                               |
 | Pace → deficit     | `weeklyKg × 7700 / 7` (0.25 → 275, 0.5 → 550, 0.75 → 825, 1.0 → 1100 kcal/day) |
 | Muscle gain        | +250 kcal/day                                                                  |
 | Protein            | 1.8 g/kg; 2.2 g/kg if goals include Build Muscle                               |
@@ -45,6 +45,7 @@ All three prototype bugs are fixed and have regression tests: the ~7× timeline 
 15. **Edited values**: an edited body fat drives fat and lean mass, and an edited BMR drives TDEE. An edited TDEE, fat mass or lean mass stands on its own. Edited BMR/TDEE are passed to `computePlan` as overrides. The calorie floor still applies, and uses the edited BMR.
 16. **Exercise recommendation** (`exercise.ts`): weekly templates by current training frequency (0–1, 2–3, 4–5, 6+ days). Fat loss adds 10 minutes to cardio. Performance goals turn one cardio session into intervals (≤30 min). Calorie burn = MET × kg × hours (strength 5, cardio 4.3, intervals 8, active rest 2.5), rounded to 10 kcal. It is shown as an estimate only and never added to food targets.
 17. **Forecast** (`forecast.ts`): milestones at −1 kg, halfway and the goal, at the plan's actual weekly rate after safety caps. A milestone that falls in the same week as a later one is dropped. The chart is a weekly projected-weight line that never overshoots the goal.
+18. **Activity multipliers** (owner decision 2026-10-19): 1.15 / 1.225 / 1.375 / 1.5 instead of the classic 1.2 / 1.375 / 1.55 / 1.725, because the classic values gave targets that real users found too high. Active levels are 11–13 % lower. Sedentary is only 4 % lower, because calories never go below BMR: at ×1.1 a sedentary user could run a deficit of only about 10 % of BMR (≈0.1–0.2 kg a week). The level describes the whole day, workouts included.
 
 ## Plan check-in (adaptive target)
 

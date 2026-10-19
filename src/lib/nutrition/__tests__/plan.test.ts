@@ -31,31 +31,31 @@ describe('computePlan: standard weight loss', () => {
 
   it('derives energy from Mifflin-St Jeor and activity', () => {
     expect(plan.bmr).toBe(1880);
-    expect(plan.tdee).toBe(2914); // 1880 × 1.55
+    expect(plan.tdee).toBe(2585); // 1880 × 1.375
   });
 
   it('applies a 550 kcal/day deficit for 0.5 kg/week, rounded to 10 kcal', () => {
     expect(plan.strategy).toBe('lose');
-    expect(plan.dailyCalories).toBe(2360);
-    expect(plan.dailyCalorieDelta).toBe(-554);
-    expect(plan.weeklyChangeKg).toBeCloseTo(-0.5036, 3);
+    expect(plan.dailyCalories).toBe(2040);
+    expect(plan.dailyCalorieDelta).toBe(-545);
+    expect(plan.weeklyChangeKg).toBeCloseTo(-0.4955, 3);
   });
 
   it('builds a timeline from kg to lose / weekly rate', () => {
     expect(plan.timeline).toEqual({
       kgToLose: 10,
-      weeks: 20,
-      goalDate: new Date(2026, 4, 21),
+      weeks: 21,
+      goalDate: new Date(2026, 4, 28),
     });
   });
 
   it('sets macros from grams: 1.8 g/kg protein, 30 % fat, carbs the rest', () => {
     expect(plan.macros).toEqual({
       proteinG: 162,
-      fatG: 79,
-      carbsG: 250,
-      fiberG: 33,
-      pct: { protein: 28, carbs: 42, fat: 30 },
+      fatG: 68,
+      carbsG: 195,
+      fiberG: 29,
+      pct: { protein: 32, carbs: 38, fat: 30 },
     });
   });
 
@@ -82,8 +82,8 @@ describe('computePlan: safety guardrails', () => {
     const plan = computePlan(smallWoman);
     expect(plan.calorieFloor).toBe(1200);
     expect(plan.dailyCalories).toBe(1200);
-    expect(plan.weeklyChangeKg).toBeCloseTo(-0.199, 2);
-    expect(plan.timeline?.weeks).toBe(16);
+    expect(plan.weeklyChangeKg).toBeCloseTo(-0.145, 2); // TDEE 1,360 − floor 1,200
+    expect(plan.timeline?.weeks).toBe(21);
     expect(plan.warnings.map((w) => w.code)).toContain('calorie_floor_applied');
   });
 
@@ -131,13 +131,23 @@ describe('computePlan: safety guardrails', () => {
       pace: 'fast',
     });
     expect(-plan.weeklyChangeKg).toBeLessThanOrEqual(0.6 + 0.01);
-    expect(plan.warnings.map((w) => w.code)).toEqual(['fast_pace', 'weekly_loss_capped']);
+    expect(plan.warnings.map((w) => w.code)).toEqual([
+      'fast_pace',
+      'weekly_loss_capped',
+      'calorie_floor_applied',
+    ]);
   });
 
   it('always cautions on the fast pace', () => {
-    expect(codes({ ...baseLoss, body: { ...baseLoss.body, weightKg: 120 }, pace: 'fast' })).toEqual(
-      ['fast_pace'],
-    );
+    expect(
+      codes({
+        ...baseLoss,
+        body: { ...baseLoss.body, weightKg: 120 },
+        activity: 'very_active',
+        pace: 'fast',
+      }),
+    ).toContain('fast_pace');
+    expect(codes({ ...baseLoss, pace: 'fast' })).toContain('fast_pace');
   });
 
   it('warns when current BMI is underweight', () => {
@@ -182,8 +192,8 @@ describe('computePlan: other goals', () => {
   it('adds a 250 kcal surplus and 2.2 g/kg protein for muscle gain', () => {
     const plan = computePlan({ body, activity: 'active', goals: ['build_muscle'] });
     expect(plan.strategy).toBe('gain');
-    // BMR 1730 × 1.55 = 2681.5 → +250 → 2930
-    expect(plan.dailyCalories).toBe(2930);
+    // BMR 1730 × 1.375 = 2378.75 → +250 → 2630
+    expect(plan.dailyCalories).toBe(2630);
     expect(plan.macros.proteinG).toBe(165);
     expect(plan.weeklyChangeKg).toBe(0);
     expect(plan.timeline).toBeNull();
@@ -192,7 +202,7 @@ describe('computePlan: other goals', () => {
   it('keeps maintenance for recomposition at a normal BMI', () => {
     const plan = computePlan({ body, activity: 'active', goals: ['body_recomposition'] });
     expect(plan.strategy).toBe('maintain');
-    expect(plan.dailyCalories).toBe(2680);
+    expect(plan.dailyCalories).toBe(2380);
   });
 
   it('runs a small deficit for recomposition at BMI ≥ 25', () => {
@@ -221,7 +231,7 @@ describe('overrides from the body-scan screen', () => {
   it('uses an edited BMR for TDEE', () => {
     const plan = computePlan({ ...baseLoss, overrides: { bmr: 2000 } });
     expect(plan.bmr).toBe(2000);
-    expect(plan.tdee).toBe(3100);
+    expect(plan.tdee).toBe(2750);
   });
 
   it('uses an edited TDEE directly', () => {
@@ -281,9 +291,9 @@ describe('dailyWaterMl', () => {
 describe('comparePaces', () => {
   it('orders the timelines from slowest to fastest pace', () => {
     const [sustainable, balanced, fast] = comparePaces(baseLoss);
-    expect(sustainable?.weeks).toBe(41); // 2914 − 275 → 2640 kcal: 274 deficit, 0.249 kg/week
-    expect(balanced?.weeks).toBe(20);
-    expect(fast?.weeks).toBeLessThan(20);
+    expect(sustainable?.weeks).toBe(40); // 2585 − 275 → 2310 kcal: 275 deficit, 0.25 kg/week
+    expect(balanced?.weeks).toBe(21);
+    expect(fast?.weeks).toBeLessThan(21);
     expect(fast?.warnings).toContain('fast_pace');
   });
 });

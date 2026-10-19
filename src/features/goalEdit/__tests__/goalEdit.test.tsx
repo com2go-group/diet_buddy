@@ -73,16 +73,16 @@ describe('goal editing', () => {
     const at = new Date(2026, 9, 19);
     const kcal = (d: Partial<OnboardingDraft>) =>
       previewPlan({ ...man, ...d }, null, fmt, at)?.plan.dailyCalories;
-    expect(kcal({ goals: ['build_muscle'] })).toBe(3600);
-    expect(kcal({ goals: ['build_muscle'], activity: 'active' })).toBe(3260);
-    expect(kcal({ goals: ['body_recomposition'], activity: 'active' })).toBe(3010);
+    expect(kcal({ goals: ['build_muscle'] })).toBe(3160); // 1,940 × 1.5 + 250
+    expect(kcal({ goals: ['build_muscle'], activity: 'active' })).toBe(2920);
+    expect(kcal({ goals: ['body_recomposition'], activity: 'active' })).toBe(2670);
   });
 
   it('recalculates an edited TDEE when the activity level changes', () => {
     const edited = { weight_kg: 88, bmr: 1900, tdee: 3400, user_overridden: true };
     const active = { ...draft, activity: 'active' as const };
     expect(editMetric(edited, active, 'active')).toBe(edited);
-    expect(editMetric(edited, { ...draft, activity: 'sedentary' }, 'active')?.tdee).toBe(2280);
+    expect(editMetric(edited, { ...draft, activity: 'sedentary' }, 'active')?.tdee).toBe(2185);
     expect(editMetric(metric, { ...draft, activity: 'sedentary' }, 'active')).toBe(metric);
   });
 

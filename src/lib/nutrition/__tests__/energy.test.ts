@@ -33,10 +33,10 @@ describe('bmr (Mifflin-St Jeor)', () => {
 
 describe('tdee', () => {
   it.each([
-    ['sedentary', 1.2],
-    ['lightly_active', 1.375],
-    ['active', 1.55],
-    ['very_active', 1.725],
+    ['sedentary', 1.15],
+    ['lightly_active', 1.225],
+    ['active', 1.375],
+    ['very_active', 1.5],
   ] as const)('%s multiplies BMR by %p', (level, multiplier) => {
     expect(tdee(male, level)).toBeCloseTo(1880 * multiplier);
   });

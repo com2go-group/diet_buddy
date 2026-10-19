@@ -22,7 +22,7 @@ describe('scanResults', () => {
     expect(r.values.fatMass).toBeCloseTo(90 * 0.2403, 1);
     expect(r.values.leanMass + r.values.fatMass).toBeCloseTo(90);
     expect(r.values.bmr).toBe(1880);
-    expect(r.values.tdee).toBeCloseTo(2914);
+    expect(r.values.tdee).toBeCloseTo(2585);
     expect(r.values.bmi).toBeCloseTo(27.78, 2);
   });
 
@@ -42,7 +42,7 @@ describe('scanResults', () => {
     expect(r.method).toBe('user');
     expect(r.values.fatMass).toBe(18);
     expect(r.values.leanMass).toBe(72);
-    expect(r.values.tdee).toBeCloseTo(3100);
+    expect(r.values.tdee).toBeCloseTo(2750);
     expect(r.overridden).toMatchObject({ bodyFat: true, bmr: true, tdee: false, fatMass: false });
   });
 

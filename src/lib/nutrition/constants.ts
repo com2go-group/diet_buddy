@@ -5,11 +5,18 @@ export const KCAL_PER_KG_FAT = 7700;
 
 export const KCAL_PER_GRAM = { protein: 4, carbs: 4, fat: 9 } as const;
 
+/**
+ * TDEE = BMR × multiplier. 11–13 % below the classic 1.375 / 1.55 / 1.725, which overestimated
+ * real users' burn (owner decision 2026-10-19; see docs/nutrition-model.md). Sedentary drops only
+ * 4 % (1.2 → 1.15): calories never go below BMR (§9), so a lower multiplier would leave sedentary
+ * users almost no room for a deficit. The level covers the whole day, workouts included; workout
+ * calories are never added on top.
+ */
 export const ACTIVITY_MULTIPLIERS: Record<ActivityLevel, number> = {
-  sedentary: 1.2,
-  lightly_active: 1.375,
-  active: 1.55,
-  very_active: 1.725,
+  sedentary: 1.15,
+  lightly_active: 1.225,
+  active: 1.375,
+  very_active: 1.5,
 };
 
 /**

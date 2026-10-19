@@ -1,4 +1,9 @@
-import type { ActivityLevel, GoalType, Pace } from '@/lib/nutrition';
+import {
+  ACTIVITY_MULTIPLIERS,
+  type ActivityLevel,
+  type GoalType,
+  type Pace,
+} from '@/lib/nutrition';
 import type { Enums } from '@/lib/supabase';
 
 // Option lists from the prototype. IDs are stored in the database; labels are in src/i18n/en.ts
@@ -36,12 +41,9 @@ export const MOTIVATIONS = [
   { id: 'other', emoji: '🎯' },
 ] as const;
 
-export const ACTIVITY_LEVELS: readonly { id: ActivityLevel; multiplier: number }[] = [
-  { id: 'sedentary', multiplier: 1.2 },
-  { id: 'lightly_active', multiplier: 1.375 },
-  { id: 'active', multiplier: 1.55 },
-  { id: 'very_active', multiplier: 1.725 },
-];
+export const ACTIVITY_LEVELS: readonly { id: ActivityLevel; multiplier: number }[] = (
+  ['sedentary', 'lightly_active', 'active', 'very_active'] as const
+).map((id) => ({ id, multiplier: ACTIVITY_MULTIPLIERS[id] }));
 
 export const TRAINING_FREQUENCIES: readonly Enums<'training_frequency'>[] = [
   '0_1',
