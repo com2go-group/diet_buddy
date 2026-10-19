@@ -123,7 +123,7 @@ function Editor({ userId, data }: { userId: string; data: GoalEditData }) {
         {losing ? (
           <>
             <GoalWeightStep draft={draft} update={update} errors={errors} formatWeight={weight} />
-            {draft.goalWeightKg && draft.weightKg && draft.goalWeightKg < draft.weightKg ? (
+            {!goalErrors(draft, weight).goalWeight ? (
               <PaceStep draft={draft} update={update} errors={errors} formatWeight={weight} />
             ) : null}
           </>

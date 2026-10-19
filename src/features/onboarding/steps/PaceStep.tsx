@@ -3,17 +3,34 @@ import { View } from 'react-native';
 import { SelectCard, Text } from '@/components';
 import { t } from '@/i18n';
 import { formatDuration } from '@/lib/format';
-import { comparePaces, computePlan } from '@/lib/nutrition';
+import { comparePaces, computePlan, PlanInputError } from '@/lib/nutrition';
 
 import { previewInputFrom } from '../draft';
 import { PACES } from '../options';
 import { PlanWarnings } from './PlanWarnings';
 import { StepHeader, type StepProps } from './shared';
 
-export function PaceStep({ draft, update, formatWeight }: StepProps) {
+/**
+ * The pace comparison, or nothing while the goal is one the plan refuses (e.g. a goal BMI below
+ * 18.5 while a weight is still being typed on the Goals & activity screen).
+ */
+function previews(draft: StepProps['draft']) {
   const input = previewInputFrom(draft);
-  const scenarios = input ? comparePaces(input) : [];
-  const plan = input ? computePlan({ ...input, pace: draft.pace }) : null;
+  if (!input) return { input: null, scenarios: [], plan: null };
+  try {
+    return {
+      input,
+      scenarios: comparePaces(input),
+      plan: computePlan({ ...input, pace: draft.pace }),
+    };
+  } catch (e) {
+    if (e instanceof PlanInputError) return { input: null, scenarios: [], plan: null };
+    throw e;
+  }
+}
+
+export function PaceStep({ draft, update, formatWeight }: StepProps) {
+  const { input, scenarios, plan } = previews(draft);
   const maxWeeks = Math.max(1, ...scenarios.map((s) => s.weeks ?? 0));
   const kgToLose = draft.weightKg && draft.goalWeightKg ? draft.weightKg - draft.goalWeightKg : 0;
 

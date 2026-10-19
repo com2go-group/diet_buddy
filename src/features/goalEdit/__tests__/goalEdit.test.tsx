@@ -112,3 +112,19 @@ describe('goal editing', () => {
     ]);
   });
 });
+
+describe('goal editing screen while typing', () => {
+  it('doesn’t crash on a partly typed goal weight (goal BMI below 18.5)', async () => {
+    (loadGoalEdit as jest.Mock).mockResolvedValue({
+      state: { draft, step: 'aiPlan', goalId: 'g1' },
+      metric,
+      currentKcal: 1800,
+    });
+    await renderScreen(<GoalEditScreen />, 'u1');
+    const field = await screen.findByLabelText(/Goal weight/);
+    await fireEvent.changeText(field, '6');
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeOnTheScreen();
+    await fireEvent.changeText(field, '68');
+    expect(screen.getByText(/Daily target:/)).toBeOnTheScreen();
+  });
+});
