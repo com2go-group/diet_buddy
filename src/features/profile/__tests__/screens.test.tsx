@@ -60,7 +60,13 @@ const overview: ProfileOverview = {
     exercise_recommendation: null,
     forecast: { weekly_change_kg: -0.5 },
   },
-  goal: { startKg: 82, goalKg: 70, goalDate: '2027-03-01', losing: true },
+  goal: {
+    startKg: 82,
+    goalKg: 70,
+    goalDate: '2027-03-01',
+    losing: true,
+    types: ['lose_fat'],
+  },
   latest: { weightKg: 80, bmr: 1500, tdee: 2300 },
   stats: { loggedDays: 12, mealsLogged: 40, goalProgress: 17 },
   checkedInToday: false,
@@ -89,7 +95,7 @@ describe('ProfileScreen', () => {
     await renderScreen(<ProfileScreen />);
     expect(await screen.findByText('Olivia')).toBeOnTheScreen();
     expect(screen.getByLabelText('Goal Progress: 17%')).toBeOnTheScreen();
-    expect(screen.getByLabelText('Weight Goal, 70 kg by 1 March 2027')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Goals & activity, 70 kg by 1 March 2027')).toBeOnTheScreen();
     expect(screen.getByLabelText('Daily Calorie Target, 1,800 kcal')).toBeOnTheScreen();
     expect(screen.getByLabelText('Hydration Goal, 2.5 L per day')).toBeOnTheScreen();
     expect(screen.getByText('Free plan')).toBeOnTheScreen();

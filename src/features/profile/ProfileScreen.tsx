@@ -178,7 +178,9 @@ export function ProfileScreen() {
                     weight: formatWeight(data.goal.goalKg, profile.units, 0),
                     date: formatLongDate(goalDate),
                   })
-                : t('profile.weightGoalNone')
+                : data.goal?.types.length
+                  ? data.goal.types.map((g) => t(`onboardingOptions.${g}`)).join(', ')
+                  : t('profile.weightGoalNone')
             }
             onPress={() => router.push('/edit-goal')}
           />

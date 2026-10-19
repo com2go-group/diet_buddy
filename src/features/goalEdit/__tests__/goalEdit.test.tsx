@@ -3,13 +3,14 @@ import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import { renderScreen } from '@/test/render';
 
 import { EMPTY_DRAFT, type OnboardingDraft } from '../../onboarding/draft';
-import { loadInitialPlan } from '../../plan/api';
-import { saveGoalEdit } from '../api';
-import { editDraft, previewPlan, withLosing } from '../goalEdit';
+import { loadGoalEdit, saveGoalEdit } from '../api';
+import { editDraft, editMetric, goalErrors, previewPlan, withLosing } from '../goalEdit';
 import { GoalEditScreen } from '../GoalEditScreen';
 
-jest.mock('../../plan/api', () => ({ loadInitialPlan: jest.fn() }));
-jest.mock('../api', () => ({ saveGoalEdit: jest.fn(async () => undefined) }));
+jest.mock('../api', () => ({
+  loadGoalEdit: jest.fn(),
+  saveGoalEdit: jest.fn(async () => undefined),
+}));
 jest.mock('expo-router', () => ({
   router: { back: jest.fn(), replace: jest.fn(), canGoBack: () => true },
 }));
@@ -53,18 +54,61 @@ describe('goal editing', () => {
     expect(previewPlan({ ...current, goalWeightKg: 45 }, metric, fmt)).toBeNull();
   });
 
-  it('saves a new goal and plan from the screen', async () => {
-    (loadInitialPlan as jest.Mock).mockResolvedValue({
+  it('needs at least one goal', () => {
+    expect(goalErrors({ ...draft, goals: [] }, fmt).goals).toBeDefined();
+    expect(previewPlan({ ...draft, goals: [] }, metric, fmt)).toBeNull();
+  });
+
+  it('plans maintenance for recomposition at BMI < 25 and a surplus for Build Muscle', () => {
+    // Male, 24, 188 cm, 88 kg (BMR 1,940): the case that prompted this screen.
+    const man: OnboardingDraft = {
+      ...draft,
+      sex: 'male',
+      birthDate: { day: '5', month: '2', year: '2002' },
+      heightCm: 188,
+      weightKg: 88,
+      goalWeightKg: null,
+      activity: 'very_active',
+    };
+    const at = new Date(2026, 9, 19);
+    const kcal = (d: Partial<OnboardingDraft>) =>
+      previewPlan({ ...man, ...d }, null, fmt, at)?.plan.dailyCalories;
+    expect(kcal({ goals: ['build_muscle'] })).toBe(3600);
+    expect(kcal({ goals: ['build_muscle'], activity: 'active' })).toBe(3260);
+    expect(kcal({ goals: ['body_recomposition'], activity: 'active' })).toBe(3010);
+  });
+
+  it('recalculates an edited TDEE when the activity level changes', () => {
+    const edited = { weight_kg: 88, bmr: 1900, tdee: 3400, user_overridden: true };
+    const active = { ...draft, activity: 'active' as const };
+    expect(editMetric(edited, active, 'active')).toBe(edited);
+    expect(editMetric(edited, { ...draft, activity: 'sedentary' }, 'active')?.tdee).toBe(2280);
+    expect(editMetric(metric, { ...draft, activity: 'sedentary' }, 'active')).toBe(metric);
+  });
+
+  it('saves goals, activity and a new plan from the screen', async () => {
+    (loadGoalEdit as jest.Mock).mockResolvedValue({
       state: { draft, step: 'aiPlan', goalId: 'g1' },
       metric,
+      currentKcal: 1800,
     });
     await renderScreen(<GoalEditScreen />, 'u1');
     expect(await screen.findByText('Your latest weight: 78 kg')).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole('radio', { name: /Sustainable/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: /Lightly Active/ }));
+    await fireEvent.press(screen.getByRole('radio', { name: /4–5/ }));
     expect(screen.getByText(/Daily target:/)).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole('button', { name: 'Save goal' }));
+    expect(screen.getByText('Now: 1,800 kcal')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(saveGoalEdit).toHaveBeenCalled());
     const [userId, goalId, saved] = (saveGoalEdit as jest.Mock).mock.calls[0];
-    expect([userId, goalId, saved.pace, saved.weightKg]).toEqual(['u1', 'g1', 'sustainable', 78]);
+    expect([userId, goalId, saved.pace, saved.weightKg, saved.activity, saved.training]).toEqual([
+      'u1',
+      'g1',
+      'sustainable',
+      78,
+      'lightly_active',
+      '4_5',
+    ]);
   });
 });

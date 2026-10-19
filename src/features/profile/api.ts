@@ -14,6 +14,7 @@ export interface ProfileOverview {
     goalKg: number | null;
     goalDate: string | null;
     losing: boolean;
+    types: Enums<'goal_type'>[];
   } | null;
   latest: { weightKg: number | null; bmr: number | null; tdee: number | null };
   stats: { loggedDays: number; mealsLogged: number; goalProgress: number | null };
@@ -72,7 +73,9 @@ export async function loadOverview(userId: string, now: Date): Promise<ProfileOv
   return {
     profile: required(profile),
     plan: (optional(plans)?.[0] as CurrentPlan | undefined) ?? null,
-    goal: g ? { startKg: start, goalKg: target, goalDate: g.goal_date, losing } : null,
+    goal: g
+      ? { startKg: start, goalKg: target, goalDate: g.goal_date, losing, types: g.goal_types }
+      : null,
     latest: { weightKg, bmr: e?.bmr ?? null, tdee: e?.tdee ?? null },
     stats: {
       loggedDays: new Set(logs.map((l) => dayKey(new Date(l.logged_at)))).size,
