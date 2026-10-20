@@ -312,16 +312,23 @@ async function attempt<T>(
   return { response: fail('generation_failed', 502) };
 }
 
+/** Meals that already passed every check on an earlier attempt, kept for the retry. */
+export type KeptMeals = Partial<Record<Slot, { meal: AiMeal; resolved: Resolved }>>;
+
 /**
  * A model reply → the day's dishes with USDA numbers, portions scaled to each meal's share, or
  * the problems to feed back (format, missing foods, anything breaking the user's diet rules).
- * Shared by the on-demand path and the overnight batch (batch-meal-plans).
+ * With `kept`, a meal that passes is remembered, and a meal that fails is replaced by one that
+ * passed on an earlier attempt, so one bad food doesn't throw away the whole day. Every meal in
+ * the result has passed the checks. Shared by the on-demand path and the overnight batch
+ * (batch-meal-plans, which makes one attempt and passes no `kept`).
  */
 export async function planFromReply(
   text: string,
   ctx: MealPlanContext,
   input: MealPlanPromptInput,
   lookup: Lookup,
+  kept?: KeptMeals,
 ): Promise<
   | { value: { slots: Record<Slot, PlannedItem[]>; dishes: Record<Slot, Dish> } }
   | { problems: string[] }
@@ -330,6 +337,7 @@ export async function planFromReply(
   if (!ai.success) return { problems: ['the JSON did not match the required format'] };
   const problems: string[] = [];
   const resolved = {} as Record<Slot, Resolved>;
+  const meals = { ...ai.data.meals };
   for (const s of SLOTS) {
     // Lunch is yesterday's dinner (checked when it was planned); the reply has a placeholder.
     if (s === 'lunch' && input.leftoverLunch) {
@@ -337,14 +345,21 @@ export async function planFromReply(
       continue;
     }
     const meal = await resolveMeal(s, ai.data.meals[s], lookup, ctx.prefs);
-    resolved[s] = meal.resolved;
-    problems.push(...meal.problems);
+    if (!meal.problems.length) {
+      resolved[s] = meal.resolved;
+      if (kept) kept[s] = { meal: ai.data.meals[s], resolved: meal.resolved };
+    } else if (kept?.[s]) {
+      resolved[s] = kept[s].resolved;
+      meals[s] = kept[s].meal;
+    } else {
+      problems.push(...meal.problems);
+    }
   }
   if (problems.length) return { problems };
   const slots = Object.fromEntries(
     SLOTS.map((s) => [s, scaleSlot(resolved[s], input.slotCalories[s])]),
   ) as Record<Slot, PlannedItem[]>;
-  const dishes = Object.fromEntries(SLOTS.map((s) => [s, dishFrom(ai.data.meals[s])])) as Record<
+  const dishes = Object.fromEntries(SLOTS.map((s) => [s, dishFrom(meals[s])])) as Record<
     Slot,
     Dish
   >;
@@ -530,6 +545,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       leftover ? { leftoverLunch: leftover.dish.sourceTitle ?? leftover.dish.title } : {},
     );
     const lookup = makeLookup(deps);
+    const kept: KeptMeals = {};
     const result = await attempt<{
       slots: Record<Slot, PlannedItem[]>;
       dishes: Record<Slot, Dish>;
@@ -539,7 +555,7 @@ export async function handleGenerateMealPlan(req: Request, deps: MealPlanDeps): 
       mealPlanSystemPrompt(input),
       `Plan meals for ${date}.`,
       lookup,
-      (text) => planFromReply(text, ctx, input, lookup),
+      (text) => planFromReply(text, ctx, input, lookup, kept),
       ctx.premium ? MAX_TOKENS.premium : MAX_TOKENS.free,
     );
     if ('response' in result) return result.response;

@@ -1,4 +1,4 @@
-import { FunctionsHttpError } from '@supabase/supabase-js';
+import { FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 
 import { aiHeaders, boostFrom, type AiBoost } from '@/lib/ai/headers';
 import { optional, supabase } from '@/lib/supabase';
@@ -135,8 +135,11 @@ async function callMealPlan(body: Record<string, unknown>): Promise<MealPlan> {
   if (error) {
     let code: MealPlanErrorCode = 'failed';
     let boost: AiBoost | null = null;
-    if (error instanceof FunctionsHttpError) {
-      const body = (await error.context.json().catch(() => null)) as { error?: string } | null;
+    // The relay can pass the function's own error body on too; read it in both cases.
+    if (error instanceof FunctionsHttpError || error instanceof FunctionsRelayError) {
+      const body = (await (error.context as Response).json().catch(() => null)) as {
+        error?: string;
+      } | null;
       const known: MealPlanErrorCode[] = [
         'not_configured',
         'generation_failed',

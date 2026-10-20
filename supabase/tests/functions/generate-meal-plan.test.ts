@@ -257,6 +257,24 @@ describe('generate-meal-plan', () => {
     expect(plan.slots.snack[0].name).toBe('Apple');
   });
 
+  it('keeps meals that passed on an earlier attempt instead of redoing the whole day', async () => {
+    // Attempt 1: the snack has peanuts. Attempt 2: the snack is fixed, but breakfast now has
+    // peanuts. Breakfast from attempt 1 and the snack from attempt 2 both passed, so the day is
+    // made from those without a third attempt, and nothing with peanuts gets through.
+    const second = JSON.parse(planJson(item('Apple', 'apple', 150)));
+    second.meals.breakfast = meal('Peanut toast', item('Peanut butter', 'peanut butter', 30));
+    const { deps, requests, saved } = setup({
+      prefs: { allergies: ['peanuts'] },
+      replies: [planJson(item('Peanut butter', 'peanut butter', 30)), JSON.stringify(second)],
+    });
+    const { plan } = await (await handleGenerateMealPlan(post(), deps)).json();
+    expect(requests).toHaveLength(2);
+    expect(plan.dishes.breakfast.title).toBe('Oats with blueberries');
+    expect(plan.slots.snack.map((i: { name: string }) => i.name)).toEqual(['Apple']);
+    expect(JSON.stringify(plan).toLowerCase()).not.toContain('peanut');
+    expect(saved).toHaveLength(1);
+  });
+
   it('fails safely after three invalid attempts and saves nothing', async () => {
     const bad = planJson(item('Peanut butter', 'peanut butter', 30));
     const { deps, saved, llm } = setup({
