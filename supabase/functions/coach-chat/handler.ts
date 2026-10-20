@@ -181,8 +181,11 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
       );
       const candidate = replySchema.safeParse(extractJson(result.text));
       if (candidate.success) reply = candidate.data;
-    } catch {
-      // Network or provider error: retry once, then fail gracefully below.
+      else console.warn(`coach-chat: reply was not valid JSON (${result.outputTokens} tokens)`);
+    } catch (e) {
+      // Network or provider error: retry once, then fail gracefully below. The error carries
+      // Anthropic's status and message, never the user's words.
+      console.error('coach-chat: the AI provider failed', e);
     }
   }
   if (!reply) return fail('ai_failed', 502);

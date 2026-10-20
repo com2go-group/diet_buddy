@@ -13,6 +13,9 @@ export interface BatchRequest {
   params: {
     model: string;
     max_tokens: number;
+    /** Thinking or effort settings from `noThinking` (llm.ts). */
+    thinking?: unknown;
+    output_config?: unknown;
     system: string;
     messages: { role: 'user' | 'assistant'; content: string }[];
   };

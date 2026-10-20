@@ -82,6 +82,21 @@ export function workspaceFromEnv(): string | undefined {
   return deno?.env.get('ANTHROPIC_WORKSPACE_ID') || undefined;
 }
 
+/**
+ * Request fields that keep a model from spending its `max_tokens` on thinking. Every call here
+ * asks for a short JSON reply under a tight cap, and models that think by default (Claude
+ * Sonnet 5, Opus 5 and newer) could use the whole cap before writing the answer, leaving an
+ * empty reply. Each model family accepts a different setting:
+ * - Claude Sonnet 5.5 rejects `disabled`; `between_tools` is its thinking-off mode.
+ * - Claude Opus 5.5, Fable and Mythos can't turn thinking off; low effort keeps it short.
+ * - Every other model (Sonnet 5, Opus 5, the 4.x family, Haiku) accepts `disabled`.
+ */
+export function noThinking(model: string): Record<string, unknown> {
+  if (model.startsWith('claude-sonnet-5-5')) return { thinking: { type: 'between_tools' } };
+  if (/^claude-(opus-5-5|fable|mythos)/.test(model)) return { output_config: { effort: 'low' } };
+  return { thinking: { type: 'disabled' } };
+}
+
 /** Anthropic Messages API. */
 export function anthropicProvider(
   apiKey: string,
@@ -104,6 +119,7 @@ export function anthropicProvider(
           system,
           messages: messages.map((m) => ({ role: m.role, content: toAnthropicContent(m.content) })),
           max_tokens: maxTokens,
+          ...noThinking(model),
           ...(cache ? { cache_control: { type: 'ephemeral' } } : {}),
         }),
       }).catch((e: unknown) => {

@@ -2,7 +2,7 @@ import { mealPlanSystemPrompt } from '../_prompts/mealPlan.v4.ts';
 import type { BatchClient, BatchRequest, BatchResult } from '../_shared/anthropicBatch.ts';
 import { fail, json } from '../_shared/http.ts';
 import { languageField } from '../_shared/language.ts';
-import type { LlmProvider } from '../_shared/llm.ts';
+import { noThinking, type LlmProvider } from '../_shared/llm.ts';
 import type { FoodResult } from '../_shared/usda.ts';
 import {
   assemblePlan,
@@ -264,6 +264,7 @@ async function submit(
       params: {
         model: deps.model,
         max_tokens: MAX_TOKENS.free,
+        ...noThinking(deps.model),
         system: mealPlanSystemPrompt(input),
         messages: [{ role: 'user', content: `Plan meals for ${date}.` }],
       },
