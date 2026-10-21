@@ -20,6 +20,13 @@ import {
 import { buildCoachContext, type CoachContextData } from './context.ts';
 import { combineFlags, screenMessage, withSupportNote, type SafetyFlag } from './safety.ts';
 
+/** A reply the model wrote as plain text (no JSON object), trimmed; null when there is none. */
+export function plainReply(text: string): string | null {
+  const t = text.trim();
+  if (!t || t.startsWith('{') || t.startsWith('```') || t.length > 4000) return null;
+  return t;
+}
+
 export const requestSchema = z.object({
   persona: z.enum(['aria', 'max', 'luna']),
   message: z.string().trim().min(1).max(2000),
@@ -164,7 +171,16 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
   );
   const system = coachSystemPrompt(persona, context) + replyLanguageLine(language);
   const history = conversation ? await store.history(conversation, HISTORY_MESSAGES) : [];
-  const messages: LlmMessage[] = [...history, { role: 'user', content: message }];
+  // Earlier replies are stored as plain text; show them in the reply format so the model keeps
+  // answering in JSON instead of copying the plain style (deterministic, so caching still works).
+  const messages: LlmMessage[] = [
+    ...history.map((m) =>
+      m.role === 'assistant' && typeof m.content === 'string'
+        ? { role: m.role, content: JSON.stringify({ reply: m.content, safety: 'none' }) }
+        : m,
+    ),
+    { role: 'user', content: message },
+  ];
 
   // Structured output, validated; one retry on invalid output (CLAUDE.md §11).
   let reply: z.infer<typeof replySchema> | null = null;
@@ -181,7 +197,16 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
       );
       const candidate = replySchema.safeParse(extractJson(result.text));
       if (candidate.success) reply = candidate.data;
-      else console.warn(`coach-chat: reply was not valid JSON (${result.outputTokens} tokens)`);
+      else {
+        // A plain-text answer is still an answer: use it rather than show an error. The model's
+        // own safety flag is missing then, so the code screen of the user's message (below)
+        // decides on the professional-help note on its own.
+        const plain = plainReply(result.text);
+        if (plain) reply = { reply: plain, safety: 'none' };
+        console.warn(
+          `coach-chat: reply was not valid JSON (${result.outputTokens} tokens)${plain ? '; used the plain text' : ''}`,
+        );
+      }
     } catch (e) {
       // Network or provider error: retry once, then fail gracefully below. The error carries
       // Anthropic's status and message, never the user's words.

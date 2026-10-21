@@ -146,9 +146,24 @@ describe('coach-chat handler', () => {
     );
     expect(requests[1]!.messages).toEqual([
       { role: 'user', content: 'Hi' },
-      { role: 'assistant', content: 'First.' },
+      // Earlier replies are shown in the reply format, so the model keeps answering in JSON.
+      { role: 'assistant', content: ok('First.') },
       { role: 'user', content: 'And legs?' },
     ]);
+  });
+
+  it('uses a plain-text answer instead of failing, with the code safety screen still applied', async () => {
+    const mem = memoryStore();
+    const { llm } = fakeLlm('Great question! Keep your protein up and drink water.');
+    const res = await handleCoachChat(
+      post({ persona: 'aria', message: 'How am I doing?' }),
+      deps(mem.store, llm),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).messages[1].content).toBe(
+      'Great question! Keep your protein up and drink water.',
+    );
+    expect(llm.complete).toHaveBeenCalledTimes(1);
   });
 
   it('enforces the free daily limit on the server and offers a rewarded video', async () => {
@@ -253,14 +268,14 @@ describe('coach-chat handler', () => {
 
   it('retries once on invalid output, then fails gracefully', async () => {
     const mem = memoryStore();
-    const retry = fakeLlm('not json', ok('Recovered.'));
+    const retry = fakeLlm('{"reply": "cut off', ok('Recovered.'));
     const res = await handleCoachChat(
       post({ persona: 'aria', message: 'Hi' }),
       deps(mem.store, retry.llm),
     );
     expect((await res.json()).messages[1].content).toBe('Recovered.');
 
-    const broken = fakeLlm('nope', 'THROW');
+    const broken = fakeLlm('{"broken', 'THROW');
     const failed = await handleCoachChat(
       post({ persona: 'aria', message: 'Hi' }),
       deps(memoryStore().store, broken.llm),

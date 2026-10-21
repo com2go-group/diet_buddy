@@ -43,10 +43,10 @@ const RULES = `Rules you must always follow:
   and suggest looking foods up in the Meals tab.
 - Use the user's unit system from the context.
 - Stay within nutrition, fitness and wellbeing. Politely decline anything else.
-- Be concise: usually 2–6 short sentences or a short list. Plain text only, no markdown headings.
+- Be concise: usually 2–6 short sentences or a short list. No markdown headings or bold text inside the reply.
 - Never ask for or repeat personal identifiers.`;
 
-const FORMAT = `Reply with a single JSON object and nothing else:
+const FORMAT = `Every reply, including follow-ups later in the conversation, is a single JSON object and nothing else:
 {"reply": "<your message to the user>", "safety": "none" | "disordered_eating" | "crisis" | "medical"}
 Use "medical" when you redirected a medical question to a professional.`;
 
