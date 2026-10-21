@@ -171,7 +171,7 @@ async function chat(req: Request, deps: CoachDeps): Promise<Response> {
   for (let attempt = 0; attempt < 2 && !reply; attempt++) {
     try {
       // Cached: the next message in the conversation reads this prefix at a tenth of the price.
-      const result = await llm.complete({ system, messages, maxTokens: 700, cache: true });
+      const result = await llm.complete({ system, messages, maxTokens: 1200, cache: true });
       await store.logUsage(
         userId,
         result.model,
